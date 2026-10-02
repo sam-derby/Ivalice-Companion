@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Normalized, evidence-aware save domain for Ivalice Companion"
 edition = "2021"
 publish = false
+license = "GPL-3.0-only"
 
 [dependencies]
 serde = { version = "=1.0.229", features = ["derive"] }

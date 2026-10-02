@@ -5,8 +5,6 @@ coverage/
 src-tauri/gen/
 .local/
 public/reader-art/
-tools/upstream-dump/bin/
-tools/upstream-dump/obj/
 .env
 .env.*
 !.env.example

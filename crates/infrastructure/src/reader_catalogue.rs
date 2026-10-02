@@ -324,16 +324,14 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "requires ignored enriched reader catalogue"]
     fn older_matching_profile_uses_bundled_mechanics_without_changing_profile(
     ) -> Result<(), Box<dyn Error>> {
         let workspace = Path::new(env!("CARGO_MANIFEST_DIR"))
             .parent()
             .and_then(Path::parent)
             .ok_or("workspace unavailable")?;
-        let bundled = fs::read(
-            workspace.join(".local/reader-catalogue/reader-catalogue-with-commands.json"),
-        )?;
+        let bundled =
+            fs::read(workspace.join("src-tauri/installer-resources/reader-catalogue-v1.json"))?;
         let mut older: serde_json::Value = serde_json::from_slice(&bundled)?;
         older
             .as_object_mut()
@@ -387,11 +385,8 @@ mod tests {
             .parent()
             .and_then(Path::parent)
             .ok_or("workspace unavailable")?;
-        let Ok(bundled) = fs::read(
-            workspace.join(".local/reader-catalogue/reader-catalogue-with-growth-v3.json"),
-        ) else {
-            return Ok(());
-        };
+        let bundled =
+            fs::read(workspace.join("src-tauri/installer-resources/reader-catalogue-v1.json"))?;
         let mut older: ReaderCatalogueDocument = serde_json::from_slice(&bundled)?;
         for job in &mut older.mechanics.as_mut().ok_or("mechanics missing")?.jobs {
             job.growth = None;
@@ -622,18 +617,17 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "run only under D032's registered local source-artifact reproduction"]
-    fn registered_offline_artifact_loads_without_changing_source() -> Result<(), Box<dyn Error>> {
+    fn bundled_catalogue_loads_without_changing_source() -> Result<(), Box<dyn Error>> {
         let repository = Path::new(env!("CARGO_MANIFEST_DIR"))
             .parent()
             .and_then(Path::parent)
             .ok_or("missing repository ancestor")?;
-        let source = repository.join(".local/d032-catalogue/run-1.json");
+        let source = repository.join("src-tauri/installer-resources/reader-catalogue-v1.json");
         let cancel = CancellationToken::default();
         let source_reader = SnapshotReader::new();
         let before =
             source_reader.acquire_limited(&source, &cancel, MAX_READER_CATALOGUE_BYTES as u64)?;
-        assert_eq!(before.len(), 413_817);
+        assert_eq!(before.len(), 531_201);
         let digest: String = before
             .sha256()
             .iter()
@@ -641,7 +635,7 @@ mod tests {
             .collect();
         assert_eq!(
             digest,
-            "d9733e2573dc228cbbb8228cdeb90d2dee52a0a22383cd70a528408ffb31ea8c"
+            "8177a64d751ea3dc9c61ce5f59bf7bb954484fcabb070111faa5db755ae755a9"
         );
         let root = temporary_root()?;
         fs::write(target(&root), before.bytes())?;

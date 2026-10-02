@@ -1,0 +1,507 @@
+{
+  "schema": "reader_v2",
+  "identity": {
+    "session": "synthetic-session",
+    "snapshot_generation": 1,
+    "resource_generation": 1,
+    "resource_token": {
+      "state": "unknown"
+    },
+    "manual_slot": 0
+  },
+  "roster": {
+    "value": {
+      "state": "known",
+      "value": [
+        {
+          "key": 1,
+          "persistent_identity": {
+            "value": {
+              "state": "unknown"
+            }
+          },
+          "name": {
+            "value": {
+              "state": "known",
+              "value": {
+                "text": "Synthetic Unit",
+                "origin": "saved_rename"
+              }
+            }
+          },
+          "kind": {
+            "value": {
+              "state": "known",
+              "value": "regular_human"
+            }
+          },
+          "membership": {
+            "value": {
+              "state": "known",
+              "value": "party"
+            }
+          },
+          "sprite": {
+            "value": {
+              "state": "unknown"
+            }
+          },
+          "portrait": {
+            "value": {
+              "state": "unknown"
+            }
+          },
+          "current_job": {
+            "value": {
+              "state": "unknown"
+            }
+          },
+          "jobs": {
+            "value": {
+              "state": "unknown"
+            }
+          },
+          "learned_abilities": {
+            "value": {
+              "state": "unknown"
+            }
+          },
+          "saved_ability_flags": {
+            "value": {
+              "state": "unknown"
+            }
+          },
+          "combat_sets": {
+            "value": {
+              "state": "unknown"
+            }
+          },
+          "selected_combat_set": {
+            "value": {
+              "state": "unknown"
+            }
+          },
+          "stored": {
+            "level": {
+              "value": {
+                "state": "unknown"
+              }
+            },
+            "experience": {
+              "value": {
+                "state": "known",
+                "value": 0
+              }
+            },
+            "brave": {
+              "value": {
+                "state": "unknown"
+              }
+            },
+            "faith": {
+              "value": {
+                "state": "unknown"
+              }
+            },
+            "sex": {
+              "value": {
+                "state": "unknown"
+              }
+            },
+            "birthday": {
+              "value": {
+                "state": "unknown"
+              }
+            },
+            "zodiac": {
+              "value": {
+                "state": "unknown"
+              }
+            },
+            "statuses": {
+              "value": {
+                "state": "unknown"
+              }
+            },
+            "bases": {
+              "hp": {
+                "value": {
+                  "state": "unknown"
+                }
+              },
+              "mp": {
+                "value": {
+                  "state": "unknown"
+                }
+              },
+              "speed": {
+                "value": {
+                  "state": "unknown"
+                }
+              },
+              "physical_attack": {
+                "value": {
+                  "state": "unknown"
+                }
+              },
+              "magical_attack": {
+                "value": {
+                  "state": "unknown"
+                }
+              }
+            }
+          },
+          "effective": {
+            "hp": {
+              "value": {
+                "state": "unknown"
+              }
+            },
+            "mp": {
+              "value": {
+                "state": "unknown"
+              }
+            },
+            "speed": {
+              "value": {
+                "state": "unknown"
+              }
+            },
+            "physical_attack": {
+              "value": {
+                "state": "unknown"
+              }
+            },
+            "magical_attack": {
+              "value": {
+                "state": "unknown"
+              }
+            },
+            "movement_tiles": {
+              "value": {
+                "state": "unknown"
+              }
+            },
+            "jump_tiles": {
+              "value": {
+                "state": "unknown"
+              }
+            },
+            "evasion": {
+              "value": {
+                "state": "unknown"
+              }
+            }
+          },
+          "growth": {
+            "value": { "state": "unknown" }
+          },
+          "abilities": {
+            "primary_command": {
+              "value": {
+                "state": "unknown"
+              }
+            },
+            "secondary_command": {
+              "value": {
+                "state": "unknown"
+              }
+            },
+            "reaction": {
+              "value": {
+                "state": "unknown"
+              }
+            },
+            "support": {
+              "value": {
+                "state": "unknown"
+              }
+            },
+            "movement": {
+              "value": {
+                "state": "unknown"
+              }
+            }
+          },
+          "equipment": {
+            "head": {
+              "value": {
+                "state": "absent"
+              }
+            },
+            "body": {
+              "value": {
+                "state": "unknown"
+              }
+            },
+            "accessory": {
+              "value": {
+                "state": "unknown"
+              }
+            },
+            "right_weapon": {
+              "value": {
+                "state": "unknown"
+              }
+            },
+            "right_shield": {
+              "value": {
+                "state": "unknown"
+              }
+            },
+            "left_weapon": {
+              "value": {
+                "state": "unknown"
+              }
+            },
+            "left_shield": {
+              "value": {
+                "state": "unknown"
+              }
+            }
+          },
+          "guidance": {
+            "target_job": {
+              "value": {
+                "state": "unknown"
+              }
+            },
+            "samurai_prerequisites": {
+              "value": {
+                "state": "unknown"
+              }
+            },
+            "steel_cost": {
+              "value": {
+                "state": "unknown"
+              }
+            },
+            "job_eligible": {
+              "value": {
+                "state": "unknown"
+              }
+            },
+            "ability_purchasable": {
+              "value": {
+                "state": "unknown"
+              }
+            }
+          },
+          "saved": {
+            "character": 1,
+            "unit_index": 1,
+            "job": 0,
+            "union": 0,
+            "sex": 0,
+            "birthday": 0,
+            "zodiac_sign": 0,
+            "secondary_action": 0,
+            "reaction_ability": 0,
+            "support_ability": 0,
+            "movement_ability": 0,
+            "equip_items": [255, 255, 255, 255, 255, 255, 255],
+            "exp": 0,
+            "level": 1,
+            "start_bcp": 0,
+            "start_faith": 0,
+            "hp_max_base": 0,
+            "mp_max_base": 0,
+            "wt_base": 0,
+            "at_base": 0,
+            "mat_base": 0,
+            "unlocked_jobs": 0,
+            "ability_flags": [
+              [0, 0, 0],
+              [0, 0, 0],
+              [0, 0, 0],
+              [0, 0, 0],
+              [0, 0, 0],
+              [0, 0, 0],
+              [0, 0, 0],
+              [0, 0, 0],
+              [0, 0, 0],
+              [0, 0, 0],
+              [0, 0, 0],
+              [0, 0, 0],
+              [0, 0, 0],
+              [0, 0, 0],
+              [0, 0, 0],
+              [0, 0, 0],
+              [0, 0, 0],
+              [0, 0, 0],
+              [0, 0, 0],
+              [0, 0, 0],
+              [0, 0, 0],
+              [0, 0, 0]
+            ],
+            "job_levels_raw": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "job_levels": [
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0
+            ],
+            "job_points": [
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0
+            ],
+            "total_job_points": [
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0
+            ],
+            "nickname_raw": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "custom_job_name_raw": [
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ],
+            "unit_name_trailing": [
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ],
+            "name_no": 0,
+            "in_trip": 0,
+            "parasite": 0,
+            "egg_color": 0,
+            "psp_killed_num": 0,
+            "unit_order_id": 0,
+            "unit_starting_team": 0,
+            "unit_join_id": 0,
+            "current_combat_set": 0,
+            "combat_sets": [
+              {
+                "name_raw": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                "name_padding": [
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0
+                ],
+                "equipment": [255, 255, 255, 255, 255],
+                "skillsets": [0, 0],
+                "abilities": [0, 0, 0],
+                "job": 0,
+                "is_double_hand": false
+              },
+              {
+                "name_raw": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                "name_padding": [
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0
+                ],
+                "equipment": [255, 255, 255, 255, 255],
+                "skillsets": [0, 0],
+                "abilities": [0, 0, 0],
+                "job": 0,
+                "is_double_hand": false
+              },
+              {
+                "name_raw": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                "name_padding": [
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0
+                ],
+                "equipment": [255, 255, 255, 255, 255],
+                "skillsets": [0, 0],
+                "abilities": [0, 0, 0],
+                "job": 0,
+                "is_double_hand": false
+              }
+            ],
+            "pad": 0,
+            "chara_name_key": 0,
+            "pad2": [
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "inventory": {
+    "value": {
+      "state": "unknown"
+    }
+  },
+  "gil": {
+    "value": {
+      "state": "unknown"
+    }
+  },
+  "progress": {
+    "title": {
+      "value": {
+        "state": "unknown"
+      }
+    },
+    "saved_at_unix_seconds": {
+      "value": {
+        "state": "unknown"
+      }
+    },
+    "hero_name": {
+      "value": {
+        "state": "unknown"
+      }
+    },
+    "location": {
+      "value": {
+        "state": "unknown"
+      }
+    },
+    "difficulty": {
+      "value": {
+        "state": "unknown"
+      }
+    },
+    "difficulty_code": {
+      "value": {
+        "state": "unknown"
+      }
+    },
+    "chapter": {
+      "value": {
+        "state": "unknown"
+      }
+    },
+    "ramza_level": {
+      "value": {
+        "state": "unknown"
+      }
+    },
+    "story": {
+      "value": {
+        "state": "unknown"
+      }
+    },
+    "play_time_seconds": {
+      "value": {
+        "state": "unknown"
+      }
+    },
+    "next_event_id": {
+      "value": {
+        "state": "unknown"
+      }
+    },
+    "unnamed_event_values": {
+      "value": {
+        "state": "unknown"
+      }
+    },
+    "errands": {
+      "value": {
+        "state": "unknown"
+      }
+    },
+    "events": {
+      "value": {
+        "state": "unknown"
+      }
+    },
+    "recruitment": {
+      "value": {
+        "state": "unknown"
+      }
+    }
+  },
+  "profile": "english_steam_enhanced_manual"
+}

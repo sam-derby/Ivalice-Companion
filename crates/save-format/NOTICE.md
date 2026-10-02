@@ -1,18 +1,23 @@
-﻿# Save format attribution
+# Save format attribution
 
-The UMIF container implementation, manual slot mapping, unit record layout and
-selected edit behavior were adapted from Nelveska's TICSaveEditor at revision
-`07ea857a0d2b7a96190f18ee10cfd99dbcf37a1b` (GPL-3.0), principally
-`TICSaveEditor.Core/Save/UmifContainer.cs`, `PngEnvelope.cs`, `SaveSlot.cs`,
-`SaveWork.cs`, `UnitSaveData.cs` and their layout types.
+Adapted in Rust from
+[Nelveska's TICSaveEditor](https://github.com/Nelveska/TICSaveEditor/tree/07ea857a0d2b7a96190f18ee10cfd99dbcf37a1b)
+revision `07ea857a0d2b7a96190f18ee10cfd99dbcf37a1b` (GPL-3.0):
 
-TICSaveEditor credits Nenkai's FF16Tools at revision
-`dd91fb451d3b2e97bc637b5d43388e7118c145bf` (MIT) for the UMIF XOR and
-preset-dictionary algorithm and `CompressDict.bin`. The Rust implementation
-follows that behavior without copying an FF16Tools source file verbatim. See the
-root `NOTICE.md` and `LICENSES/Nenkai-MIT.txt`.
+| Rust implementation                                          | Upstream files in `TICSaveEditor.Core`                                            |
+| ------------------------------------------------------------ | --------------------------------------------------------------------------------- |
+| `src/umif.rs`, `src/png.rs`                                  | `Save/UmifContainer.cs`, `Save/PngEnvelope.cs`                                    |
+| `src/manual.rs`, `src/manual/slot_metadata.rs`               | `Save/SaveSlot.cs`, `Save/SaveWork.cs`, `Save/SaveWorkLayout.cs`, `Sections/*.cs` |
+| `src/manual/unit_record.rs`, `src/manual/upstream_reader.rs` | `Records/UnitSaveData.cs`, `Records/CombatSet.cs`, `Records/Layouts/*.cs`         |
+| `src/manual/inventory.rs`                                    | `Records/PartyInventory.cs`, `Sections/BattleSection.cs`                          |
+| `src/edit.rs`, `src/manual/unit_image.rs`                    | `Operations/SlotOperations.cs`, `Records/Layouts/*.cs`                            |
 
-This Rust implementation adds strict bounds and integrity checks, immutable
-decode, scoped replacement of the selected manual slot, and separate recoverable
-file backup and restore. It does not include the upstream reference dump or
-private save fixtures.
+TICSaveEditor credits Nenkai's MIT-licensed FF16Tools
+`FF16Tools.Files/Save/FaithSaveFile.cs` and `CompressDict.cs` at revision
+`dd91fb451d3b2e97bc637b5d43388e7118c145bf` for the UMIF implementation and
+dictionary. Matching the XOR key and byte processing does not by itself show
+that the Rust code copied FF16Tools source. See the
+[root notices](../../NOTICE.md) and [MIT terms](../../LICENSES/Nenkai-MIT.txt).
+
+The port adds bounds and integrity checks and scoped manual-slot edits. File
+snapshots, backups and restoration are implemented separately in infrastructure.

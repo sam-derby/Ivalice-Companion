@@ -1,8 +1,8 @@
-//! Bounded save-container decoding and a scoped gil edit.
+//! Bounded save-container decoding and scoped manual-slot edits.
 //!
 //! The UMIF read path adapts TICSaveEditor behavior derived from FF16Tools.
 //! See `NOTICE.md`. The public API accepts only immutable bytes and
-//! exposes no filesystem operation. The gil packer is limited to one field.
+//! exposes no filesystem operation. Edits return a new encoded container.
 
 mod creature;
 mod edit;
@@ -43,7 +43,7 @@ pub const SUPPORTED_PAYLOAD_LENGTH: usize = 2_008_216;
 
 /// A decoded, integrity-checked payload for the exact supported structure.
 ///
-/// The payload stays opaque to callers. Only the scoped gil edit may repack it.
+/// Callers may inspect the payload; scoped edit APIs validate and repack changes.
 #[derive(Debug, Eq, PartialEq)]
 pub struct DecodedContainer {
     payload: Box<[u8]>,

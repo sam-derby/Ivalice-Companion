@@ -5,16 +5,18 @@
   "license": "GPL-3.0-only",
   "type": "module",
   "engines": {
-    "node": "\u003e=22.22.2 \u003c23 || \u003e=24.15.0 \u003c25"
+    "node": ">=22.22.2 <23 || >=24.15.0 <25"
   },
   "scripts": {
     "dev": "tauri dev",
     "dev:web": "vite",
     "build": "tauri build --config src-tauri/tauri.installer.conf.json -- --locked",
-    "build:web": "tsc --noEmit \u0026\u0026 vite build",
+    "build:web": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "check:rust": "cargo check --workspace --all-targets --locked && cargo clippy --workspace --all-targets --locked -- -D warnings && cargo test --workspace --locked",
+    "validate": "npm run typecheck && npm run check:rust && npm run build"
   },
   "dependencies": {
     "@tauri-apps/api": "2.11.1",
@@ -23,21 +25,12 @@
     "react-dom": "19.3.0"
   },
   "devDependencies": {
-    "@eslint/js": "10.0.1",
     "@tauri-apps/cli": "2.11.5",
-    "@testing-library/react": "16.3.3",
     "@types/node": "22.20.4",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "6.1.1",
-    "eslint": "10.11.0",
-    "eslint-plugin-react-hooks": "7.1.1",
-    "globals": "17.12.0",
-    "jsdom": "30.1.1",
-    "prettier": "3.9.8",
     "typescript": "6.0.3",
-    "typescript-eslint": "8.70.1",
-    "vite": "8.3.0",
-    "vitest": "5.0.1"
+    "vite": "8.3.0"
   }
 }
