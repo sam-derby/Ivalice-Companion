@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-preview-job-progress"
+description = "Enables the preview_job_progress command without any pre-configured scope."
+commands.allow = ["preview_job_progress"]
+
+[[permission]]
+identifier = "deny-preview-job-progress"
+description = "Denies the preview_job_progress command without any pre-configured scope."
+commands.deny = ["preview_job_progress"]

@@ -1,0 +1,15 @@
+{
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "resources": {
+      "installer-resources/CompressDict.bin": "resources/CompressDict.bin",
+      "installer-resources/reader-catalogue-v1.json": "resources/reader-catalogue-v1.json",
+      "installer-resources/job-requirements-v1.json": "resources/job-requirements-v1.json",
+      "installer-resources/ability-flags-v1.json": "resources/ability-flags-v1.json"
+    },
+    "windows": {
+      "nsis": { "installMode": "currentUser" }
+    }
+  }
+}

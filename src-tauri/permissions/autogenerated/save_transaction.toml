@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-save-transaction"
+description = "Enables the save_transaction command without any pre-configured scope."
+commands.allow = ["save_transaction"]
+
+[[permission]]
+identifier = "deny-save-transaction"
+description = "Denies the save_transaction command without any pre-configured scope."
+commands.deny = ["save_transaction"]
