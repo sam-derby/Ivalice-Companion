@@ -91,7 +91,7 @@ pub struct SnapshotProvenance {
 /// An evidence-scoped game writer build label.
 ///
 /// The current supported structure has no verified writer build, so production
-/// D004 values use `ValueState::Unknown` rather than inventing one.
+/// values use `ValueState::Unknown` rather than inventing one.
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct GameBuild(String);
@@ -135,7 +135,7 @@ pub struct ContainerMetadata {
 pub struct ManualSlotId(u8);
 
 impl ManualSlotId {
-    /// The R005 manual layout contains exactly fifty positions, indexed 0–49.
+    /// The manual layout contains exactly fifty positions, indexed 0–49.
     pub fn new(index: u8) -> Result<Self, DomainValueError> {
         if index >= 50 {
             return Err(DomainValueError::ManualSlotOutOfRange(index));
@@ -196,7 +196,7 @@ pub struct SamuraiPrerequisiteLevels {
     pub dragoon: u8,
 }
 
-/// The installed selected Samurai row from R027/R028. This evaluates level
+/// The verified installed Samurai requirement row. This evaluates level
 /// requirements only; per-unit Change Job availability remains unknown.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -240,7 +240,7 @@ fn compare_level(current_level: u8, required_level: u8) -> LevelRequirementProgr
     }
 }
 
-/// Compare only the six installed Samurai level thresholds verified by R027.
+/// Compare only the six installed Samurai level thresholds in the installed requirement row.
 #[must_use]
 pub fn compare_samurai_prerequisites(
     levels: &SamuraiPrerequisiteLevels,
@@ -272,7 +272,7 @@ pub struct ManualSlot {
     pub id: ManualSlotId,
 }
 
-/// The complete D004 normalized result prepared for later IPC serialization.
+/// The normalized result serialized by the save IPC adapter.
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct NormalizedSave {

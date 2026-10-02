@@ -21,8 +21,8 @@ pub enum GameDataSchema {
     V1,
 }
 
-/// This profile names the exact R011 catalogue and R022 installed-job parity/evaluator evidence.
-/// It does not assert that the other R011 tables came from installed build 24304444.
+/// This legacy profile combines upstream catalogue facts and an installed job-table sample.
+/// The installed build identifier applies only to the sampled job table.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum SourceProfile {
@@ -132,17 +132,17 @@ pub struct Count {
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Coverage {
-    /// R011's 174 job identities. A selected job may still have unknown fields.
+    /// 174 job identities. A selected job may still have unknown fields.
     pub jobs: Count,
-    /// R011's 227 command identities. V1 accepts only command 25 for memberships.
+    /// 227 command identities. V1 accepts only command 25 for memberships.
     pub commands: Count,
-    /// R011's 512 ability identities; only accepted cost facts count here.
+    /// 512 ability identities; only accepted cost facts count here.
     pub ability_costs: Count,
-    /// R011's 1,061 nonzero accepted membership edges are the bounded source pool.
+    /// 1,061 nonzero accepted membership edges are the bounded source pool.
     pub memberships: Count,
-    /// R022's 32 GeneralJob numeric requirements, one accepted.
+    /// 32 GeneralJob numeric requirements, one accepted.
     pub prerequisites: Count,
-    /// R022 accepts no job as having no requirements.
+    /// This profile accepts no job as having no requirements.
     pub no_requirement_jobs: Count,
 }
 
@@ -655,7 +655,7 @@ mod tests {
     fn canonical_round_trip_preserves_zero_unknown_and_colliding_labels() {
         let documented = include_bytes!(concat!(
             env!("CARGO_MANIFEST_DIR"),
-            "/../../data/imported/example-v1.json"
+            "/../../tests/fixtures/reference-v1.json"
         ));
         assert!(ValidatedGameData::from_json(documented).is_ok());
         let validated = ValidatedGameData::validate(fixture()).unwrap_or_else(|e| panic!("{e}"));

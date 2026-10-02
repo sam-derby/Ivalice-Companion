@@ -1463,7 +1463,7 @@ fn named_character_id(character: u8) -> bool {
 
 /// Creature identities cannot use the human donor initializer: it would inherit
 /// human metadata and fall back to Squire. CharaName/Job tables at d3123d2;
-/// their complete creature construction remains T074/T075.
+/// independent creature initialization is implemented in `creature.rs`.
 pub fn named_human_initialization_supported(character: u8) -> bool {
     matches!(character, 4..=52 | 74..=76 | 120..=127)
 }

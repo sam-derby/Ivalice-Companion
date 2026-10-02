@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Save acquisition, scoped edit publication, path discovery, and local configuration infrastructure"
 edition = "2021"
 publish = false
+license = "GPL-3.0-only"
 
 [dependencies]
 ivalice-domain = { path = "../domain" }

@@ -1,0 +1,73 @@
+{
+  "schema": "v1",
+  "provenance": {
+    "profile": "r011_r022_english",
+    "catalogue_revision": "07ea857a0d2b7a96190f18ee10cfd99dbcf37a1b",
+    "installed_job_build": "24304444",
+    "locale": "en"
+  },
+  "coverage": {
+    "jobs": { "accepted": 3, "unknown": 171, "rejected": 0 },
+    "commands": { "accepted": 1, "unknown": 226, "rejected": 0 },
+    "ability_costs": { "accepted": 1, "unknown": 501, "rejected": 10 },
+    "memberships": { "accepted": 1, "unknown": 1060, "rejected": 0 },
+    "prerequisites": { "accepted": 1, "unknown": 31, "rejected": 0 },
+    "no_requirement_jobs": { "accepted": 0, "unknown": 0, "rejected": 0 }
+  },
+  "jobs": [
+    {
+      "id": "job:1",
+      "english_label": { "state": "known", "value": "Squire" },
+      "command": { "state": "known", "value": "command:25" },
+      "requirement": { "state": "unknown" },
+      "evidence": "r011",
+      "spoiler": "minimal"
+    },
+    {
+      "id": "job:74",
+      "english_label": { "state": "known", "value": "Squire" },
+      "command": { "state": "unknown" },
+      "requirement": { "state": "unknown" },
+      "evidence": "r022",
+      "spoiler": "minimal"
+    },
+    {
+      "id": "job:76",
+      "english_label": { "state": "known", "value": "Knight" },
+      "command": { "state": "unknown" },
+      "requirement": {
+        "state": "known",
+        "value": { "op": "at_least_level", "job": "job:74", "level": 2 }
+      },
+      "evidence": "r022",
+      "spoiler": "minimal"
+    }
+  ],
+  "commands": [
+    {
+      "id": "command:25",
+      "english_label": { "state": "known", "value": "Mettle" },
+      "evidence": "r011",
+      "spoiler": "minimal"
+    }
+  ],
+  "abilities": [
+    {
+      "id": "ability:152",
+      "english_label": { "state": "known", "value": "Chant" },
+      "jp_cost": { "state": "known", "value": 0 },
+      "evidence": "r011",
+      "spoiler": "minimal"
+    }
+  ],
+  "memberships": [
+    {
+      "command": "command:25",
+      "family": "action",
+      "ordinal": 6,
+      "ability": "ability:152",
+      "evidence": "r011",
+      "spoiler": "minimal"
+    }
+  ]
+}

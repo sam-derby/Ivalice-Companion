@@ -4,6 +4,7 @@ version = "0.1.3"
 description = "Local deterministic Ivalice Companion desktop shell"
 edition = "2021"
 publish = false
+license = "GPL-3.0-only"
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }

@@ -186,7 +186,7 @@ mod tests {
     use crate::game_data::{GameDataArtifact, ValidatedGameData};
 
     fn sample() -> GameDataArtifact {
-        serde_json::from_str(include_str!("../../../../data/imported/example-v1.json"))
+        serde_json::from_str(include_str!("../../../../tests/fixtures/reference-v1.json"))
             .unwrap_or_else(|error| panic!("{error}"))
     }
 
