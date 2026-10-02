@@ -1,0 +1,15 @@
+[workspace]
+members = [
+  "crates/domain",
+  "crates/infrastructure",
+  "crates/save-format",
+  "src-tauri",
+]
+resolver = "2"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"

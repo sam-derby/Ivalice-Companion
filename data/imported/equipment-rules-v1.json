@@ -1,0 +1,3928 @@
+{
+  "items": [
+    {
+      "category": "None",
+      "family": "weapon",
+      "id": 0,
+      "rare": false,
+      "weapon_flags": ["Striking", "TwoSwords"]
+    },
+    {
+      "category": "Knife",
+      "family": "weapon",
+      "id": 1,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoSwords"]
+    },
+    {
+      "category": "Knife",
+      "family": "weapon",
+      "id": 2,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoSwords"]
+    },
+    {
+      "category": "Knife",
+      "family": "weapon",
+      "id": 3,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoSwords"]
+    },
+    {
+      "category": "Knife",
+      "family": "weapon",
+      "id": 4,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoSwords"]
+    },
+    {
+      "category": "Knife",
+      "family": "weapon",
+      "id": 5,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoSwords"]
+    },
+    {
+      "category": "Knife",
+      "family": "weapon",
+      "id": 6,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoSwords"]
+    },
+    {
+      "category": "Knife",
+      "family": "weapon",
+      "id": 7,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoSwords"]
+    },
+    {
+      "category": "Knife",
+      "family": "weapon",
+      "id": 8,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoSwords"]
+    },
+    {
+      "category": "Knife",
+      "family": "weapon",
+      "id": 9,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoSwords"]
+    },
+    {
+      "category": "Knife",
+      "family": "weapon",
+      "id": 10,
+      "rare": true,
+      "weapon_flags": ["Striking", "Throwable", "TwoSwords"]
+    },
+    {
+      "category": "NinjaBlade",
+      "family": "weapon",
+      "id": 11,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "NinjaBlade",
+      "family": "weapon",
+      "id": 12,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "NinjaBlade",
+      "family": "weapon",
+      "id": 13,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "NinjaBlade",
+      "family": "weapon",
+      "id": 14,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "NinjaBlade",
+      "family": "weapon",
+      "id": 15,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "NinjaBlade",
+      "family": "weapon",
+      "id": 16,
+      "rare": true,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "NinjaBlade",
+      "family": "weapon",
+      "id": 17,
+      "rare": true,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "NinjaBlade",
+      "family": "weapon",
+      "id": 18,
+      "rare": true,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Sword",
+      "family": "weapon",
+      "id": 19,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Sword",
+      "family": "weapon",
+      "id": 20,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Sword",
+      "family": "weapon",
+      "id": 21,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Sword",
+      "family": "weapon",
+      "id": 22,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Sword",
+      "family": "weapon",
+      "id": 23,
+      "rare": true,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Sword",
+      "family": "weapon",
+      "id": 24,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Sword",
+      "family": "weapon",
+      "id": 25,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Sword",
+      "family": "weapon",
+      "id": 26,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Sword",
+      "family": "weapon",
+      "id": 27,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Sword",
+      "family": "weapon",
+      "id": 28,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Sword",
+      "family": "weapon",
+      "id": 29,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Sword",
+      "family": "weapon",
+      "id": 30,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Sword",
+      "family": "weapon",
+      "id": 31,
+      "rare": true,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Sword",
+      "family": "weapon",
+      "id": 32,
+      "rare": true,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "KnightSword",
+      "family": "weapon",
+      "id": 33,
+      "rare": true,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "KnightSword",
+      "family": "weapon",
+      "id": 34,
+      "rare": true,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "KnightSword",
+      "family": "weapon",
+      "id": 35,
+      "rare": true,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "KnightSword",
+      "family": "weapon",
+      "id": 36,
+      "rare": true,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "KnightSword",
+      "family": "weapon",
+      "id": 37,
+      "rare": true,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Katana",
+      "family": "weapon",
+      "id": 38,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Katana",
+      "family": "weapon",
+      "id": 39,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Katana",
+      "family": "weapon",
+      "id": 40,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Katana",
+      "family": "weapon",
+      "id": 41,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Katana",
+      "family": "weapon",
+      "id": 42,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Katana",
+      "family": "weapon",
+      "id": 43,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Katana",
+      "family": "weapon",
+      "id": 44,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Katana",
+      "family": "weapon",
+      "id": 45,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Katana",
+      "family": "weapon",
+      "id": 46,
+      "rare": true,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Katana",
+      "family": "weapon",
+      "id": 47,
+      "rare": true,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Axe",
+      "family": "weapon",
+      "id": 48,
+      "rare": false,
+      "weapon_flags": ["ForcedTwoHands", "Striking", "Throwable", "TwoHands"]
+    },
+    {
+      "category": "Axe",
+      "family": "weapon",
+      "id": 49,
+      "rare": false,
+      "weapon_flags": ["ForcedTwoHands", "Striking", "Throwable", "TwoHands"]
+    },
+    {
+      "category": "Axe",
+      "family": "weapon",
+      "id": 50,
+      "rare": false,
+      "weapon_flags": ["ForcedTwoHands", "Striking", "Throwable", "TwoHands"]
+    },
+    {
+      "category": "Rod",
+      "family": "weapon",
+      "id": 51,
+      "rare": false,
+      "weapon_flags": ["Striking", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Rod",
+      "family": "weapon",
+      "id": 52,
+      "rare": false,
+      "weapon_flags": ["Striking", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Rod",
+      "family": "weapon",
+      "id": 53,
+      "rare": false,
+      "weapon_flags": ["Striking", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Rod",
+      "family": "weapon",
+      "id": 54,
+      "rare": false,
+      "weapon_flags": ["Striking", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Rod",
+      "family": "weapon",
+      "id": 55,
+      "rare": false,
+      "weapon_flags": ["Striking", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Rod",
+      "family": "weapon",
+      "id": 56,
+      "rare": false,
+      "weapon_flags": ["Striking", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Rod",
+      "family": "weapon",
+      "id": 57,
+      "rare": true,
+      "weapon_flags": ["Striking", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Rod",
+      "family": "weapon",
+      "id": 58,
+      "rare": true,
+      "weapon_flags": ["Striking", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Staff",
+      "family": "weapon",
+      "id": 59,
+      "rare": false,
+      "weapon_flags": ["Striking", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Staff",
+      "family": "weapon",
+      "id": 60,
+      "rare": false,
+      "weapon_flags": ["Striking", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Staff",
+      "family": "weapon",
+      "id": 61,
+      "rare": true,
+      "weapon_flags": ["Striking", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Staff",
+      "family": "weapon",
+      "id": 62,
+      "rare": false,
+      "weapon_flags": ["Striking", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Staff",
+      "family": "weapon",
+      "id": 63,
+      "rare": false,
+      "weapon_flags": ["Striking", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Staff",
+      "family": "weapon",
+      "id": 64,
+      "rare": false,
+      "weapon_flags": ["Striking", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Staff",
+      "family": "weapon",
+      "id": 65,
+      "rare": true,
+      "weapon_flags": ["Striking", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Staff",
+      "family": "weapon",
+      "id": 66,
+      "rare": true,
+      "weapon_flags": ["Striking", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Flail",
+      "family": "weapon",
+      "id": 67,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Flail",
+      "family": "weapon",
+      "id": 68,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Flail",
+      "family": "weapon",
+      "id": 69,
+      "rare": false,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Flail",
+      "family": "weapon",
+      "id": 70,
+      "rare": true,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Gun",
+      "family": "weapon",
+      "id": 71,
+      "rare": true,
+      "weapon_flags": ["Direct"]
+    },
+    {
+      "category": "Gun",
+      "family": "weapon",
+      "id": 72,
+      "rare": true,
+      "weapon_flags": ["Direct"]
+    },
+    {
+      "category": "Gun",
+      "family": "weapon",
+      "id": 73,
+      "rare": true,
+      "weapon_flags": ["Direct"]
+    },
+    {
+      "category": "Gun",
+      "family": "weapon",
+      "id": 74,
+      "rare": true,
+      "weapon_flags": ["Direct"]
+    },
+    {
+      "category": "Gun",
+      "family": "weapon",
+      "id": 75,
+      "rare": true,
+      "weapon_flags": ["Direct"]
+    },
+    {
+      "category": "Gun",
+      "family": "weapon",
+      "id": 76,
+      "rare": true,
+      "weapon_flags": ["Direct"]
+    },
+    {
+      "category": "Crossbow",
+      "family": "weapon",
+      "id": 77,
+      "rare": false,
+      "weapon_flags": ["Direct"]
+    },
+    {
+      "category": "Crossbow",
+      "family": "weapon",
+      "id": 78,
+      "rare": true,
+      "weapon_flags": ["Direct"]
+    },
+    {
+      "category": "Crossbow",
+      "family": "weapon",
+      "id": 79,
+      "rare": false,
+      "weapon_flags": ["Direct"]
+    },
+    {
+      "category": "Crossbow",
+      "family": "weapon",
+      "id": 80,
+      "rare": false,
+      "weapon_flags": ["Direct"]
+    },
+    {
+      "category": "Crossbow",
+      "family": "weapon",
+      "id": 81,
+      "rare": false,
+      "weapon_flags": ["Direct"]
+    },
+    {
+      "category": "Crossbow",
+      "family": "weapon",
+      "id": 82,
+      "rare": true,
+      "weapon_flags": ["Direct"]
+    },
+    {
+      "category": "Bow",
+      "family": "weapon",
+      "id": 83,
+      "rare": false,
+      "weapon_flags": ["Arc", "ForcedTwoHands", "TwoHands"]
+    },
+    {
+      "category": "Bow",
+      "family": "weapon",
+      "id": 84,
+      "rare": false,
+      "weapon_flags": ["Arc", "ForcedTwoHands", "TwoHands"]
+    },
+    {
+      "category": "Bow",
+      "family": "weapon",
+      "id": 85,
+      "rare": false,
+      "weapon_flags": ["Arc", "ForcedTwoHands", "TwoHands"]
+    },
+    {
+      "category": "Bow",
+      "family": "weapon",
+      "id": 86,
+      "rare": false,
+      "weapon_flags": ["Arc", "ForcedTwoHands", "TwoHands"]
+    },
+    {
+      "category": "Bow",
+      "family": "weapon",
+      "id": 87,
+      "rare": false,
+      "weapon_flags": ["Arc", "ForcedTwoHands", "TwoHands"]
+    },
+    {
+      "category": "Bow",
+      "family": "weapon",
+      "id": 88,
+      "rare": false,
+      "weapon_flags": ["Arc", "ForcedTwoHands", "TwoHands"]
+    },
+    {
+      "category": "Bow",
+      "family": "weapon",
+      "id": 89,
+      "rare": false,
+      "weapon_flags": ["Arc", "ForcedTwoHands", "TwoHands"]
+    },
+    {
+      "category": "Bow",
+      "family": "weapon",
+      "id": 90,
+      "rare": true,
+      "weapon_flags": ["Arc", "ForcedTwoHands", "TwoHands"]
+    },
+    {
+      "category": "Bow",
+      "family": "weapon",
+      "id": 91,
+      "rare": true,
+      "weapon_flags": ["Arc", "ForcedTwoHands", "TwoHands"]
+    },
+    {
+      "category": "Instrument",
+      "family": "weapon",
+      "id": 92,
+      "rare": false,
+      "weapon_flags": ["Direct"]
+    },
+    {
+      "category": "Instrument",
+      "family": "weapon",
+      "id": 93,
+      "rare": false,
+      "weapon_flags": ["Direct"]
+    },
+    {
+      "category": "Instrument",
+      "family": "weapon",
+      "id": 94,
+      "rare": true,
+      "weapon_flags": ["Direct"]
+    },
+    {
+      "category": "Book",
+      "family": "weapon",
+      "id": 95,
+      "rare": false,
+      "weapon_flags": ["Direct", "Throwable"]
+    },
+    {
+      "category": "Book",
+      "family": "weapon",
+      "id": 96,
+      "rare": false,
+      "weapon_flags": ["Direct", "Throwable"]
+    },
+    {
+      "category": "Book",
+      "family": "weapon",
+      "id": 97,
+      "rare": false,
+      "weapon_flags": ["Direct", "Throwable"]
+    },
+    {
+      "category": "Book",
+      "family": "weapon",
+      "id": 98,
+      "rare": true,
+      "weapon_flags": ["Direct", "Throwable"]
+    },
+    {
+      "category": "Polearm",
+      "family": "weapon",
+      "id": 99,
+      "rare": false,
+      "weapon_flags": ["Lunging", "Throwable", "TwoHands"]
+    },
+    {
+      "category": "Polearm",
+      "family": "weapon",
+      "id": 100,
+      "rare": false,
+      "weapon_flags": ["Lunging", "Throwable", "TwoHands"]
+    },
+    {
+      "category": "Polearm",
+      "family": "weapon",
+      "id": 101,
+      "rare": false,
+      "weapon_flags": ["Lunging", "Throwable", "TwoHands"]
+    },
+    {
+      "category": "Polearm",
+      "family": "weapon",
+      "id": 102,
+      "rare": false,
+      "weapon_flags": ["Lunging", "Throwable", "TwoHands"]
+    },
+    {
+      "category": "Polearm",
+      "family": "weapon",
+      "id": 103,
+      "rare": false,
+      "weapon_flags": ["Lunging", "Throwable", "TwoHands"]
+    },
+    {
+      "category": "Polearm",
+      "family": "weapon",
+      "id": 104,
+      "rare": true,
+      "weapon_flags": ["Lunging", "Throwable", "TwoHands"]
+    },
+    {
+      "category": "Polearm",
+      "family": "weapon",
+      "id": 105,
+      "rare": true,
+      "weapon_flags": ["Lunging", "Throwable", "TwoHands"]
+    },
+    {
+      "category": "Polearm",
+      "family": "weapon",
+      "id": 106,
+      "rare": true,
+      "weapon_flags": ["Lunging", "Throwable", "TwoHands"]
+    },
+    {
+      "category": "Pole",
+      "family": "weapon",
+      "id": 107,
+      "rare": false,
+      "weapon_flags": ["Lunging", "Throwable", "TwoHands"]
+    },
+    {
+      "category": "Pole",
+      "family": "weapon",
+      "id": 108,
+      "rare": false,
+      "weapon_flags": ["Lunging", "Throwable", "TwoHands"]
+    },
+    {
+      "category": "Pole",
+      "family": "weapon",
+      "id": 109,
+      "rare": false,
+      "weapon_flags": ["Lunging", "Throwable", "TwoHands"]
+    },
+    {
+      "category": "Pole",
+      "family": "weapon",
+      "id": 110,
+      "rare": false,
+      "weapon_flags": ["Lunging", "Throwable", "TwoHands"]
+    },
+    {
+      "category": "Pole",
+      "family": "weapon",
+      "id": 111,
+      "rare": false,
+      "weapon_flags": ["Lunging", "Throwable", "TwoHands"]
+    },
+    {
+      "category": "Pole",
+      "family": "weapon",
+      "id": 112,
+      "rare": true,
+      "weapon_flags": ["Lunging", "Throwable", "TwoHands"]
+    },
+    {
+      "category": "Pole",
+      "family": "weapon",
+      "id": 113,
+      "rare": false,
+      "weapon_flags": ["Lunging", "Throwable", "TwoHands"]
+    },
+    {
+      "category": "Pole",
+      "family": "weapon",
+      "id": 114,
+      "rare": true,
+      "weapon_flags": ["Lunging", "Throwable", "TwoHands"]
+    },
+    {
+      "category": "Bag",
+      "family": "weapon",
+      "id": 115,
+      "rare": true,
+      "weapon_flags": ["Striking"]
+    },
+    {
+      "category": "Bag",
+      "family": "weapon",
+      "id": 116,
+      "rare": true,
+      "weapon_flags": ["Striking"]
+    },
+    {
+      "category": "Bag",
+      "family": "weapon",
+      "id": 117,
+      "rare": true,
+      "weapon_flags": ["Striking"]
+    },
+    {
+      "category": "Bag",
+      "family": "weapon",
+      "id": 118,
+      "rare": true,
+      "weapon_flags": ["Striking"]
+    },
+    {
+      "category": "Cloth",
+      "family": "weapon",
+      "id": 119,
+      "rare": false,
+      "weapon_flags": ["Lunging"]
+    },
+    {
+      "category": "Cloth",
+      "family": "weapon",
+      "id": 120,
+      "rare": false,
+      "weapon_flags": ["Lunging"]
+    },
+    {
+      "category": "Cloth",
+      "family": "weapon",
+      "id": 121,
+      "rare": true,
+      "weapon_flags": ["Lunging"]
+    },
+    {
+      "category": "Throwing",
+      "family": "weapon",
+      "id": 122,
+      "rare": false,
+      "weapon_flags": ["Direct", "Throwable"]
+    },
+    {
+      "category": "Throwing",
+      "family": "weapon",
+      "id": 123,
+      "rare": false,
+      "weapon_flags": ["Direct", "Throwable"]
+    },
+    {
+      "category": "Throwing",
+      "family": "weapon",
+      "id": 124,
+      "rare": false,
+      "weapon_flags": ["Direct", "Throwable"]
+    },
+    {
+      "category": "Bomb",
+      "family": "weapon",
+      "id": 125,
+      "rare": false,
+      "weapon_flags": ["Direct", "Throwable"]
+    },
+    {
+      "category": "Bomb",
+      "family": "weapon",
+      "id": 126,
+      "rare": false,
+      "weapon_flags": ["Direct", "Throwable"]
+    },
+    {
+      "category": "Bomb",
+      "family": "weapon",
+      "id": 127,
+      "rare": false,
+      "weapon_flags": ["Direct", "Throwable"]
+    },
+    {
+      "category": "Shield",
+      "family": "shield",
+      "id": 128,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Shield",
+      "family": "shield",
+      "id": 129,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Shield",
+      "family": "shield",
+      "id": 130,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Shield",
+      "family": "shield",
+      "id": 131,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Shield",
+      "family": "shield",
+      "id": 132,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Shield",
+      "family": "shield",
+      "id": 133,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Shield",
+      "family": "shield",
+      "id": 134,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Shield",
+      "family": "shield",
+      "id": 135,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Shield",
+      "family": "shield",
+      "id": 136,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Shield",
+      "family": "shield",
+      "id": 137,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Shield",
+      "family": "shield",
+      "id": 138,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Shield",
+      "family": "shield",
+      "id": 139,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Shield",
+      "family": "shield",
+      "id": 140,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Shield",
+      "family": "shield",
+      "id": 141,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Shield",
+      "family": "shield",
+      "id": 142,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Shield",
+      "family": "shield",
+      "id": 143,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Helmet",
+      "family": "headgear",
+      "id": 144,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Helmet",
+      "family": "headgear",
+      "id": 145,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Helmet",
+      "family": "headgear",
+      "id": 146,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Helmet",
+      "family": "headgear",
+      "id": 147,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Helmet",
+      "family": "headgear",
+      "id": 148,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Helmet",
+      "family": "headgear",
+      "id": 149,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Helmet",
+      "family": "headgear",
+      "id": 150,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Helmet",
+      "family": "headgear",
+      "id": 151,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Helmet",
+      "family": "headgear",
+      "id": 152,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Helmet",
+      "family": "headgear",
+      "id": 153,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Helmet",
+      "family": "headgear",
+      "id": 154,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Helmet",
+      "family": "headgear",
+      "id": 155,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Helmet",
+      "family": "headgear",
+      "id": 156,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Hat",
+      "family": "headgear",
+      "id": 157,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Hat",
+      "family": "headgear",
+      "id": 158,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Hat",
+      "family": "headgear",
+      "id": 159,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Hat",
+      "family": "headgear",
+      "id": 160,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Hat",
+      "family": "headgear",
+      "id": 161,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Hat",
+      "family": "headgear",
+      "id": 162,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Hat",
+      "family": "headgear",
+      "id": 163,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Hat",
+      "family": "headgear",
+      "id": 164,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Hat",
+      "family": "headgear",
+      "id": 165,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Hat",
+      "family": "headgear",
+      "id": 166,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Hat",
+      "family": "headgear",
+      "id": 167,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Hat",
+      "family": "headgear",
+      "id": 168,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "HairAdornment",
+      "family": "headgear",
+      "id": 169,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "HairAdornment",
+      "family": "headgear",
+      "id": 170,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "HairAdornment",
+      "family": "headgear",
+      "id": 171,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Armor",
+      "family": "armor",
+      "id": 172,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Armor",
+      "family": "armor",
+      "id": 173,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Armor",
+      "family": "armor",
+      "id": 174,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Armor",
+      "family": "armor",
+      "id": 175,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Armor",
+      "family": "armor",
+      "id": 176,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Armor",
+      "family": "armor",
+      "id": 177,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Armor",
+      "family": "armor",
+      "id": 178,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Armor",
+      "family": "armor",
+      "id": 179,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Armor",
+      "family": "armor",
+      "id": 180,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Armor",
+      "family": "armor",
+      "id": 181,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Armor",
+      "family": "armor",
+      "id": 182,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Armor",
+      "family": "armor",
+      "id": 183,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Armor",
+      "family": "armor",
+      "id": 184,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Armor",
+      "family": "armor",
+      "id": 185,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Clothing",
+      "family": "armor",
+      "id": 186,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Clothing",
+      "family": "armor",
+      "id": 187,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Clothing",
+      "family": "armor",
+      "id": 188,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Clothing",
+      "family": "armor",
+      "id": 189,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Clothing",
+      "family": "armor",
+      "id": 190,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Clothing",
+      "family": "armor",
+      "id": 191,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Clothing",
+      "family": "armor",
+      "id": 192,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Clothing",
+      "family": "armor",
+      "id": 193,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Clothing",
+      "family": "armor",
+      "id": 194,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Clothing",
+      "family": "armor",
+      "id": 195,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Clothing",
+      "family": "armor",
+      "id": 196,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Clothing",
+      "family": "armor",
+      "id": 197,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Clothing",
+      "family": "armor",
+      "id": 198,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Clothing",
+      "family": "armor",
+      "id": 199,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Robe",
+      "family": "armor",
+      "id": 200,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Robe",
+      "family": "armor",
+      "id": 201,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Robe",
+      "family": "armor",
+      "id": 202,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Robe",
+      "family": "armor",
+      "id": 203,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Robe",
+      "family": "armor",
+      "id": 204,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Robe",
+      "family": "armor",
+      "id": 205,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Robe",
+      "family": "armor",
+      "id": 206,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Robe",
+      "family": "armor",
+      "id": 207,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Shoes",
+      "family": "accessory",
+      "id": 208,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Shoes",
+      "family": "accessory",
+      "id": 209,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Shoes",
+      "family": "accessory",
+      "id": 210,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Shoes",
+      "family": "accessory",
+      "id": 211,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Shoes",
+      "family": "accessory",
+      "id": 212,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Shoes",
+      "family": "accessory",
+      "id": 213,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Shoes",
+      "family": "accessory",
+      "id": 214,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Armguard",
+      "family": "accessory",
+      "id": 215,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Armguard",
+      "family": "accessory",
+      "id": 216,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Armguard",
+      "family": "accessory",
+      "id": 217,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Armguard",
+      "family": "accessory",
+      "id": 218,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Ring",
+      "family": "accessory",
+      "id": 219,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Ring",
+      "family": "accessory",
+      "id": 220,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Ring",
+      "family": "accessory",
+      "id": 221,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Ring",
+      "family": "accessory",
+      "id": 222,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Ring",
+      "family": "accessory",
+      "id": 223,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Armlet",
+      "family": "accessory",
+      "id": 224,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Armlet",
+      "family": "accessory",
+      "id": 225,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Armlet",
+      "family": "accessory",
+      "id": 226,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Armlet",
+      "family": "accessory",
+      "id": 227,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Armlet",
+      "family": "accessory",
+      "id": 228,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Cloak",
+      "family": "accessory",
+      "id": 229,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Cloak",
+      "family": "accessory",
+      "id": 230,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Cloak",
+      "family": "accessory",
+      "id": 231,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Cloak",
+      "family": "accessory",
+      "id": 232,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Cloak",
+      "family": "accessory",
+      "id": 233,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Cloak",
+      "family": "accessory",
+      "id": 234,
+      "rare": false,
+      "weapon_flags": []
+    },
+    {
+      "category": "Cloak",
+      "family": "accessory",
+      "id": 235,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Perfume",
+      "family": "accessory",
+      "id": 236,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Perfume",
+      "family": "accessory",
+      "id": 237,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Perfume",
+      "family": "accessory",
+      "id": 238,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Perfume",
+      "family": "accessory",
+      "id": 239,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Item",
+      "family": "other",
+      "id": 240,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Item",
+      "family": "other",
+      "id": 241,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Item",
+      "family": "other",
+      "id": 242,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Item",
+      "family": "other",
+      "id": 243,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Item",
+      "family": "other",
+      "id": 244,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Item",
+      "family": "other",
+      "id": 245,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Item",
+      "family": "other",
+      "id": 246,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Item",
+      "family": "other",
+      "id": 247,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Item",
+      "family": "other",
+      "id": 248,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Item",
+      "family": "other",
+      "id": 249,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Item",
+      "family": "other",
+      "id": 250,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Item",
+      "family": "other",
+      "id": 251,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Item",
+      "family": "other",
+      "id": 252,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Item",
+      "family": "other",
+      "id": 253,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "None",
+      "family": "other",
+      "id": 254,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "None",
+      "family": "other",
+      "id": 255,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Sword",
+      "family": "weapon",
+      "id": 256,
+      "rare": true,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Sword",
+      "family": "weapon",
+      "id": 257,
+      "rare": true,
+      "weapon_flags": ["Striking", "Throwable", "TwoHands", "TwoSwords"]
+    },
+    {
+      "category": "Hat",
+      "family": "armor",
+      "id": 258,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Clothing",
+      "family": "armor",
+      "id": 259,
+      "rare": true,
+      "weapon_flags": []
+    },
+    {
+      "category": "Ring",
+      "family": "accessory",
+      "id": 260,
+      "rare": true,
+      "weapon_flags": []
+    }
+  ],
+  "jobs": [
+    { "categories": [], "id": 0, "innate_abilities": [0, 0, 0, 0] },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "Clothing",
+        "Flail",
+        "HairAdornment",
+        "Hat",
+        "Knife",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 1,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "Clothing",
+        "Flail",
+        "HairAdornment",
+        "Hat",
+        "Helmet",
+        "Knife",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 2,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "Clothing",
+        "Flail",
+        "HairAdornment",
+        "Hat",
+        "Helmet",
+        "Knife",
+        "KnightSword",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 3,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "Clothing",
+        "Flail",
+        "HairAdornment",
+        "Hat",
+        "Knife",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 4,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "Clothing",
+        "Flail",
+        "HairAdornment",
+        "Helmet",
+        "Knife",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 5,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "Flail",
+        "HairAdornment",
+        "Helmet",
+        "Knife",
+        "KnightSword",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 6,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "Clothing",
+        "Flail",
+        "HairAdornment",
+        "Hat",
+        "Knife",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 7,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "HairAdornment",
+        "Helmet",
+        "KnightSword",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 8,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "HairAdornment",
+        "Helmet",
+        "KnightSword",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 9,
+      "innate_abilities": [466, 468, 0, 0]
+    },
+    { "categories": ["Unarmed"], "id": 10, "innate_abilities": [0, 0, 0, 0] },
+    { "categories": ["Unarmed"], "id": 11, "innate_abilities": [0, 0, 0, 0] },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shoes",
+        "Staff",
+        "Unarmed"
+      ],
+      "id": 12,
+      "innate_abilities": [466, 468, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "Helmet",
+        "Katana",
+        "KnightSword",
+        "NinjaBlade",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 13,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "HairAdornment",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 14,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armlet",
+        "Bag",
+        "HairAdornment",
+        "Perfume",
+        "Ring",
+        "Unarmed"
+      ],
+      "id": 15,
+      "innate_abilities": [473, 477, 478, 470]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Book",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "Perfume",
+        "Pole",
+        "Ring",
+        "Robe",
+        "Rod",
+        "Shoes",
+        "Staff",
+        "Unarmed"
+      ],
+      "id": 16,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "HairAdornment",
+        "Helmet",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 17,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    { "categories": ["Unarmed"], "id": 18, "innate_abilities": [0, 0, 0, 0] },
+    { "categories": ["Unarmed"], "id": 19, "innate_abilities": [0, 0, 0, 0] },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shoes",
+        "Staff",
+        "Unarmed"
+      ],
+      "id": 20,
+      "innate_abilities": [466, 468, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Book",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 21,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "Clothing",
+        "Gun",
+        "HairAdornment",
+        "Hat",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 22,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "HairAdornment",
+        "Helmet",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 23,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "HairAdornment",
+        "Knife",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 24,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "Perfume",
+        "Pole",
+        "Ring",
+        "Robe",
+        "Shoes",
+        "Staff",
+        "Unarmed"
+      ],
+      "id": 25,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "Perfume",
+        "Pole",
+        "Ring",
+        "Robe",
+        "Shoes",
+        "Staff",
+        "Unarmed"
+      ],
+      "id": 26,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "Helmet",
+        "Katana",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 27,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    { "categories": ["Unarmed"], "id": 28, "innate_abilities": [0, 0, 0, 0] },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "HairAdornment",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 29,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "HairAdornment",
+        "Helmet",
+        "KnightSword",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 30,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "HairAdornment",
+        "Helmet",
+        "Knife",
+        "KnightSword",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 31,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "HairAdornment",
+        "Helmet",
+        "KnightSword",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 32,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "HairAdornment",
+        "Knife",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 33,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "Clothing",
+        "Gun",
+        "HairAdornment",
+        "Hat",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 34,
+      "innate_abilities": [475, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "HairAdornment",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 35,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Helmet",
+        "KnightSword",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 36,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Helmet",
+        "KnightSword",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 37,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "HairAdornment",
+        "Helmet",
+        "KnightSword",
+        "NinjaBlade",
+        "Perfume",
+        "Polearm",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 38,
+      "innate_abilities": [469, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "Perfume",
+        "Pole",
+        "Ring",
+        "Robe",
+        "Rod",
+        "Shoes",
+        "Staff",
+        "Unarmed"
+      ],
+      "id": 39,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "HairAdornment",
+        "Helmet",
+        "KnightSword",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 40,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "Perfume",
+        "Pole",
+        "Ring",
+        "Robe",
+        "Shoes",
+        "Staff",
+        "Unarmed"
+      ],
+      "id": 41,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "Clothing",
+        "Crossbow",
+        "HairAdornment",
+        "Helmet",
+        "KnightSword",
+        "Perfume",
+        "Polearm",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 42,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "Crossbow",
+        "Gun",
+        "HairAdornment",
+        "Hat",
+        "Knife",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 43,
+      "innate_abilities": [466, 468, 473, 0]
+    },
+    { "categories": ["Unarmed"], "id": 44, "innate_abilities": [0, 0, 0, 0] },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "Katana",
+        "Perfume",
+        "Ring",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 45,
+      "innate_abilities": [477, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "NinjaBlade",
+        "Perfume",
+        "Ring",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 46,
+      "innate_abilities": [477, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "Clothing",
+        "Crossbow",
+        "HairAdornment",
+        "Helmet",
+        "KnightSword",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 47,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shoes",
+        "Staff",
+        "Unarmed"
+      ],
+      "id": 48,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "HairAdornment",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 49,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "Perfume",
+        "Ring",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 50,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "HairAdornment",
+        "Helmet",
+        "KnightSword",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 51,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "HairAdornment",
+        "Helmet",
+        "KnightSword",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 52,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Axe",
+        "Bag",
+        "Book",
+        "Bow",
+        "Cloak",
+        "Cloth",
+        "Clothing",
+        "Crossbow",
+        "Flail",
+        "Gun",
+        "HairAdornment",
+        "Hat",
+        "Helmet",
+        "Instrument",
+        "Katana",
+        "Knife",
+        "KnightSword",
+        "NinjaBlade",
+        "Perfume",
+        "Pole",
+        "Polearm",
+        "Ring",
+        "Robe",
+        "Rod",
+        "Shield",
+        "Shoes",
+        "Staff",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 53,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Axe",
+        "Bag",
+        "Book",
+        "Bow",
+        "Cloak",
+        "Cloth",
+        "Clothing",
+        "Crossbow",
+        "Flail",
+        "Gun",
+        "HairAdornment",
+        "Hat",
+        "Helmet",
+        "Instrument",
+        "Katana",
+        "Knife",
+        "KnightSword",
+        "NinjaBlade",
+        "Perfume",
+        "Pole",
+        "Polearm",
+        "Ring",
+        "Robe",
+        "Rod",
+        "Shield",
+        "Shoes",
+        "Staff",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 54,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Axe",
+        "Bag",
+        "Book",
+        "Bow",
+        "Cloak",
+        "Cloth",
+        "Clothing",
+        "Crossbow",
+        "Flail",
+        "Gun",
+        "HairAdornment",
+        "Hat",
+        "Helmet",
+        "Instrument",
+        "Katana",
+        "Knife",
+        "KnightSword",
+        "NinjaBlade",
+        "Perfume",
+        "Pole",
+        "Polearm",
+        "Ring",
+        "Robe",
+        "Rod",
+        "Shield",
+        "Shoes",
+        "Staff",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 55,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Axe",
+        "Bag",
+        "Book",
+        "Bow",
+        "Cloak",
+        "Cloth",
+        "Clothing",
+        "Crossbow",
+        "Flail",
+        "Gun",
+        "HairAdornment",
+        "Hat",
+        "Helmet",
+        "Instrument",
+        "Katana",
+        "Knife",
+        "KnightSword",
+        "NinjaBlade",
+        "Perfume",
+        "Pole",
+        "Polearm",
+        "Ring",
+        "Robe",
+        "Rod",
+        "Shield",
+        "Shoes",
+        "Staff",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 56,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "HairAdornment",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shoes"
+      ],
+      "id": 57,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "HairAdornment",
+        "Knife",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 58,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    { "categories": ["Unarmed"], "id": 59, "innate_abilities": [0, 0, 0, 0] },
+    {
+      "categories": ["Unarmed"],
+      "id": 60,
+      "innate_abilities": [497, 472, 482, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "Flail",
+        "HairAdornment",
+        "Helmet",
+        "KnightSword",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 61,
+      "innate_abilities": [478, 0, 0, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 62,
+      "innate_abilities": [497, 507, 482, 478]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Bow",
+        "Cloak",
+        "Clothing",
+        "Crossbow",
+        "HairAdornment",
+        "Hat",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 63,
+      "innate_abilities": [478, 0, 0, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 64,
+      "innate_abilities": [497, 0, 482, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 65,
+      "innate_abilities": [0, 472, 482, 499]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Rod",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 66,
+      "innate_abilities": [478, 0, 0, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 67,
+      "innate_abilities": [497, 472, 482, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shoes",
+        "Staff",
+        "Unarmed"
+      ],
+      "id": 68,
+      "innate_abilities": [478, 0, 0, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 69,
+      "innate_abilities": [497, 0, 482, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Book",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "Perfume",
+        "Pole",
+        "Ring",
+        "Robe",
+        "Rod",
+        "Shoes",
+        "Staff",
+        "Unarmed"
+      ],
+      "id": 70,
+      "innate_abilities": [478, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Rod",
+        "Shoes",
+        "Staff",
+        "Unarmed"
+      ],
+      "id": 71,
+      "innate_abilities": [478, 0, 0, 0]
+    },
+    { "categories": ["Unarmed"], "id": 72, "innate_abilities": [497, 0, 0, 0] },
+    {
+      "categories": ["Unarmed"],
+      "id": 73,
+      "innate_abilities": [0, 430, 482, 499]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Axe",
+        "Cloak",
+        "Clothing",
+        "Flail",
+        "HairAdornment",
+        "Hat",
+        "Knife",
+        "Perfume",
+        "Ring",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 74,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "Clothing",
+        "Gun",
+        "HairAdornment",
+        "Hat",
+        "Knife",
+        "Perfume",
+        "Ring",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 75,
+      "innate_abilities": [474, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "HairAdornment",
+        "Helmet",
+        "KnightSword",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 76,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Bow",
+        "Cloak",
+        "Clothing",
+        "Crossbow",
+        "HairAdornment",
+        "Hat",
+        "Perfume",
+        "Ring",
+        "Shield",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 77,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Perfume",
+        "Ring",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 78,
+      "innate_abilities": [472, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shoes",
+        "Staff",
+        "Unarmed"
+      ],
+      "id": 79,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Rod",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 80,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shoes",
+        "Staff",
+        "Unarmed"
+      ],
+      "id": 81,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Rod",
+        "Shoes",
+        "Staff",
+        "Unarmed"
+      ],
+      "id": 82,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "Knife",
+        "Perfume",
+        "Ring",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 83,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "Clothing",
+        "Gun",
+        "HairAdornment",
+        "Hat",
+        "Knife",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 84,
+      "innate_abilities": [473, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Book",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "Perfume",
+        "Pole",
+        "Ring",
+        "Robe",
+        "Rod",
+        "Shoes",
+        "Staff",
+        "Unarmed"
+      ],
+      "id": 85,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Axe",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 86,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "HairAdornment",
+        "Helmet",
+        "Perfume",
+        "Polearm",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 87,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "HairAdornment",
+        "Helmet",
+        "Katana",
+        "Perfume",
+        "Ring",
+        "Robe",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 88,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Cloak",
+        "Clothing",
+        "Flail",
+        "HairAdornment",
+        "Hat",
+        "Knife",
+        "NinjaBlade",
+        "Perfume",
+        "Ring",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 89,
+      "innate_abilities": [477, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Book",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "Perfume",
+        "Pole",
+        "Ring",
+        "Robe",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 90,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Bag",
+        "Cloak",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "Instrument",
+        "Perfume",
+        "Ring",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 91,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Bag",
+        "Cloak",
+        "Cloth",
+        "Clothing",
+        "HairAdornment",
+        "Hat",
+        "Knife",
+        "Perfume",
+        "Ring",
+        "Shoes",
+        "Unarmed"
+      ],
+      "id": 92,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 93,
+      "innate_abilities": [469, 472, 478, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 94,
+      "innate_abilities": [503, 0, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 95,
+      "innate_abilities": [503, 507, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 96,
+      "innate_abilities": [503, 492, 442, 0]
+    },
+    { "categories": ["Unarmed"], "id": 97, "innate_abilities": [0, 0, 442, 0] },
+    { "categories": ["Unarmed"], "id": 98, "innate_abilities": [0, 0, 442, 0] },
+    { "categories": ["Unarmed"], "id": 99, "innate_abilities": [0, 0, 442, 0] },
+    {
+      "categories": ["Unarmed"],
+      "id": 100,
+      "innate_abilities": [497, 506, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 101,
+      "innate_abilities": [497, 506, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 102,
+      "innate_abilities": [497, 506, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 103,
+      "innate_abilities": [497, 492, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 104,
+      "innate_abilities": [497, 492, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 105,
+      "innate_abilities": [497, 492, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 106,
+      "innate_abilities": [0, 505, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 107,
+      "innate_abilities": [0, 505, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 108,
+      "innate_abilities": [0, 505, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 109,
+      "innate_abilities": [0, 0, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 110,
+      "innate_abilities": [0, 0, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 111,
+      "innate_abilities": [0, 0, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 112,
+      "innate_abilities": [497, 506, 442, 498]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 113,
+      "innate_abilities": [497, 506, 442, 498]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 114,
+      "innate_abilities": [497, 506, 442, 498]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 115,
+      "innate_abilities": [497, 507, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 116,
+      "innate_abilities": [497, 507, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 117,
+      "innate_abilities": [497, 507, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 118,
+      "innate_abilities": [497, 507, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 119,
+      "innate_abilities": [497, 507, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 120,
+      "innate_abilities": [497, 507, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 121,
+      "innate_abilities": [497, 0, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 122,
+      "innate_abilities": [497, 0, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 123,
+      "innate_abilities": [497, 0, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 124,
+      "innate_abilities": [497, 0, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 125,
+      "innate_abilities": [497, 0, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 126,
+      "innate_abilities": [497, 0, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 127,
+      "innate_abilities": [497, 0, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 128,
+      "innate_abilities": [497, 0, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 129,
+      "innate_abilities": [497, 0, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 130,
+      "innate_abilities": [0, 502, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 131,
+      "innate_abilities": [0, 502, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 132,
+      "innate_abilities": [0, 502, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 133,
+      "innate_abilities": [497, 0, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 134,
+      "innate_abilities": [497, 0, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 135,
+      "innate_abilities": [497, 0, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 136,
+      "innate_abilities": [497, 0, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 137,
+      "innate_abilities": [497, 0, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 138,
+      "innate_abilities": [497, 0, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 139,
+      "innate_abilities": [497, 507, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 140,
+      "innate_abilities": [497, 507, 442, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 141,
+      "innate_abilities": [497, 507, 442, 0]
+    },
+    { "categories": [], "id": 142, "innate_abilities": [0, 0, 0, 0] },
+    { "categories": [], "id": 143, "innate_abilities": [0, 0, 0, 0] },
+    {
+      "categories": ["Unarmed"],
+      "id": 144,
+      "innate_abilities": [497, 492, 471, 442]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 145,
+      "innate_abilities": [497, 500, 501, 442]
+    },
+    { "categories": [], "id": 146, "innate_abilities": [0, 0, 0, 0] },
+    { "categories": [], "id": 147, "innate_abilities": [0, 0, 0, 0] },
+    { "categories": [], "id": 148, "innate_abilities": [0, 0, 0, 0] },
+    { "categories": [], "id": 149, "innate_abilities": [0, 0, 0, 0] },
+    {
+      "categories": ["Unarmed"],
+      "id": 150,
+      "innate_abilities": [497, 492, 482, 442]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 151,
+      "innate_abilities": [497, 0, 482, 442]
+    },
+    { "categories": [], "id": 152, "innate_abilities": [0, 0, 0, 0] },
+    {
+      "categories": ["Unarmed"],
+      "id": 153,
+      "innate_abilities": [497, 0, 482, 442]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 154,
+      "innate_abilities": [497, 472, 482, 442]
+    },
+    { "categories": [], "id": 155, "innate_abilities": [0, 0, 0, 0] },
+    { "categories": [], "id": 156, "innate_abilities": [0, 0, 0, 0] },
+    { "categories": [], "id": 157, "innate_abilities": [0, 0, 0, 0] },
+    { "categories": [], "id": 158, "innate_abilities": [0, 0, 0, 0] },
+    { "categories": [], "id": 159, "innate_abilities": [0, 0, 0, 0] },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Axe",
+        "Cloak",
+        "Clothing",
+        "FellSword",
+        "Flail",
+        "Helmet",
+        "KnightSword",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 160,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Axe",
+        "Bag",
+        "Book",
+        "Bow",
+        "Cloak",
+        "Cloth",
+        "Clothing",
+        "Crossbow",
+        "FellSword",
+        "Flail",
+        "Gun",
+        "HairAdornment",
+        "Hat",
+        "Helmet",
+        "Instrument",
+        "Katana",
+        "Knife",
+        "KnightSword",
+        "LipRouge",
+        "NinjaBlade",
+        "Perfume",
+        "Pole",
+        "Polearm",
+        "Ring",
+        "Robe",
+        "Rod",
+        "Shield",
+        "Shoes",
+        "Staff",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 161,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Bow",
+        "Cloak",
+        "Clothing",
+        "Crossbow",
+        "Gun",
+        "Hat",
+        "Helmet",
+        "Knife",
+        "KnightSword",
+        "Polearm",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 162,
+      "innate_abilities": [475, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "Clothing",
+        "Flail",
+        "Hat",
+        "Helmet",
+        "Knife",
+        "KnightSword",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 163,
+      "innate_abilities": [471, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Axe",
+        "Bag",
+        "Book",
+        "Bow",
+        "Cloak",
+        "Cloth",
+        "Clothing",
+        "Crossbow",
+        "FellSword",
+        "Flail",
+        "Gun",
+        "HairAdornment",
+        "Hat",
+        "Helmet",
+        "Instrument",
+        "Katana",
+        "Knife",
+        "KnightSword",
+        "LipRouge",
+        "NinjaBlade",
+        "Perfume",
+        "Pole",
+        "Polearm",
+        "Ring",
+        "Robe",
+        "Rod",
+        "Shield",
+        "Shoes",
+        "Staff",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 164,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "Helmet",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 165,
+      "innate_abilities": [466, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Armor",
+        "Cloak",
+        "Helmet",
+        "Knife",
+        "KnightSword",
+        "Ring",
+        "Robe",
+        "Shield",
+        "Shoes",
+        "Sword",
+        "Unarmed"
+      ],
+      "id": 166,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": [
+        "Armguard",
+        "Armlet",
+        "Book",
+        "Cloak",
+        "Clothing",
+        "Hat",
+        "Pole",
+        "Ring",
+        "Robe",
+        "Rod",
+        "Shoes",
+        "Staff",
+        "Unarmed"
+      ],
+      "id": 167,
+      "innate_abilities": [0, 0, 0, 0]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 168,
+      "innate_abilities": [442, 465, 467, 468]
+    },
+    {
+      "categories": ["Unarmed"],
+      "id": 169,
+      "innate_abilities": [497, 492, 0, 0]
+    },
+    { "categories": ["Unarmed"], "id": 170, "innate_abilities": [0, 0, 0, 0] },
+    { "categories": ["Unarmed"], "id": 171, "innate_abilities": [0, 0, 0, 0] },
+    {
+      "categories": ["Unarmed"],
+      "id": 172,
+      "innate_abilities": [497, 506, 0, 0]
+    },
+    { "categories": ["Unarmed"], "id": 173, "innate_abilities": [503, 0, 0, 0] }
+  ],
+  "revision": "d3123d2",
+  "schema": "equipment_rules_v1",
+  "sources": [
+    {
+      "sha256": "c724d1e5475eff2633d1ff3295f641f450dc341d90c443491860b5f5df1d49c5",
+      "table": "ItemData"
+    },
+    {
+      "sha256": "30ca54ac24746960d86cf97f6f4467895960bf925a4437e20297f549a55b8de1",
+      "table": "ItemWeaponData"
+    },
+    {
+      "sha256": "63e49670e9f237824aa0fa0b4c333280bc8cbd041440fcf1638bdb5e35cf7f2b",
+      "table": "JobData"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "main",
+  "description": "The main window can choose one save and invoke bounded save commands.",
+  "windows": ["main"],
+  "permissions": [
+    "dialog:allow-open",
+    "allow-get-save-selection",
+    "allow-set-save-selection",
+    "allow-load-reader",
+    "allow-preview-character",
+    "allow-preview-job-progress",
+    "allow-save-transaction",
+    "allow-restore-last-backup"
+  ]
+}
