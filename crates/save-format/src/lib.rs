@@ -1,7 +1,7 @@
 //! Bounded save-container decoding and a scoped gil edit.
 //!
-//! The UMIF read path is an attributed adaptation of TICSaveEditor and
-//! FF16Tools. See `NOTICE.md`. The public API accepts only immutable bytes and
+//! The UMIF read path adapts TICSaveEditor behavior derived from FF16Tools.
+//! See `NOTICE.md`. The public API accepts only immutable bytes and
 //! exposes no filesystem operation. The gil packer is limited to one field.
 
 mod creature;

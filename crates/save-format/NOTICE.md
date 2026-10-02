@@ -6,9 +6,11 @@ selected edit behavior were adapted from Nelveska's TICSaveEditor at revision
 `TICSaveEditor.Core/Save/UmifContainer.cs`, `PngEnvelope.cs`, `SaveSlot.cs`,
 `SaveWork.cs`, `UnitSaveData.cs` and their layout types.
 
-The UMIF XOR and preset-dictionary algorithm and `CompressDict.bin` originate
-with Nenkai's FF16Tools at revision `dd91fb451d3b2e97bc637b5d43388e7118c145bf`
-(MIT). See the root `NOTICE.md` and `LICENSES/Nenkai-MIT.txt`.
+TICSaveEditor credits Nenkai's FF16Tools at revision
+`dd91fb451d3b2e97bc637b5d43388e7118c145bf` (MIT) for the UMIF XOR and
+preset-dictionary algorithm and `CompressDict.bin`. The Rust implementation
+follows that behavior without copying an FF16Tools source file verbatim. See the
+root `NOTICE.md` and `LICENSES/Nenkai-MIT.txt`.
 
 This Rust implementation adds strict bounds and integrity checks, immutable
 decode, scoped replacement of the selected manual slot, and separate recoverable

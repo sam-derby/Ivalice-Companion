@@ -1,0 +1,5077 @@
+{
+  "schema": "ability_flags_v1",
+  "profile": "english_steam_enhanced_manual",
+  "job_sha256": "0bb0d6ac321c65ed80e9597cd5c8f6324e02bbc1a8446f9344cceb1643f4cd44",
+  "job_xml_sha256": "1ee9761b6e94e9be2d1895bff5d5c14b1df2059a4560cdf5e4ad0de30d074650",
+  "ability_sha256": "349d1a3640c6772872b24c3bf3a85dadfe54ddfa47ebbcd2b0eead16fbb77aa5",
+  "ability_xml_sha256": "46f5105ff1874e85572dfdda016cc2a6db4ca4a62b14a16d4f3e0279756b7391",
+  "command_sha256": "f6dd33581c5880200c7f3e0b45e2e6f706061214227f989fef368baf25a6ef88",
+  "command_xml_sha256": "da9a9d77ed4e441e4b554ed4a98805b7e0e6765d76a0bde8e79653b8d0cb311b",
+  "jobs": [
+    {
+      "slot": 0,
+      "job_id": 74,
+      "command_id": 5,
+      "command_label": "Fundaments",
+      "members": [
+        {
+          "key": "ability:146",
+          "bit": 7,
+          "label": "Focus",
+          "kind": "action"
+        },
+        {
+          "key": "ability:147",
+          "bit": 6,
+          "label": "Rush",
+          "kind": "action"
+        },
+        {
+          "key": "ability:148",
+          "bit": 5,
+          "label": "Throw Stone",
+          "kind": "action"
+        },
+        {
+          "key": "ability:149",
+          "bit": 4,
+          "label": "Salve",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 1,
+      "job_id": 75,
+      "command_id": 6,
+      "command_label": "Items",
+      "members": [
+        {
+          "key": "ability:368",
+          "bit": 7,
+          "label": "Potion",
+          "kind": "action"
+        },
+        {
+          "key": "ability:369",
+          "bit": 6,
+          "label": "High Potion",
+          "kind": "action"
+        },
+        {
+          "key": "ability:370",
+          "bit": 5,
+          "label": "X-Potion",
+          "kind": "action"
+        },
+        {
+          "key": "ability:371",
+          "bit": 4,
+          "label": "Ether",
+          "kind": "action"
+        },
+        {
+          "key": "ability:372",
+          "bit": 3,
+          "label": "High Ether",
+          "kind": "action"
+        },
+        {
+          "key": "ability:373",
+          "bit": 2,
+          "label": "Elixir",
+          "kind": "action"
+        },
+        {
+          "key": "ability:374",
+          "bit": 1,
+          "label": "Antidote",
+          "kind": "action"
+        },
+        {
+          "key": "ability:375",
+          "bit": 0,
+          "label": "Eye Drops",
+          "kind": "action"
+        },
+        {
+          "key": "ability:376",
+          "bit": 15,
+          "label": "Echo Herbs",
+          "kind": "action"
+        },
+        {
+          "key": "ability:377",
+          "bit": 14,
+          "label": "Maiden's Kiss",
+          "kind": "action"
+        },
+        {
+          "key": "ability:378",
+          "bit": 13,
+          "label": "Gold Needle",
+          "kind": "action"
+        },
+        {
+          "key": "ability:379",
+          "bit": 12,
+          "label": "Holy Water",
+          "kind": "action"
+        },
+        {
+          "key": "ability:380",
+          "bit": 11,
+          "label": "Remedy",
+          "kind": "action"
+        },
+        {
+          "key": "ability:381",
+          "bit": 10,
+          "label": "Phoenix Down",
+          "kind": "action"
+        },
+        {
+          "key": "ability:441",
+          "bit": 23,
+          "label": "Auto-Potion",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:474",
+          "bit": 22,
+          "label": "Throw Items",
+          "kind": "support"
+        },
+        {
+          "key": "ability:475",
+          "bit": 21,
+          "label": "Safeguard",
+          "kind": "support"
+        },
+        {
+          "key": "ability:480",
+          "bit": 20,
+          "label": "Reequip",
+          "kind": "support"
+        },
+        {
+          "key": "ability:509",
+          "bit": 19,
+          "label": "Treasure Hunter",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 2,
+      "job_id": 76,
+      "command_id": 7,
+      "command_label": "Arts of War",
+      "members": [
+        {
+          "key": "ability:138",
+          "bit": 7,
+          "label": "Rend Helm",
+          "kind": "action"
+        },
+        {
+          "key": "ability:139",
+          "bit": 6,
+          "label": "Rend Armor",
+          "kind": "action"
+        },
+        {
+          "key": "ability:140",
+          "bit": 5,
+          "label": "Rend Shield",
+          "kind": "action"
+        },
+        {
+          "key": "ability:141",
+          "bit": 4,
+          "label": "Rend Weapon",
+          "kind": "action"
+        },
+        {
+          "key": "ability:142",
+          "bit": 3,
+          "label": "Rend MP",
+          "kind": "action"
+        },
+        {
+          "key": "ability:143",
+          "bit": 2,
+          "label": "Rend Speed",
+          "kind": "action"
+        },
+        {
+          "key": "ability:144",
+          "bit": 1,
+          "label": "Rend Power",
+          "kind": "action"
+        },
+        {
+          "key": "ability:145",
+          "bit": 0,
+          "label": "Rend Magick",
+          "kind": "action"
+        },
+        {
+          "key": "ability:447",
+          "bit": 23,
+          "label": "Parry",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:454",
+          "bit": 22,
+          "label": "Equip Heavy Armor",
+          "kind": "support"
+        },
+        {
+          "key": "ability:455",
+          "bit": 21,
+          "label": "Equip Shields",
+          "kind": "support"
+        },
+        {
+          "key": "ability:456",
+          "bit": 20,
+          "label": "Equip Swords",
+          "kind": "support"
+        }
+      ]
+    },
+    {
+      "slot": 3,
+      "job_id": 77,
+      "command_id": 8,
+      "command_label": "Aim",
+      "members": [
+        {
+          "key": "ability:406",
+          "bit": 7,
+          "label": "Aim +1",
+          "kind": "action"
+        },
+        {
+          "key": "ability:407",
+          "bit": 6,
+          "label": "Aim +2",
+          "kind": "action"
+        },
+        {
+          "key": "ability:408",
+          "bit": 5,
+          "label": "Aim +3",
+          "kind": "action"
+        },
+        {
+          "key": "ability:409",
+          "bit": 4,
+          "label": "Aim +4",
+          "kind": "action"
+        },
+        {
+          "key": "ability:410",
+          "bit": 3,
+          "label": "Aim +5",
+          "kind": "action"
+        },
+        {
+          "key": "ability:411",
+          "bit": 2,
+          "label": "Aim +7",
+          "kind": "action"
+        },
+        {
+          "key": "ability:412",
+          "bit": 1,
+          "label": "Aim +10",
+          "kind": "action"
+        },
+        {
+          "key": "ability:413",
+          "bit": 0,
+          "label": "Aim +20",
+          "kind": "action"
+        },
+        {
+          "key": "ability:424",
+          "bit": 23,
+          "label": "Speed Surge",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:452",
+          "bit": 22,
+          "label": "Archer's Bane",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:458",
+          "bit": 21,
+          "label": "Equip Crossbows",
+          "kind": "support"
+        },
+        {
+          "key": "ability:469",
+          "bit": 20,
+          "label": "Concentration",
+          "kind": "support"
+        },
+        {
+          "key": "ability:489",
+          "bit": 19,
+          "label": "Jump +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 4,
+      "job_id": 78,
+      "command_id": 9,
+      "command_label": "Martial Arts",
+      "members": [
+        {
+          "key": "ability:100",
+          "bit": 7,
+          "label": "Cyclone",
+          "kind": "action"
+        },
+        {
+          "key": "ability:101",
+          "bit": 6,
+          "label": "Pummel",
+          "kind": "action"
+        },
+        {
+          "key": "ability:102",
+          "bit": 5,
+          "label": "Aurablast",
+          "kind": "action"
+        },
+        {
+          "key": "ability:103",
+          "bit": 4,
+          "label": "Shockwave",
+          "kind": "action"
+        },
+        {
+          "key": "ability:104",
+          "bit": 3,
+          "label": "Doom Fist",
+          "kind": "action"
+        },
+        {
+          "key": "ability:105",
+          "bit": 2,
+          "label": "Purification",
+          "kind": "action"
+        },
+        {
+          "key": "ability:106",
+          "bit": 1,
+          "label": "Chakra",
+          "kind": "action"
+        },
+        {
+          "key": "ability:107",
+          "bit": 0,
+          "label": "Revive",
+          "kind": "action"
+        },
+        {
+          "key": "ability:431",
+          "bit": 23,
+          "label": "Critical: Recover HP",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:442",
+          "bit": 22,
+          "label": "Counter",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:453",
+          "bit": 21,
+          "label": "First Strike",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:472",
+          "bit": 20,
+          "label": "Brawler",
+          "kind": "support"
+        },
+        {
+          "key": "ability:493",
+          "bit": 19,
+          "label": "Lifefont",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 5,
+      "job_id": 79,
+      "command_id": 10,
+      "command_label": "White Magicks",
+      "members": [
+        {
+          "key": "ability:1",
+          "bit": 7,
+          "label": "Cure",
+          "kind": "action"
+        },
+        {
+          "key": "ability:2",
+          "bit": 6,
+          "label": "Cura",
+          "kind": "action"
+        },
+        {
+          "key": "ability:3",
+          "bit": 5,
+          "label": "Curaga",
+          "kind": "action"
+        },
+        {
+          "key": "ability:4",
+          "bit": 4,
+          "label": "Curaja",
+          "kind": "action"
+        },
+        {
+          "key": "ability:5",
+          "bit": 3,
+          "label": "Raise",
+          "kind": "action"
+        },
+        {
+          "key": "ability:6",
+          "bit": 2,
+          "label": "Arise",
+          "kind": "action"
+        },
+        {
+          "key": "ability:7",
+          "bit": 1,
+          "label": "Reraise",
+          "kind": "action"
+        },
+        {
+          "key": "ability:8",
+          "bit": 0,
+          "label": "Regen",
+          "kind": "action"
+        },
+        {
+          "key": "ability:9",
+          "bit": 15,
+          "label": "Protect",
+          "kind": "action"
+        },
+        {
+          "key": "ability:10",
+          "bit": 14,
+          "label": "Protectja",
+          "kind": "action"
+        },
+        {
+          "key": "ability:11",
+          "bit": 13,
+          "label": "Shell",
+          "kind": "action"
+        },
+        {
+          "key": "ability:12",
+          "bit": 12,
+          "label": "Shellja",
+          "kind": "action"
+        },
+        {
+          "key": "ability:13",
+          "bit": 11,
+          "label": "Wall",
+          "kind": "action"
+        },
+        {
+          "key": "ability:14",
+          "bit": 10,
+          "label": "Esuna",
+          "kind": "action"
+        },
+        {
+          "key": "ability:15",
+          "bit": 9,
+          "label": "Holy",
+          "kind": "action"
+        },
+        {
+          "key": "ability:428",
+          "bit": 23,
+          "label": "Regenerate",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:468",
+          "bit": 22,
+          "label": "Magick Defense Boost",
+          "kind": "support"
+        }
+      ]
+    },
+    {
+      "slot": 6,
+      "job_id": 80,
+      "command_id": 11,
+      "command_label": "Black Magicks",
+      "members": [
+        {
+          "key": "ability:16",
+          "bit": 7,
+          "label": "Fire",
+          "kind": "action"
+        },
+        {
+          "key": "ability:17",
+          "bit": 6,
+          "label": "Fira",
+          "kind": "action"
+        },
+        {
+          "key": "ability:18",
+          "bit": 5,
+          "label": "Firaga",
+          "kind": "action"
+        },
+        {
+          "key": "ability:19",
+          "bit": 4,
+          "label": "Firaja",
+          "kind": "action"
+        },
+        {
+          "key": "ability:20",
+          "bit": 3,
+          "label": "Thunder",
+          "kind": "action"
+        },
+        {
+          "key": "ability:21",
+          "bit": 2,
+          "label": "Thundara",
+          "kind": "action"
+        },
+        {
+          "key": "ability:22",
+          "bit": 1,
+          "label": "Thundaga",
+          "kind": "action"
+        },
+        {
+          "key": "ability:23",
+          "bit": 0,
+          "label": "Thundaja",
+          "kind": "action"
+        },
+        {
+          "key": "ability:24",
+          "bit": 15,
+          "label": "Blizzard",
+          "kind": "action"
+        },
+        {
+          "key": "ability:25",
+          "bit": 14,
+          "label": "Blizzara",
+          "kind": "action"
+        },
+        {
+          "key": "ability:26",
+          "bit": 13,
+          "label": "Blizzaga",
+          "kind": "action"
+        },
+        {
+          "key": "ability:27",
+          "bit": 12,
+          "label": "Blizzaja",
+          "kind": "action"
+        },
+        {
+          "key": "ability:28",
+          "bit": 11,
+          "label": "Poison",
+          "kind": "action"
+        },
+        {
+          "key": "ability:29",
+          "bit": 10,
+          "label": "Toad",
+          "kind": "action"
+        },
+        {
+          "key": "ability:30",
+          "bit": 9,
+          "label": "Death",
+          "kind": "action"
+        },
+        {
+          "key": "ability:31",
+          "bit": 8,
+          "label": "Flare",
+          "kind": "action"
+        },
+        {
+          "key": "ability:435",
+          "bit": 23,
+          "label": "Magick Counter",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:467",
+          "bit": 22,
+          "label": "Magick Boost",
+          "kind": "support"
+        }
+      ]
+    },
+    {
+      "slot": 7,
+      "job_id": 81,
+      "command_id": 12,
+      "command_label": "Time Magicks",
+      "members": [
+        {
+          "key": "ability:32",
+          "bit": 7,
+          "label": "Haste",
+          "kind": "action"
+        },
+        {
+          "key": "ability:33",
+          "bit": 6,
+          "label": "Hasteja",
+          "kind": "action"
+        },
+        {
+          "key": "ability:34",
+          "bit": 5,
+          "label": "Slow",
+          "kind": "action"
+        },
+        {
+          "key": "ability:35",
+          "bit": 4,
+          "label": "Slowja",
+          "kind": "action"
+        },
+        {
+          "key": "ability:36",
+          "bit": 3,
+          "label": "Stop",
+          "kind": "action"
+        },
+        {
+          "key": "ability:37",
+          "bit": 2,
+          "label": "Immobilize",
+          "kind": "action"
+        },
+        {
+          "key": "ability:38",
+          "bit": 1,
+          "label": "Float",
+          "kind": "action"
+        },
+        {
+          "key": "ability:39",
+          "bit": 0,
+          "label": "Reflect",
+          "kind": "action"
+        },
+        {
+          "key": "ability:41",
+          "bit": 15,
+          "label": "Quick",
+          "kind": "action"
+        },
+        {
+          "key": "ability:42",
+          "bit": 14,
+          "label": "Gravity",
+          "kind": "action"
+        },
+        {
+          "key": "ability:43",
+          "bit": 13,
+          "label": "Graviga",
+          "kind": "action"
+        },
+        {
+          "key": "ability:44",
+          "bit": 12,
+          "label": "Meteor",
+          "kind": "action"
+        },
+        {
+          "key": "ability:433",
+          "bit": 23,
+          "label": "Critical: Quick",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:445",
+          "bit": 22,
+          "label": "Mana Shield",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:482",
+          "bit": 21,
+          "label": "Swiftspell",
+          "kind": "support"
+        },
+        {
+          "key": "ability:498",
+          "bit": 20,
+          "label": "Teleport",
+          "kind": "movement"
+        },
+        {
+          "key": "ability:506",
+          "bit": 19,
+          "label": "Levitate",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 8,
+      "job_id": 82,
+      "command_id": 13,
+      "command_label": "Summon",
+      "members": [
+        {
+          "key": "ability:60",
+          "bit": 7,
+          "label": "Moogle",
+          "kind": "action"
+        },
+        {
+          "key": "ability:61",
+          "bit": 6,
+          "label": "Shiva",
+          "kind": "action"
+        },
+        {
+          "key": "ability:62",
+          "bit": 5,
+          "label": "Ramuh",
+          "kind": "action"
+        },
+        {
+          "key": "ability:63",
+          "bit": 4,
+          "label": "Ifrit",
+          "kind": "action"
+        },
+        {
+          "key": "ability:64",
+          "bit": 3,
+          "label": "Titan",
+          "kind": "action"
+        },
+        {
+          "key": "ability:65",
+          "bit": 2,
+          "label": "Golem",
+          "kind": "action"
+        },
+        {
+          "key": "ability:66",
+          "bit": 1,
+          "label": "Carbuncle",
+          "kind": "action"
+        },
+        {
+          "key": "ability:67",
+          "bit": 0,
+          "label": "Bahamut",
+          "kind": "action"
+        },
+        {
+          "key": "ability:68",
+          "bit": 15,
+          "label": "Odin",
+          "kind": "action"
+        },
+        {
+          "key": "ability:69",
+          "bit": 14,
+          "label": "Leviathan",
+          "kind": "action"
+        },
+        {
+          "key": "ability:70",
+          "bit": 13,
+          "label": "Salamander",
+          "kind": "action"
+        },
+        {
+          "key": "ability:71",
+          "bit": 12,
+          "label": "Sylph",
+          "kind": "action"
+        },
+        {
+          "key": "ability:72",
+          "bit": 11,
+          "label": "Faerie",
+          "kind": "action"
+        },
+        {
+          "key": "ability:73",
+          "bit": 10,
+          "label": "Lich",
+          "kind": "action"
+        },
+        {
+          "key": "ability:74",
+          "bit": 9,
+          "label": "Cyclops",
+          "kind": "action"
+        },
+        {
+          "key": "ability:75",
+          "bit": 8,
+          "label": "Zodiark",
+          "kind": "action"
+        },
+        {
+          "key": "ability:432",
+          "bit": 23,
+          "label": "Critical: Recover MP",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:462",
+          "bit": 22,
+          "label": "Halve MP",
+          "kind": "support"
+        }
+      ]
+    },
+    {
+      "slot": 9,
+      "job_id": 83,
+      "command_id": 14,
+      "command_label": "Steal",
+      "members": [
+        {
+          "key": "ability:108",
+          "bit": 7,
+          "label": "Steal Gil",
+          "kind": "action"
+        },
+        {
+          "key": "ability:109",
+          "bit": 6,
+          "label": "Steal Heart",
+          "kind": "action"
+        },
+        {
+          "key": "ability:110",
+          "bit": 5,
+          "label": "Steal Helm",
+          "kind": "action"
+        },
+        {
+          "key": "ability:111",
+          "bit": 4,
+          "label": "Steal Armor",
+          "kind": "action"
+        },
+        {
+          "key": "ability:112",
+          "bit": 3,
+          "label": "Steal Shield",
+          "kind": "action"
+        },
+        {
+          "key": "ability:113",
+          "bit": 2,
+          "label": "Steal Weapon",
+          "kind": "action"
+        },
+        {
+          "key": "ability:114",
+          "bit": 1,
+          "label": "Steal Accessory",
+          "kind": "action"
+        },
+        {
+          "key": "ability:115",
+          "bit": 0,
+          "label": "Steal EXP",
+          "kind": "action"
+        },
+        {
+          "key": "ability:426",
+          "bit": 23,
+          "label": "Vigilance",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:439",
+          "bit": 22,
+          "label": "Gil Snapper",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:450",
+          "bit": 21,
+          "label": "Sticky Fingers",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:471",
+          "bit": 20,
+          "label": "Poach",
+          "kind": "support"
+        },
+        {
+          "key": "ability:487",
+          "bit": 19,
+          "label": "Movement +2",
+          "kind": "movement"
+        },
+        {
+          "key": "ability:490",
+          "bit": 18,
+          "label": "Jump +2",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 10,
+      "job_id": 84,
+      "command_id": 15,
+      "command_label": "Speechcraft",
+      "members": [
+        {
+          "key": "ability:116",
+          "bit": 7,
+          "label": "Entice",
+          "kind": "action"
+        },
+        {
+          "key": "ability:117",
+          "bit": 6,
+          "label": "Stall",
+          "kind": "action"
+        },
+        {
+          "key": "ability:118",
+          "bit": 5,
+          "label": "Praise",
+          "kind": "action"
+        },
+        {
+          "key": "ability:119",
+          "bit": 4,
+          "label": "Intimidate",
+          "kind": "action"
+        },
+        {
+          "key": "ability:120",
+          "bit": 3,
+          "label": "Preach",
+          "kind": "action"
+        },
+        {
+          "key": "ability:121",
+          "bit": 2,
+          "label": "Enlighten",
+          "kind": "action"
+        },
+        {
+          "key": "ability:122",
+          "bit": 1,
+          "label": "Condemn",
+          "kind": "action"
+        },
+        {
+          "key": "ability:123",
+          "bit": 0,
+          "label": "Defraud",
+          "kind": "action"
+        },
+        {
+          "key": "ability:124",
+          "bit": 15,
+          "label": "Insult",
+          "kind": "action"
+        },
+        {
+          "key": "ability:125",
+          "bit": 14,
+          "label": "Mimic Darlavon",
+          "kind": "action"
+        },
+        {
+          "key": "ability:448",
+          "bit": 23,
+          "label": "Earplugs",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:461",
+          "bit": 22,
+          "label": "Equip Guns",
+          "kind": "support"
+        },
+        {
+          "key": "ability:470",
+          "bit": 21,
+          "label": "Tame",
+          "kind": "support"
+        },
+        {
+          "key": "ability:473",
+          "bit": 20,
+          "label": "Beast Tongue",
+          "kind": "support"
+        }
+      ]
+    },
+    {
+      "slot": 11,
+      "job_id": 85,
+      "command_id": 16,
+      "command_label": "Mystic Arts",
+      "members": [
+        {
+          "key": "ability:46",
+          "bit": 7,
+          "label": "Umbra",
+          "kind": "action"
+        },
+        {
+          "key": "ability:47",
+          "bit": 6,
+          "label": "Empowerment",
+          "kind": "action"
+        },
+        {
+          "key": "ability:48",
+          "bit": 5,
+          "label": "Invigoration",
+          "kind": "action"
+        },
+        {
+          "key": "ability:49",
+          "bit": 4,
+          "label": "Belief",
+          "kind": "action"
+        },
+        {
+          "key": "ability:50",
+          "bit": 3,
+          "label": "Disbelief",
+          "kind": "action"
+        },
+        {
+          "key": "ability:51",
+          "bit": 2,
+          "label": "Corruption",
+          "kind": "action"
+        },
+        {
+          "key": "ability:52",
+          "bit": 1,
+          "label": "Quiescence",
+          "kind": "action"
+        },
+        {
+          "key": "ability:53",
+          "bit": 0,
+          "label": "Fervor",
+          "kind": "action"
+        },
+        {
+          "key": "ability:54",
+          "bit": 15,
+          "label": "Trepidation",
+          "kind": "action"
+        },
+        {
+          "key": "ability:55",
+          "bit": 14,
+          "label": "Delirium",
+          "kind": "action"
+        },
+        {
+          "key": "ability:56",
+          "bit": 13,
+          "label": "Harmony",
+          "kind": "action"
+        },
+        {
+          "key": "ability:57",
+          "bit": 12,
+          "label": "Hesitation",
+          "kind": "action"
+        },
+        {
+          "key": "ability:58",
+          "bit": 11,
+          "label": "Repose",
+          "kind": "action"
+        },
+        {
+          "key": "ability:59",
+          "bit": 10,
+          "label": "Induration",
+          "kind": "action"
+        },
+        {
+          "key": "ability:438",
+          "bit": 23,
+          "label": "Absorb MP",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:466",
+          "bit": 22,
+          "label": "Defense Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:500",
+          "bit": 21,
+          "label": "Ignore Weather",
+          "kind": "movement"
+        },
+        {
+          "key": "ability:494",
+          "bit": 20,
+          "label": "Manafont",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 12,
+      "job_id": 86,
+      "command_id": 17,
+      "command_label": "Geomancy",
+      "members": [
+        {
+          "key": "ability:126",
+          "bit": 7,
+          "label": "Sinkhole",
+          "kind": "action"
+        },
+        {
+          "key": "ability:127",
+          "bit": 6,
+          "label": "Torrent",
+          "kind": "action"
+        },
+        {
+          "key": "ability:128",
+          "bit": 5,
+          "label": "Tanglevine",
+          "kind": "action"
+        },
+        {
+          "key": "ability:129",
+          "bit": 4,
+          "label": "Contortion",
+          "kind": "action"
+        },
+        {
+          "key": "ability:130",
+          "bit": 3,
+          "label": "Tremor",
+          "kind": "action"
+        },
+        {
+          "key": "ability:131",
+          "bit": 2,
+          "label": "Wind Slash",
+          "kind": "action"
+        },
+        {
+          "key": "ability:132",
+          "bit": 1,
+          "label": "Will-o'-the-Wisp",
+          "kind": "action"
+        },
+        {
+          "key": "ability:133",
+          "bit": 0,
+          "label": "Quicksand",
+          "kind": "action"
+        },
+        {
+          "key": "ability:134",
+          "bit": 15,
+          "label": "Sandstorm",
+          "kind": "action"
+        },
+        {
+          "key": "ability:135",
+          "bit": 14,
+          "label": "Snowstorm",
+          "kind": "action"
+        },
+        {
+          "key": "ability:136",
+          "bit": 13,
+          "label": "Wind Blast",
+          "kind": "action"
+        },
+        {
+          "key": "ability:137",
+          "bit": 12,
+          "label": "Magma Surge",
+          "kind": "action"
+        },
+        {
+          "key": "ability:437",
+          "bit": 23,
+          "label": "Nature's Wrath",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:465",
+          "bit": 22,
+          "label": "Attack Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:501",
+          "bit": 21,
+          "label": "Ignore Terrain",
+          "kind": "movement"
+        },
+        {
+          "key": "ability:504",
+          "bit": 20,
+          "label": "Lavawalking",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 13,
+      "job_id": 87,
+      "command_id": 18,
+      "command_label": "Jump",
+      "members": [
+        {
+          "key": "ability:394",
+          "bit": 7,
+          "label": "Horizontal Jump +1",
+          "kind": "action"
+        },
+        {
+          "key": "ability:395",
+          "bit": 6,
+          "label": "Horizontal Jump +2",
+          "kind": "action"
+        },
+        {
+          "key": "ability:396",
+          "bit": 5,
+          "label": "Horizontal Jump +3",
+          "kind": "action"
+        },
+        {
+          "key": "ability:397",
+          "bit": 4,
+          "label": "Horizontal Jump +4",
+          "kind": "action"
+        },
+        {
+          "key": "ability:398",
+          "bit": 3,
+          "label": "Horizontal Jump +7",
+          "kind": "action"
+        },
+        {
+          "key": "ability:399",
+          "bit": 2,
+          "label": "Vertical Jump ±2",
+          "kind": "action"
+        },
+        {
+          "key": "ability:400",
+          "bit": 1,
+          "label": "Vertical Jump ±3",
+          "kind": "action"
+        },
+        {
+          "key": "ability:401",
+          "bit": 0,
+          "label": "Vertical Jump ±4",
+          "kind": "action"
+        },
+        {
+          "key": "ability:402",
+          "bit": 15,
+          "label": "Vertical Jump ±5",
+          "kind": "action"
+        },
+        {
+          "key": "ability:403",
+          "bit": 14,
+          "label": "Vertical Jump ±6",
+          "kind": "action"
+        },
+        {
+          "key": "ability:404",
+          "bit": 13,
+          "label": "Vertical Jump ±7",
+          "kind": "action"
+        },
+        {
+          "key": "ability:405",
+          "bit": 12,
+          "label": "Vertical Jump ±8",
+          "kind": "action"
+        },
+        {
+          "key": "ability:427",
+          "bit": 23,
+          "label": "Dragonheart",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:459",
+          "bit": 22,
+          "label": "Equip Polearms",
+          "kind": "support"
+        },
+        {
+          "key": "ability:492",
+          "bit": 21,
+          "label": "Ignore Elevation",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 14,
+      "job_id": 88,
+      "command_id": 19,
+      "command_label": "Iaido",
+      "members": [
+        {
+          "key": "ability:76",
+          "bit": 7,
+          "label": "Ashura",
+          "kind": "action"
+        },
+        {
+          "key": "ability:77",
+          "bit": 6,
+          "label": "Kotetsu",
+          "kind": "action"
+        },
+        {
+          "key": "ability:78",
+          "bit": 5,
+          "label": "Bizen Osafune",
+          "kind": "action"
+        },
+        {
+          "key": "ability:79",
+          "bit": 4,
+          "label": "Murasame",
+          "kind": "action"
+        },
+        {
+          "key": "ability:80",
+          "bit": 3,
+          "label": "Ame-no-Murakumo",
+          "kind": "action"
+        },
+        {
+          "key": "ability:81",
+          "bit": 2,
+          "label": "Kiyomori",
+          "kind": "action"
+        },
+        {
+          "key": "ability:82",
+          "bit": 1,
+          "label": "Muramasa",
+          "kind": "action"
+        },
+        {
+          "key": "ability:83",
+          "bit": 0,
+          "label": "Kiku-ichimonji",
+          "kind": "action"
+        },
+        {
+          "key": "ability:84",
+          "bit": 15,
+          "label": "Masamune",
+          "kind": "action"
+        },
+        {
+          "key": "ability:85",
+          "bit": 14,
+          "label": "Chirijiraden",
+          "kind": "action"
+        },
+        {
+          "key": "ability:434",
+          "bit": 23,
+          "label": "Bonecrusher",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:451",
+          "bit": 22,
+          "label": "Shirahadori",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:457",
+          "bit": 21,
+          "label": "Equip Katana",
+          "kind": "support"
+        },
+        {
+          "key": "ability:476",
+          "bit": 20,
+          "label": "Doublehand",
+          "kind": "support"
+        },
+        {
+          "key": "ability:503",
+          "bit": 19,
+          "label": "Swim",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 15,
+      "job_id": 89,
+      "command_id": 20,
+      "command_label": "Throw",
+      "members": [
+        {
+          "key": "ability:382",
+          "bit": 7,
+          "label": "Throw Shuriken",
+          "kind": "action"
+        },
+        {
+          "key": "ability:393",
+          "bit": 6,
+          "label": "Throw Bombs",
+          "kind": "action"
+        },
+        {
+          "key": "ability:383",
+          "bit": 5,
+          "label": "Throw Daggers",
+          "kind": "action"
+        },
+        {
+          "key": "ability:384",
+          "bit": 4,
+          "label": "Throw Swords",
+          "kind": "action"
+        },
+        {
+          "key": "ability:385",
+          "bit": 3,
+          "label": "Throw Flails",
+          "kind": "action"
+        },
+        {
+          "key": "ability:386",
+          "bit": 2,
+          "label": "Throw Katana",
+          "kind": "action"
+        },
+        {
+          "key": "ability:387",
+          "bit": 1,
+          "label": "Throw Ninja Blades",
+          "kind": "action"
+        },
+        {
+          "key": "ability:388",
+          "bit": 0,
+          "label": "Throw Axes",
+          "kind": "action"
+        },
+        {
+          "key": "ability:389",
+          "bit": 15,
+          "label": "Throw Polearms",
+          "kind": "action"
+        },
+        {
+          "key": "ability:390",
+          "bit": 14,
+          "label": "Throw Poles",
+          "kind": "action"
+        },
+        {
+          "key": "ability:391",
+          "bit": 13,
+          "label": "Throw Knight's Swords",
+          "kind": "action"
+        },
+        {
+          "key": "ability:392",
+          "bit": 12,
+          "label": "Throw Books",
+          "kind": "action"
+        },
+        {
+          "key": "ability:425",
+          "bit": 23,
+          "label": "Vanish",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:449",
+          "bit": 22,
+          "label": "Reflexes",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:477",
+          "bit": 21,
+          "label": "Dual Wield",
+          "kind": "support"
+        },
+        {
+          "key": "ability:502",
+          "bit": 20,
+          "label": "Waterwalking",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 16,
+      "job_id": 90,
+      "command_id": 21,
+      "command_label": "Arithmeticks",
+      "members": [
+        {
+          "key": "ability:414",
+          "bit": 7,
+          "label": "Target CT",
+          "kind": "action"
+        },
+        {
+          "key": "ability:415",
+          "bit": 6,
+          "label": "Target Level",
+          "kind": "action"
+        },
+        {
+          "key": "ability:416",
+          "bit": 5,
+          "label": "Target EXP",
+          "kind": "action"
+        },
+        {
+          "key": "ability:417",
+          "bit": 4,
+          "label": "Target Elevation",
+          "kind": "action"
+        },
+        {
+          "key": "ability:418",
+          "bit": 3,
+          "label": "Prime",
+          "kind": "action"
+        },
+        {
+          "key": "ability:419",
+          "bit": 2,
+          "label": "Multiple of 5",
+          "kind": "action"
+        },
+        {
+          "key": "ability:420",
+          "bit": 1,
+          "label": "Multiple of 4",
+          "kind": "action"
+        },
+        {
+          "key": "ability:421",
+          "bit": 0,
+          "label": "Multiple of 3",
+          "kind": "action"
+        },
+        {
+          "key": "ability:444",
+          "bit": 23,
+          "label": "Cup of Life",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:446",
+          "bit": 22,
+          "label": "Soulbind",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:464",
+          "bit": 21,
+          "label": "EXP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:495",
+          "bit": 20,
+          "label": "Accrue EXP",
+          "kind": "movement"
+        },
+        {
+          "key": "ability:496",
+          "bit": 19,
+          "label": "Accrue JP",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 17,
+      "job_id": 91,
+      "command_id": 22,
+      "command_label": "Bardsong",
+      "members": [
+        {
+          "key": "ability:86",
+          "bit": 7,
+          "label": "Seraph Song",
+          "kind": "action"
+        },
+        {
+          "key": "ability:87",
+          "bit": 6,
+          "label": "Life's Anthem",
+          "kind": "action"
+        },
+        {
+          "key": "ability:88",
+          "bit": 5,
+          "label": "Rousing Melody",
+          "kind": "action"
+        },
+        {
+          "key": "ability:89",
+          "bit": 4,
+          "label": "Battle Chant",
+          "kind": "action"
+        },
+        {
+          "key": "ability:90",
+          "bit": 3,
+          "label": "Magickal Refrain",
+          "kind": "action"
+        },
+        {
+          "key": "ability:91",
+          "bit": 2,
+          "label": "Nameless Song",
+          "kind": "action"
+        },
+        {
+          "key": "ability:92",
+          "bit": 1,
+          "label": "Finale",
+          "kind": "action"
+        },
+        {
+          "key": "ability:423",
+          "bit": 23,
+          "label": "Magick Surge",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:430",
+          "bit": 22,
+          "label": "Faith Surge",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:488",
+          "bit": 21,
+          "label": "Movement +3",
+          "kind": "movement"
+        },
+        {
+          "key": "ability:507",
+          "bit": 20,
+          "label": "Fly",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 18,
+      "job_id": 92,
+      "command_id": 23,
+      "command_label": "Dance",
+      "members": [
+        {
+          "key": "ability:93",
+          "bit": 7,
+          "label": "Witch Hunt",
+          "kind": "action"
+        },
+        {
+          "key": "ability:94",
+          "bit": 6,
+          "label": "Mincing Minuet",
+          "kind": "action"
+        },
+        {
+          "key": "ability:95",
+          "bit": 5,
+          "label": "Slow Dance",
+          "kind": "action"
+        },
+        {
+          "key": "ability:96",
+          "bit": 4,
+          "label": "Polka",
+          "kind": "action"
+        },
+        {
+          "key": "ability:97",
+          "bit": 3,
+          "label": "Heathen Frolic",
+          "kind": "action"
+        },
+        {
+          "key": "ability:98",
+          "bit": 2,
+          "label": "Forbidden Dance",
+          "kind": "action"
+        },
+        {
+          "key": "ability:99",
+          "bit": 1,
+          "label": "Last Waltz",
+          "kind": "action"
+        },
+        {
+          "key": "ability:422",
+          "bit": 23,
+          "label": "Strength Surge",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:429",
+          "bit": 22,
+          "label": "Bravery Surge",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:491",
+          "bit": 21,
+          "label": "Jump +3",
+          "kind": "movement"
+        },
+        {
+          "key": "ability:507",
+          "bit": 20,
+          "label": "Fly",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 19,
+      "job_id": 93,
+      "command_id": 24,
+      "command_label": "Mimic",
+      "members": []
+    }
+  ],
+  "special_jobs": [
+    {
+      "slot": 0,
+      "job_id": 1,
+      "command_id": 25,
+      "command_label": "Mettle",
+      "members": [
+        {
+          "key": "ability:146",
+          "bit": 7,
+          "label": "Focus",
+          "kind": "action"
+        },
+        {
+          "key": "ability:147",
+          "bit": 6,
+          "label": "Rush",
+          "kind": "action"
+        },
+        {
+          "key": "ability:148",
+          "bit": 5,
+          "label": "Throw Stone",
+          "kind": "action"
+        },
+        {
+          "key": "ability:149",
+          "bit": 4,
+          "label": "Salve",
+          "kind": "action"
+        },
+        {
+          "key": "ability:150",
+          "bit": 3,
+          "label": "Tailwind",
+          "kind": "action"
+        },
+        {
+          "key": "ability:152",
+          "bit": 2,
+          "label": "Chant",
+          "kind": "action"
+        },
+        {
+          "key": "ability:154",
+          "bit": 1,
+          "label": "Ultima",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 2,
+      "command_id": 26,
+      "command_label": "Mettle",
+      "members": [
+        {
+          "key": "ability:146",
+          "bit": 7,
+          "label": "Focus",
+          "kind": "action"
+        },
+        {
+          "key": "ability:147",
+          "bit": 6,
+          "label": "Rush",
+          "kind": "action"
+        },
+        {
+          "key": "ability:148",
+          "bit": 5,
+          "label": "Throw Stone",
+          "kind": "action"
+        },
+        {
+          "key": "ability:149",
+          "bit": 4,
+          "label": "Salve",
+          "kind": "action"
+        },
+        {
+          "key": "ability:150",
+          "bit": 3,
+          "label": "Tailwind",
+          "kind": "action"
+        },
+        {
+          "key": "ability:152",
+          "bit": 2,
+          "label": "Chant",
+          "kind": "action"
+        },
+        {
+          "key": "ability:151",
+          "bit": 1,
+          "label": "Steel",
+          "kind": "action"
+        },
+        {
+          "key": "ability:154",
+          "bit": 0,
+          "label": "Ultima",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 3,
+      "command_id": 27,
+      "command_label": "Mettle",
+      "members": [
+        {
+          "key": "ability:146",
+          "bit": 7,
+          "label": "Focus",
+          "kind": "action"
+        },
+        {
+          "key": "ability:147",
+          "bit": 6,
+          "label": "Rush",
+          "kind": "action"
+        },
+        {
+          "key": "ability:148",
+          "bit": 5,
+          "label": "Throw Stone",
+          "kind": "action"
+        },
+        {
+          "key": "ability:149",
+          "bit": 4,
+          "label": "Salve",
+          "kind": "action"
+        },
+        {
+          "key": "ability:150",
+          "bit": 3,
+          "label": "Tailwind",
+          "kind": "action"
+        },
+        {
+          "key": "ability:152",
+          "bit": 2,
+          "label": "Chant",
+          "kind": "action"
+        },
+        {
+          "key": "ability:151",
+          "bit": 1,
+          "label": "Steel",
+          "kind": "action"
+        },
+        {
+          "key": "ability:153",
+          "bit": 0,
+          "label": "Shout",
+          "kind": "action"
+        },
+        {
+          "key": "ability:154",
+          "bit": 15,
+          "label": "Ultima",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 4,
+      "command_id": 28,
+      "command_label": "Mettle",
+      "members": [
+        {
+          "key": "ability:146",
+          "bit": 7,
+          "label": "Focus",
+          "kind": "action"
+        },
+        {
+          "key": "ability:147",
+          "bit": 6,
+          "label": "Rush",
+          "kind": "action"
+        },
+        {
+          "key": "ability:148",
+          "bit": 5,
+          "label": "Throw Stone",
+          "kind": "action"
+        },
+        {
+          "key": "ability:149",
+          "bit": 4,
+          "label": "Salve",
+          "kind": "action"
+        },
+        {
+          "key": "ability:152",
+          "bit": 3,
+          "label": "Chant",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 5,
+      "command_id": 29,
+      "command_label": "Holy Sword",
+      "members": [
+        {
+          "key": "ability:155",
+          "bit": 7,
+          "label": "Judgment Blade",
+          "kind": "action"
+        },
+        {
+          "key": "ability:156",
+          "bit": 6,
+          "label": "Cleansing Strike",
+          "kind": "action"
+        },
+        {
+          "key": "ability:157",
+          "bit": 5,
+          "label": "Northswain's Strike",
+          "kind": "action"
+        },
+        {
+          "key": "ability:158",
+          "bit": 4,
+          "label": "Hallowed Bolt",
+          "kind": "action"
+        },
+        {
+          "key": "ability:159",
+          "bit": 3,
+          "label": "Divine Ruination",
+          "kind": "action"
+        },
+        {
+          "key": "ability:45",
+          "bit": 2,
+          "label": "Chant",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 7,
+      "command_id": 31,
+      "command_label": "Fundaments",
+      "members": [
+        {
+          "key": "ability:146",
+          "bit": 7,
+          "label": "Focus",
+          "kind": "action"
+        },
+        {
+          "key": "ability:147",
+          "bit": 6,
+          "label": "Rush",
+          "kind": "action"
+        },
+        {
+          "key": "ability:148",
+          "bit": 5,
+          "label": "Throw Stone",
+          "kind": "action"
+        },
+        {
+          "key": "ability:149",
+          "bit": 4,
+          "label": "Salve",
+          "kind": "action"
+        },
+        {
+          "key": "ability:138",
+          "bit": 3,
+          "label": "Rend Helm",
+          "kind": "action"
+        },
+        {
+          "key": "ability:139",
+          "bit": 2,
+          "label": "Rend Armor",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 8,
+      "command_id": 75,
+      "command_label": "Blade of Ruin",
+      "members": [
+        {
+          "key": "ability:196",
+          "bit": 7,
+          "label": "Magicksap",
+          "kind": "action"
+        },
+        {
+          "key": "ability:197",
+          "bit": 6,
+          "label": "Speedsap",
+          "kind": "action"
+        },
+        {
+          "key": "ability:198",
+          "bit": 5,
+          "label": "Powersap",
+          "kind": "action"
+        },
+        {
+          "key": "ability:199",
+          "bit": 4,
+          "label": "Mindsap",
+          "kind": "action"
+        },
+        {
+          "key": "ability:442",
+          "bit": 23,
+          "label": "Counter",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:436",
+          "bit": 22,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:469",
+          "bit": 21,
+          "label": "Concentration",
+          "kind": "support"
+        },
+        {
+          "key": "ability:475",
+          "bit": 20,
+          "label": "Safeguard",
+          "kind": "support"
+        },
+        {
+          "key": "ability:482",
+          "bit": 19,
+          "label": "Swiftspell",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 12,
+      "command_id": 36,
+      "command_label": "Holy Magicks",
+      "members": [
+        {
+          "key": "ability:212",
+          "bit": 7,
+          "label": "Aegis",
+          "kind": "action"
+        },
+        {
+          "key": "ability:167",
+          "bit": 6,
+          "label": "Dispelna",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 13,
+      "command_id": 74,
+      "command_label": "Swordplay",
+      "members": [
+        {
+          "key": "ability:155",
+          "bit": 7,
+          "label": "Judgment Blade",
+          "kind": "action"
+        },
+        {
+          "key": "ability:156",
+          "bit": 6,
+          "label": "Cleansing Strike",
+          "kind": "action"
+        },
+        {
+          "key": "ability:157",
+          "bit": 5,
+          "label": "Northswain's Strike",
+          "kind": "action"
+        },
+        {
+          "key": "ability:158",
+          "bit": 4,
+          "label": "Hallowed Bolt",
+          "kind": "action"
+        },
+        {
+          "key": "ability:159",
+          "bit": 3,
+          "label": "Divine Ruination",
+          "kind": "action"
+        },
+        {
+          "key": "ability:160",
+          "bit": 2,
+          "label": "Crush Armor",
+          "kind": "action"
+        },
+        {
+          "key": "ability:161",
+          "bit": 1,
+          "label": "Crush Helm",
+          "kind": "action"
+        },
+        {
+          "key": "ability:162",
+          "bit": 0,
+          "label": "Crush Weapon",
+          "kind": "action"
+        },
+        {
+          "key": "ability:163",
+          "bit": 15,
+          "label": "Crush Accessory",
+          "kind": "action"
+        },
+        {
+          "key": "ability:164",
+          "bit": 14,
+          "label": "Duskblade",
+          "kind": "action"
+        },
+        {
+          "key": "ability:165",
+          "bit": 13,
+          "label": "Shadowblade",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 15,
+      "command_id": 43,
+      "command_label": "Dragon",
+      "members": [
+        {
+          "key": "ability:248",
+          "bit": 7,
+          "label": "Ice Breath",
+          "kind": "action"
+        },
+        {
+          "key": "ability:249",
+          "bit": 6,
+          "label": "Fire Breath",
+          "kind": "action"
+        },
+        {
+          "key": "ability:250",
+          "bit": 5,
+          "label": "Thunder Breath",
+          "kind": "action"
+        },
+        {
+          "key": "ability:251",
+          "bit": 4,
+          "label": "Dragon's Charm",
+          "kind": "action"
+        },
+        {
+          "key": "ability:252",
+          "bit": 3,
+          "label": "Dragon's Gift",
+          "kind": "action"
+        },
+        {
+          "key": "ability:253",
+          "bit": 2,
+          "label": "Dragon's Might",
+          "kind": "action"
+        },
+        {
+          "key": "ability:254",
+          "bit": 1,
+          "label": "Dragon's Speed",
+          "kind": "action"
+        },
+        {
+          "key": "ability:255",
+          "bit": 0,
+          "label": "Holy Breath",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 16,
+      "command_id": 42,
+      "command_label": "Priest Magicks",
+      "members": [
+        {
+          "key": "ability:3",
+          "bit": 7,
+          "label": "Curaga",
+          "kind": "action"
+        },
+        {
+          "key": "ability:2",
+          "bit": 6,
+          "label": "Cura",
+          "kind": "action"
+        },
+        {
+          "key": "ability:6",
+          "bit": 5,
+          "label": "Arise",
+          "kind": "action"
+        },
+        {
+          "key": "ability:14",
+          "bit": 4,
+          "label": "Esuna",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 17,
+      "command_id": 39,
+      "command_label": "Fell Sword",
+      "members": [
+        {
+          "key": "ability:165",
+          "bit": 7,
+          "label": "Shadowblade",
+          "kind": "action"
+        },
+        {
+          "key": "ability:164",
+          "bit": 6,
+          "label": "Duskblade",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 18,
+      "command_id": 46,
+      "command_label": "Nether Mantra",
+      "members": [
+        {
+          "key": "ability:175",
+          "bit": 7,
+          "label": "Hell's Wrath",
+          "kind": "action"
+        },
+        {
+          "key": "ability:176",
+          "bit": 6,
+          "label": "Nether Ashura",
+          "kind": "action"
+        },
+        {
+          "key": "ability:177",
+          "bit": 5,
+          "label": "Nether Blade",
+          "kind": "action"
+        },
+        {
+          "key": "ability:178",
+          "bit": 4,
+          "label": "Nether Maelstrom",
+          "kind": "action"
+        },
+        {
+          "key": "ability:179",
+          "bit": 3,
+          "label": "Corporeal Void",
+          "kind": "action"
+        },
+        {
+          "key": "ability:180",
+          "bit": 2,
+          "label": "Impiety",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 20,
+      "command_id": 76,
+      "command_label": "Holy Magicks",
+      "members": [
+        {
+          "key": "ability:212",
+          "bit": 7,
+          "label": "Aegis",
+          "kind": "action"
+        },
+        {
+          "key": "ability:167",
+          "bit": 6,
+          "label": "Dispelna",
+          "kind": "action"
+        },
+        {
+          "key": "ability:154",
+          "bit": 5,
+          "label": "Ultima",
+          "kind": "action"
+        },
+        {
+          "key": "ability:152",
+          "bit": 4,
+          "label": "Chant",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 21,
+      "command_id": 47,
+      "command_label": "Astrology",
+      "members": [
+        {
+          "key": "ability:168",
+          "bit": 7,
+          "label": "Celestial Stasis",
+          "kind": "action"
+        },
+        {
+          "key": "ability:146",
+          "bit": 6,
+          "label": "Focus",
+          "kind": "action"
+        },
+        {
+          "key": "ability:147",
+          "bit": 5,
+          "label": "Rush",
+          "kind": "action"
+        },
+        {
+          "key": "ability:148",
+          "bit": 4,
+          "label": "Throw Stone",
+          "kind": "action"
+        },
+        {
+          "key": "ability:149",
+          "bit": 3,
+          "label": "Salve",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 22,
+      "command_id": 38,
+      "command_label": "Aimed Shot",
+      "members": [
+        {
+          "key": "ability:213",
+          "bit": 7,
+          "label": "Leg Shot",
+          "kind": "action"
+        },
+        {
+          "key": "ability:214",
+          "bit": 6,
+          "label": "Arm Shot",
+          "kind": "action"
+        },
+        {
+          "key": "ability:215",
+          "bit": 5,
+          "label": "Seal Evil",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 23,
+      "command_id": 32,
+      "command_label": "Fell Sword",
+      "members": [
+        {
+          "key": "ability:165",
+          "bit": 7,
+          "label": "Shadowblade",
+          "kind": "action"
+        },
+        {
+          "key": "ability:164",
+          "bit": 6,
+          "label": "Duskblade",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 25,
+      "command_id": 45,
+      "command_label": "Sky Mantra",
+      "members": [
+        {
+          "key": "ability:169",
+          "bit": 7,
+          "label": "Heaven's Wrath",
+          "kind": "action"
+        },
+        {
+          "key": "ability:170",
+          "bit": 6,
+          "label": "Ashura",
+          "kind": "action"
+        },
+        {
+          "key": "ability:171",
+          "bit": 5,
+          "label": "Adamantine Blade",
+          "kind": "action"
+        },
+        {
+          "key": "ability:172",
+          "bit": 4,
+          "label": "Maelstrom",
+          "kind": "action"
+        },
+        {
+          "key": "ability:173",
+          "bit": 3,
+          "label": "Celestial Void",
+          "kind": "action"
+        },
+        {
+          "key": "ability:174",
+          "bit": 2,
+          "label": "Divinity",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 26,
+      "command_id": 46,
+      "command_label": "Nether Mantra",
+      "members": [
+        {
+          "key": "ability:175",
+          "bit": 7,
+          "label": "Hell's Wrath",
+          "kind": "action"
+        },
+        {
+          "key": "ability:176",
+          "bit": 6,
+          "label": "Nether Ashura",
+          "kind": "action"
+        },
+        {
+          "key": "ability:177",
+          "bit": 5,
+          "label": "Nether Blade",
+          "kind": "action"
+        },
+        {
+          "key": "ability:178",
+          "bit": 4,
+          "label": "Nether Maelstrom",
+          "kind": "action"
+        },
+        {
+          "key": "ability:179",
+          "bit": 3,
+          "label": "Corporeal Void",
+          "kind": "action"
+        },
+        {
+          "key": "ability:180",
+          "bit": 2,
+          "label": "Impiety",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 27,
+      "command_id": 59,
+      "command_label": "Sword Spirit",
+      "members": [
+        {
+          "key": "ability:76",
+          "bit": 7,
+          "label": "Ashura",
+          "kind": "action"
+        },
+        {
+          "key": "ability:77",
+          "bit": 6,
+          "label": "Kotetsu",
+          "kind": "action"
+        },
+        {
+          "key": "ability:78",
+          "bit": 5,
+          "label": "Bizen Osafune",
+          "kind": "action"
+        },
+        {
+          "key": "ability:82",
+          "bit": 4,
+          "label": "Muramasa",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 30,
+      "command_id": 40,
+      "command_label": "Holy Sword",
+      "members": [
+        {
+          "key": "ability:155",
+          "bit": 7,
+          "label": "Judgment Blade",
+          "kind": "action"
+        },
+        {
+          "key": "ability:156",
+          "bit": 6,
+          "label": "Cleansing Strike",
+          "kind": "action"
+        },
+        {
+          "key": "ability:157",
+          "bit": 5,
+          "label": "Northswain's Strike",
+          "kind": "action"
+        },
+        {
+          "key": "ability:158",
+          "bit": 4,
+          "label": "Hallowed Bolt",
+          "kind": "action"
+        },
+        {
+          "key": "ability:159",
+          "bit": 3,
+          "label": "Divine Ruination",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 31,
+      "command_id": 69,
+      "command_label": "Spellblade",
+      "members": [
+        {
+          "key": "ability:234",
+          "bit": 7,
+          "label": "Blind",
+          "kind": "action"
+        },
+        {
+          "key": "ability:235",
+          "bit": 6,
+          "label": "Syphon",
+          "kind": "action"
+        },
+        {
+          "key": "ability:236",
+          "bit": 5,
+          "label": "Drain",
+          "kind": "action"
+        },
+        {
+          "key": "ability:237",
+          "bit": 4,
+          "label": "Faith",
+          "kind": "action"
+        },
+        {
+          "key": "ability:238",
+          "bit": 3,
+          "label": "Doubt",
+          "kind": "action"
+        },
+        {
+          "key": "ability:239",
+          "bit": 2,
+          "label": "Zombie",
+          "kind": "action"
+        },
+        {
+          "key": "ability:240",
+          "bit": 1,
+          "label": "Silence",
+          "kind": "action"
+        },
+        {
+          "key": "ability:241",
+          "bit": 0,
+          "label": "Berserk",
+          "kind": "action"
+        },
+        {
+          "key": "ability:242",
+          "bit": 15,
+          "label": "Chicken",
+          "kind": "action"
+        },
+        {
+          "key": "ability:243",
+          "bit": 14,
+          "label": "Confuse",
+          "kind": "action"
+        },
+        {
+          "key": "ability:244",
+          "bit": 13,
+          "label": "Dispel",
+          "kind": "action"
+        },
+        {
+          "key": "ability:245",
+          "bit": 12,
+          "label": "Disable",
+          "kind": "action"
+        },
+        {
+          "key": "ability:246",
+          "bit": 11,
+          "label": "Sleep",
+          "kind": "action"
+        },
+        {
+          "key": "ability:247",
+          "bit": 10,
+          "label": "Break",
+          "kind": "action"
+        },
+        {
+          "key": "ability:256",
+          "bit": 9,
+          "label": "Vengeance",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 32,
+      "command_id": 34,
+      "command_label": "Holy Sword",
+      "members": [
+        {
+          "key": "ability:155",
+          "bit": 7,
+          "label": "Judgment Blade",
+          "kind": "action"
+        },
+        {
+          "key": "ability:156",
+          "bit": 6,
+          "label": "Cleansing Strike",
+          "kind": "action"
+        },
+        {
+          "key": "ability:157",
+          "bit": 5,
+          "label": "Northswain's Strike",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 34,
+      "command_id": 37,
+      "command_label": "Aimed Shot",
+      "members": [
+        {
+          "key": "ability:213",
+          "bit": 7,
+          "label": "Leg Shot",
+          "kind": "action"
+        },
+        {
+          "key": "ability:214",
+          "bit": 6,
+          "label": "Arm Shot",
+          "kind": "action"
+        },
+        {
+          "key": "ability:215",
+          "bit": 5,
+          "label": "Seal Evil",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 36,
+      "command_id": 64,
+      "command_label": "Unyielding Blade",
+      "members": [
+        {
+          "key": "ability:160",
+          "bit": 7,
+          "label": "Crush Armor",
+          "kind": "action"
+        },
+        {
+          "key": "ability:161",
+          "bit": 6,
+          "label": "Crush Helm",
+          "kind": "action"
+        },
+        {
+          "key": "ability:162",
+          "bit": 5,
+          "label": "Crush Weapon",
+          "kind": "action"
+        },
+        {
+          "key": "ability:163",
+          "bit": 4,
+          "label": "Crush Accessory",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 37,
+      "command_id": 60,
+      "command_label": "Unyielding Blade",
+      "members": [
+        {
+          "key": "ability:160",
+          "bit": 7,
+          "label": "Crush Armor",
+          "kind": "action"
+        },
+        {
+          "key": "ability:161",
+          "bit": 6,
+          "label": "Crush Helm",
+          "kind": "action"
+        },
+        {
+          "key": "ability:162",
+          "bit": 5,
+          "label": "Crush Weapon",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 38,
+      "command_id": 51,
+      "command_label": "Arts of War",
+      "members": [
+        {
+          "key": "ability:138",
+          "bit": 7,
+          "label": "Rend Helm",
+          "kind": "action"
+        },
+        {
+          "key": "ability:139",
+          "bit": 6,
+          "label": "Rend Armor",
+          "kind": "action"
+        },
+        {
+          "key": "ability:140",
+          "bit": 5,
+          "label": "Rend Shield",
+          "kind": "action"
+        },
+        {
+          "key": "ability:141",
+          "bit": 4,
+          "label": "Rend Weapon",
+          "kind": "action"
+        },
+        {
+          "key": "ability:142",
+          "bit": 3,
+          "label": "Rend MP",
+          "kind": "action"
+        },
+        {
+          "key": "ability:143",
+          "bit": 2,
+          "label": "Rend Speed",
+          "kind": "action"
+        },
+        {
+          "key": "ability:144",
+          "bit": 1,
+          "label": "Rend Power",
+          "kind": "action"
+        },
+        {
+          "key": "ability:145",
+          "bit": 0,
+          "label": "Rend Magick",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 39,
+      "command_id": 72,
+      "command_label": "Magick Arts",
+      "members": [
+        {
+          "key": "ability:15",
+          "bit": 7,
+          "label": "Holy",
+          "kind": "action"
+        },
+        {
+          "key": "ability:31",
+          "bit": 6,
+          "label": "Flare",
+          "kind": "action"
+        },
+        {
+          "key": "ability:43",
+          "bit": 5,
+          "label": "Graviga",
+          "kind": "action"
+        },
+        {
+          "key": "ability:166",
+          "bit": 4,
+          "label": "Unholy Darkness",
+          "kind": "action"
+        },
+        {
+          "key": "ability:6",
+          "bit": 3,
+          "label": "Arise",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 40,
+      "command_id": 48,
+      "command_label": "Holy Sword",
+      "members": [
+        {
+          "key": "ability:155",
+          "bit": 7,
+          "label": "Judgment Blade",
+          "kind": "action"
+        },
+        {
+          "key": "ability:156",
+          "bit": 6,
+          "label": "Cleansing Strike",
+          "kind": "action"
+        },
+        {
+          "key": "ability:157",
+          "bit": 5,
+          "label": "Northswain's Strike",
+          "kind": "action"
+        },
+        {
+          "key": "ability:158",
+          "bit": 4,
+          "label": "Hallowed Bolt",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 41,
+      "command_id": 50,
+      "command_label": "Sky Mantra",
+      "members": [
+        {
+          "key": "ability:169",
+          "bit": 7,
+          "label": "Heaven's Wrath",
+          "kind": "action"
+        },
+        {
+          "key": "ability:170",
+          "bit": 6,
+          "label": "Ashura",
+          "kind": "action"
+        },
+        {
+          "key": "ability:171",
+          "bit": 5,
+          "label": "Adamantine Blade",
+          "kind": "action"
+        },
+        {
+          "key": "ability:172",
+          "bit": 4,
+          "label": "Maelstrom",
+          "kind": "action"
+        },
+        {
+          "key": "ability:173",
+          "bit": 3,
+          "label": "Celestial Void",
+          "kind": "action"
+        },
+        {
+          "key": "ability:174",
+          "bit": 2,
+          "label": "Divinity",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 42,
+      "command_id": 67,
+      "command_label": "Unyielding Blade",
+      "members": [
+        {
+          "key": "ability:160",
+          "bit": 7,
+          "label": "Crush Armor",
+          "kind": "action"
+        },
+        {
+          "key": "ability:161",
+          "bit": 6,
+          "label": "Crush Helm",
+          "kind": "action"
+        },
+        {
+          "key": "ability:162",
+          "bit": 5,
+          "label": "Crush Weapon",
+          "kind": "action"
+        },
+        {
+          "key": "ability:163",
+          "bit": 4,
+          "label": "Crush Accessory",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 43,
+      "command_id": 68,
+      "command_label": "Aimed Shot",
+      "members": [
+        {
+          "key": "ability:213",
+          "bit": 7,
+          "label": "Leg Shot",
+          "kind": "action"
+        },
+        {
+          "key": "ability:214",
+          "bit": 6,
+          "label": "Arm Shot",
+          "kind": "action"
+        },
+        {
+          "key": "ability:215",
+          "bit": 5,
+          "label": "Seal Evil",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 44,
+      "command_id": 76,
+      "command_label": "Holy Magicks",
+      "members": [
+        {
+          "key": "ability:212",
+          "bit": 7,
+          "label": "Aegis",
+          "kind": "action"
+        },
+        {
+          "key": "ability:167",
+          "bit": 6,
+          "label": "Dispelna",
+          "kind": "action"
+        },
+        {
+          "key": "ability:154",
+          "bit": 5,
+          "label": "Ultima",
+          "kind": "action"
+        },
+        {
+          "key": "ability:152",
+          "bit": 4,
+          "label": "Chant",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 45,
+      "command_id": 54,
+      "command_label": "Subdual Arts",
+      "members": [
+        {
+          "key": "ability:181",
+          "bit": 7,
+          "label": "Petrify",
+          "kind": "action"
+        },
+        {
+          "key": "ability:182",
+          "bit": 6,
+          "label": "Shadowbind",
+          "kind": "action"
+        },
+        {
+          "key": "ability:183",
+          "bit": 5,
+          "label": "Suffocate",
+          "kind": "action"
+        },
+        {
+          "key": "ability:154",
+          "bit": 4,
+          "label": "Ultima",
+          "kind": "action"
+        },
+        {
+          "key": "ability:201",
+          "bit": 3,
+          "label": "Charm",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 46,
+      "command_id": 55,
+      "command_label": "Subdual Arts",
+      "members": [
+        {
+          "key": "ability:181",
+          "bit": 7,
+          "label": "Petrify",
+          "kind": "action"
+        },
+        {
+          "key": "ability:182",
+          "bit": 6,
+          "label": "Shadowbind",
+          "kind": "action"
+        },
+        {
+          "key": "ability:183",
+          "bit": 5,
+          "label": "Suffocate",
+          "kind": "action"
+        },
+        {
+          "key": "ability:154",
+          "bit": 4,
+          "label": "Ultima",
+          "kind": "action"
+        },
+        {
+          "key": "ability:201",
+          "bit": 3,
+          "label": "Charm",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 47,
+      "command_id": 66,
+      "command_label": "Unyielding Blade",
+      "members": [
+        {
+          "key": "ability:160",
+          "bit": 7,
+          "label": "Crush Armor",
+          "kind": "action"
+        },
+        {
+          "key": "ability:161",
+          "bit": 6,
+          "label": "Crush Helm",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 48,
+      "command_id": 49,
+      "command_label": "Holy Magicks",
+      "members": [
+        {
+          "key": "ability:212",
+          "bit": 7,
+          "label": "Aegis",
+          "kind": "action"
+        },
+        {
+          "key": "ability:167",
+          "bit": 6,
+          "label": "Dispelna",
+          "kind": "action"
+        },
+        {
+          "key": "ability:152",
+          "bit": 5,
+          "label": "Chant",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 50,
+      "command_id": 41,
+      "command_label": "Limit",
+      "members": [
+        {
+          "key": "ability:257",
+          "bit": 7,
+          "label": "Braver",
+          "kind": "action"
+        },
+        {
+          "key": "ability:258",
+          "bit": 6,
+          "label": "Cross Slash",
+          "kind": "action"
+        },
+        {
+          "key": "ability:259",
+          "bit": 5,
+          "label": "Blade Burst",
+          "kind": "action"
+        },
+        {
+          "key": "ability:260",
+          "bit": 4,
+          "label": "Ascension",
+          "kind": "action"
+        },
+        {
+          "key": "ability:261",
+          "bit": 3,
+          "label": "Meteorain",
+          "kind": "action"
+        },
+        {
+          "key": "ability:262",
+          "bit": 2,
+          "label": "Finishing Touch",
+          "kind": "action"
+        },
+        {
+          "key": "ability:263",
+          "bit": 1,
+          "label": "Omnislash",
+          "kind": "action"
+        },
+        {
+          "key": "ability:264",
+          "bit": 0,
+          "label": "Cherry Blossom",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 51,
+      "command_id": 75,
+      "command_label": "Blade of Ruin",
+      "members": [
+        {
+          "key": "ability:196",
+          "bit": 7,
+          "label": "Magicksap",
+          "kind": "action"
+        },
+        {
+          "key": "ability:197",
+          "bit": 6,
+          "label": "Speedsap",
+          "kind": "action"
+        },
+        {
+          "key": "ability:198",
+          "bit": 5,
+          "label": "Powersap",
+          "kind": "action"
+        },
+        {
+          "key": "ability:199",
+          "bit": 4,
+          "label": "Mindsap",
+          "kind": "action"
+        },
+        {
+          "key": "ability:442",
+          "bit": 23,
+          "label": "Counter",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:436",
+          "bit": 22,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:469",
+          "bit": 21,
+          "label": "Concentration",
+          "kind": "support"
+        },
+        {
+          "key": "ability:475",
+          "bit": 20,
+          "label": "Safeguard",
+          "kind": "support"
+        },
+        {
+          "key": "ability:482",
+          "bit": 19,
+          "label": "Swiftspell",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 52,
+      "command_id": 33,
+      "command_label": "Holy Sword",
+      "members": [
+        {
+          "key": "ability:155",
+          "bit": 7,
+          "label": "Judgment Blade",
+          "kind": "action"
+        },
+        {
+          "key": "ability:156",
+          "bit": 6,
+          "label": "Cleansing Strike",
+          "kind": "action"
+        },
+        {
+          "key": "ability:157",
+          "bit": 5,
+          "label": "Northswain's Strike",
+          "kind": "action"
+        },
+        {
+          "key": "ability:158",
+          "bit": 4,
+          "label": "Hallowed Bolt",
+          "kind": "action"
+        },
+        {
+          "key": "ability:159",
+          "bit": 3,
+          "label": "Divine Ruination",
+          "kind": "action"
+        },
+        {
+          "key": "ability:436",
+          "bit": 23,
+          "label": "Counter Tackle",
+          "kind": "reaction"
+        },
+        {
+          "key": "ability:460",
+          "bit": 22,
+          "label": "Equip Axes",
+          "kind": "support"
+        },
+        {
+          "key": "ability:478",
+          "bit": 21,
+          "label": "Beastmaster",
+          "kind": "support"
+        },
+        {
+          "key": "ability:479",
+          "bit": 20,
+          "label": "Evasive Stance",
+          "kind": "support"
+        },
+        {
+          "key": "ability:463",
+          "bit": 19,
+          "label": "JP Boost",
+          "kind": "support"
+        },
+        {
+          "key": "ability:486",
+          "bit": 18,
+          "label": "Movement +1",
+          "kind": "movement"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 72,
+      "command_id": 44,
+      "command_label": "Breath",
+      "members": [
+        {
+          "key": "ability:337",
+          "bit": 7,
+          "label": "Ice Breath",
+          "kind": "action"
+        },
+        {
+          "key": "ability:338",
+          "bit": 6,
+          "label": "Fire Breath",
+          "kind": "action"
+        },
+        {
+          "key": "ability:339",
+          "bit": 5,
+          "label": "Thunder Breath",
+          "kind": "action"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 144,
+      "command_id": 170,
+      "command_label": "Spellcraft",
+      "members": [
+        {
+          "key": "ability:355",
+          "bit": 7,
+          "label": "Energize",
+          "kind": "action"
+        },
+        {
+          "key": "ability:356",
+          "bit": 6,
+          "label": "Parasite",
+          "kind": "action"
+        },
+        {
+          "key": "ability:185",
+          "bit": 5,
+          "label": "Revengeance",
+          "kind": "action"
+        },
+        {
+          "key": "ability:186",
+          "bit": 4,
+          "label": "Manaburn",
+          "kind": "action"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 145,
+      "command_id": 171,
+      "command_label": "Tasks",
+      "members": [
+        {
+          "key": "ability:351",
+          "bit": 7,
+          "label": "Destroy",
+          "kind": "action"
+        },
+        {
+          "key": "ability:352",
+          "bit": 6,
+          "label": "Compress",
+          "kind": "action"
+        },
+        {
+          "key": "ability:353",
+          "bit": 5,
+          "label": "Dispose",
+          "kind": "action"
+        },
+        {
+          "key": "ability:354",
+          "bit": 4,
+          "label": "Pulverize",
+          "kind": "action"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 150,
+      "command_id": 172,
+      "command_label": "Bio",
+      "members": [
+        {
+          "key": "ability:202",
+          "bit": 7,
+          "label": "Bio",
+          "kind": "action"
+        },
+        {
+          "key": "ability:203",
+          "bit": 6,
+          "label": "Bio",
+          "kind": "action"
+        },
+        {
+          "key": "ability:204",
+          "bit": 5,
+          "label": "Bio",
+          "kind": "action"
+        },
+        {
+          "key": "ability:205",
+          "bit": 4,
+          "label": "Biora",
+          "kind": "action"
+        },
+        {
+          "key": "ability:206",
+          "bit": 3,
+          "label": "Biora",
+          "kind": "action"
+        },
+        {
+          "key": "ability:207",
+          "bit": 2,
+          "label": "Biora",
+          "kind": "action"
+        },
+        {
+          "key": "ability:208",
+          "bit": 1,
+          "label": "Biora",
+          "kind": "action"
+        },
+        {
+          "key": "ability:209",
+          "bit": 0,
+          "label": "Bioga",
+          "kind": "action"
+        },
+        {
+          "key": "ability:210",
+          "bit": 15,
+          "label": "Bioga",
+          "kind": "action"
+        },
+        {
+          "key": "ability:211",
+          "bit": 14,
+          "label": "Bioga",
+          "kind": "action"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 153,
+      "command_id": 174,
+      "command_label": "Dark Arts",
+      "members": [
+        {
+          "key": "ability:348",
+          "bit": 7,
+          "label": "Karma",
+          "kind": "action"
+        },
+        {
+          "key": "ability:166",
+          "bit": 6,
+          "label": "Unholy Darkness",
+          "kind": "action"
+        },
+        {
+          "key": "ability:334",
+          "bit": 5,
+          "label": "Gigaflare",
+          "kind": "action"
+        }
+      ]
+    },
+    {
+      "slot": 0,
+      "job_id": 154,
+      "command_id": 175,
+      "command_label": "Demon Magicks",
+      "members": [
+        {
+          "key": "ability:349",
+          "bit": 7,
+          "label": "Nanoflare",
+          "kind": "action"
+        },
+        {
+          "key": "ability:166",
+          "bit": 6,
+          "label": "Unholy Darkness",
+          "kind": "action"
+        },
+        {
+          "key": "ability:154",
+          "bit": 5,
+          "label": "Ultima",
+          "kind": "action"
+        },
+        {
+          "key": "ability:332",
+          "bit": 4,
+          "label": "Twister",
+          "kind": "action"
+        },
+        {
+          "key": "ability:333",
+          "bit": 3,
+          "label": "Almagest",
+          "kind": "action"
+        }
+      ]
+    }
+  ]
+}

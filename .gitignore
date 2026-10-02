@@ -3,7 +3,6 @@ dist/
 target/
 coverage/
 src-tauri/gen/
-src-tauri/installer-resources/
 .local/
 public/reader-art/
 tools/upstream-dump/bin/
