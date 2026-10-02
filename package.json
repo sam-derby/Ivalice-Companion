@@ -10,8 +10,7 @@
   "scripts": {
     "dev": "tauri dev",
     "dev:web": "vite",
-    "build": "node scripts/stage-reader-art.mjs \u0026\u0026 tauri build --no-bundle -- --locked \u0026\u0026 node scripts/stage-runtime-resources.mjs",
-    "build:installer": "node scripts/stage-reader-art.mjs \u0026\u0026 node scripts/stage-installer-resources.mjs \u0026\u0026 tauri build --config src-tauri/tauri.installer.conf.json -- --locked",
+    "build": "tauri build --config src-tauri/tauri.installer.conf.json -- --locked",
     "build:web": "tsc --noEmit \u0026\u0026 vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
