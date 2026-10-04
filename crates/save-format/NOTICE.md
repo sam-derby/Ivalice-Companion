@@ -21,3 +21,8 @@ that the Rust code copied FF16Tools source. See the
 
 The port adds bounds and integrity checks and scoped manual-slot edits. File
 snapshots, backups and restoration are implemented separately in infrastructure.
+
+The v0.1.4 progression and base-stat edits in `src/edit/progression.rs` adapt
+`Records/UnitSaveData.cs` and `Records/Layouts/UnitSaveDataLayout.cs` at the
+TICSaveEditor revision above, with synthetic bounds and selected-field tests.
+Companion stat projection and validation were last modified 2026-10-04.

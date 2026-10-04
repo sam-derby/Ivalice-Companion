@@ -221,6 +221,11 @@ impl Validator {
         }
         self.scalar(&stats.movement_tiles)?;
         self.scalar(&stats.jump_tiles)?;
+        for (kind, detail) in &stats.breakdown {
+            bounded(detail.maximum == kind.display_limit())?;
+            self.fact(&detail.base, |value| bounded(*value > 0))?;
+            self.scalar(&detail.equipment_bonus)?;
+        }
         self.scalar(&unit.growth)?;
         self.fact(&stats.evasion, |entries| {
             limited(entries, 6)?;

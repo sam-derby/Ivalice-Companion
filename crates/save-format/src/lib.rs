@@ -1,8 +1,8 @@
-//! Bounded save-container decoding and scoped manual-slot edits.
+//! Bounded save-container decoding and selected-slot save edits.
 //!
-//! The UMIF read path adapts TICSaveEditor behavior derived from FF16Tools.
-//! See `NOTICE.md`. The public API accepts only immutable bytes and
-//! exposes no filesystem operation. Edits return a new encoded container.
+//! The UMIF read path is an attributed adaptation of TICSaveEditor and
+//! FF16Tools. See `NOTICE.md`. The public API accepts only immutable bytes and
+//! exposes no filesystem operation. The editor validates supported field operations.
 
 mod creature;
 mod edit;
@@ -16,8 +16,9 @@ pub use creature::{creature_form, creature_forms, CreatureCategory, CreatureForm
 pub use edit::{
     edit_enhanced_png, edit_enhanced_png_with_abilities, edit_enhanced_png_with_jobs,
     edit_gil_enhanced_png, named_character_ids, named_character_sex,
-    named_human_initialization_supported, EditOperation, EquippedSlot, GearSlot, GearSource,
-    GenericCreationDonor, GilEditError, GuestAdditionDonor, NamedCreationBase, StoryAdditionDonor,
+    named_human_initialization_supported, preview_enhanced_png, BaseStatKind, EditOperation,
+    EquippedSlot, GearSlot, GearSource, GenericCreationDonor, GilEditError, GuestAdditionDonor,
+    NamedCreationBase, StoryAdditionDonor,
 };
 pub use error::{ContainerError, ErrorKind};
 pub use ivalice_domain::StoredAdlerStatus;
@@ -43,7 +44,7 @@ pub const SUPPORTED_PAYLOAD_LENGTH: usize = 2_008_216;
 
 /// A decoded, integrity-checked payload for the exact supported structure.
 ///
-/// Callers may inspect the payload; scoped edit APIs validate and repack changes.
+/// Supported selected-slot edits repack bytes without performing filesystem I/O.
 #[derive(Debug, Eq, PartialEq)]
 pub struct DecodedContainer {
     payload: Box<[u8]>,

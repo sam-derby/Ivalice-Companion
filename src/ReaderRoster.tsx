@@ -877,16 +877,6 @@ function SavedAt({ fact }: { fact: Fact<number> }) {
   );
 }
 
-function playTime(seconds: number): string {
-  const minutes = Math.floor(seconds / 60);
-  const days = Math.floor(minutes / 1440);
-  const hours = Math.floor((minutes % 1440) / 60);
-  const remainder = minutes % 60;
-  return days > 0
-    ? `${String(days)}d ${String(hours)}h ${String(remainder)}m`
-    : `${String(hours)}h ${String(remainder)}m`;
-}
-
 /** App keys this component by the complete snapshot/resource identity. */
 export function ReaderRoster({ reader }: { reader: ReaderDocument }) {
   const art = useReaderArt();
@@ -1006,15 +996,6 @@ export function ReaderRoster({ reader }: { reader: ReaderDocument }) {
               <dd>
                 {overviewLabel(reader.progress.location.value, (area) =>
                   overviewLabel(area.label, String),
-                )}
-              </dd>
-            </div>
-            <div>
-              <dt>Play time</dt>
-              <dd>
-                {overviewLabel(
-                  reader.progress.play_time_seconds.value,
-                  playTime,
                 )}
               </dd>
             </div>

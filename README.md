@@ -5,8 +5,19 @@ Ivalice Chronicles (Steam Enhanced).
 
 ## Download
 
-[Download the 0.1.3 Windows installer](https://github.com/sam-derby/Ivalice-Companion/releases/download/v0.1.3/Ivalice.Companion_0.1.3_x64-setup.exe).
-SHA-256: `0E9FC99D2DBC2A114987E3F6E13937A041A4B4A393D78D64BD7E770875E220C7`.
+[Download the 0.1.4 Windows installer](https://github.com/sam-derby/Ivalice-Companion/releases/download/v0.1.4/Ivalice.Companion_0.1.4_x64-setup.exe)
+or
+[the portable ZIP](https://github.com/sam-derby/Ivalice-Companion/releases/download/v0.1.4/Ivalice.Companion_0.1.4_x64-portable.zip).
+SHA-256 checksums are listed in the
+[release notes](https://github.com/sam-derby/Ivalice-Companion/releases/tag/v0.1.4).
+
+Version 0.1.4 adds level and experience editing, base-stat editing before
+equipment bonuses, and live previews of staged changes. PA and MA totals respect
+the game's cap of 99 after equipment.
+
+For the portable ZIP, extract the whole folder and run `ivalice-companion.exe`.
+Keep `resources/` and `licenses/` beside it. Windows 10/11 and WebView2 are
+required; the ZIP does not install WebView2. Settings remain in LocalAppData.
 
 Edits are staged until Save. Saving checks that the loaded file is unchanged and
 creates a recoverable backup. Creature additions are experimental; their in-game
@@ -21,9 +32,10 @@ WebView2. Run `npm ci`, then `npm run build`. The installer is written to
 `target/release/bundle/nsis/`; required runtime resources are included in
 source.
 
-Run `npm run validate` for TypeScript, Rust checks, Clippy, tests and the
-installer build. The optional real-save parity test is ignored by default; no
-private inputs are needed for validation.
+Run `npm run validate` for formatting, lint, TypeScript, frontend regressions,
+Rust checks, Clippy, tests and the installer build. Optional real-save tests are
+ignored or skipped without private inputs; no private inputs are needed for
+validation.
 
 ## Licence
 

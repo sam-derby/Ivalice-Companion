@@ -18,6 +18,12 @@ use ivalice_save_format::{
 use serde::{Deserialize, Serialize};
 use tauri::State;
 
+mod draft_preview;
+mod stat_preview;
+pub use draft_preview::{__cmd__preview_draft, __tauri_command_name_preview_draft, preview_draft};
+pub use stat_preview::{
+    __cmd__preview_base_stat, __tauri_command_name_preview_base_stat, preview_base_stat,
+};
 mod character_preview;
 pub use character_preview::{
     __cmd__preview_character, __tauri_command_name_preview_character, preview_character,
@@ -731,7 +737,7 @@ mod tests {
     ) -> Result<(), Box<dyn std::error::Error>> {
         let root = test_root("success")?;
         let source = root.join("enhanced.png");
-        let original = b"original synthetic snapshot".to_vec();
+        let original = b"original synthetic D006 snapshot".to_vec();
         fs::write(&source, &original)?;
         let state = state(&root)?;
         let generation = state.begin_load();
@@ -821,22 +827,25 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "requires IVALICE_PARITY_SAVE, IVALICE_PARITY_OBSERVATIONS and IVALICE_PARITY_JOB_CATALOGUE"]
+    #[ignore = "requires ignored R006 private input, observation, catalogue, and dictionary"]
     fn private_production_pipeline_matches_independent_roster_without_writes(
     ) -> Result<(), Box<dyn std::error::Error>> {
         let workspace = workspace_root();
-        let source = PathBuf::from(
-            std::env::var_os("IVALICE_PARITY_SAVE").ok_or("set IVALICE_PARITY_SAVE")?,
-        );
-        let observations = PathBuf::from(
-            std::env::var_os("IVALICE_PARITY_OBSERVATIONS")
-                .ok_or("set IVALICE_PARITY_OBSERVATIONS")?,
-        );
-        let catalogue = PathBuf::from(
-            std::env::var_os("IVALICE_PARITY_JOB_CATALOGUE")
-                .ok_or("set IVALICE_PARITY_JOB_CATALOGUE")?,
-        );
-        let dictionary = workspace.join("src-tauri/installer-resources/CompressDict.bin");
+        let inputs = workspace.join(".local").join("research-inputs");
+        let source = inputs.join("r006-new").join("enhanced.png");
+        let dictionary = inputs
+            .join("resources")
+            .join("ticsaveeditor-07ea857")
+            .join("CompressDict.bin");
+        let observations = inputs.join("r006-new-observations.json");
+        let catalogue = workspace
+            .join(".local")
+            .join("r011-ticsaveeditor")
+            .join("TICSaveEditor.Core")
+            .join("Resources")
+            .join("Nex")
+            .join("en")
+            .join("Job.json");
         let source_before = fs::read(&source)?;
         let dictionary_before = fs::read(&dictionary)?;
         let observations_before = fs::read(&observations)?;

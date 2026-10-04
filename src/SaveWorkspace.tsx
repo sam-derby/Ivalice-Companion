@@ -5,6 +5,7 @@ import {
   previewJobProgress,
   restoreLastBackup,
   saveTransaction,
+  type BaseStatKind,
   type EditContext,
   type ReaderDocument,
   type ReaderUnit,
@@ -41,6 +42,7 @@ import {
 import { AddCharacterForm } from './AddCharacterForm';
 import { WorkspaceGame } from './WorkspaceGame';
 import { WorkspaceStatus } from './WorkspaceStatus';
+import { useDraftProjection } from './use-draft-projection';
 import { EquippedGear, description } from './WorkspaceEquipment';
 import { Tooltip } from './Tooltip';
 import { NumericField, stagedNumber, valueText } from './workspace-fields';
@@ -102,6 +104,14 @@ function editableUnit(unit: ReaderUnit): boolean {
     (unit.kind.value.state !== 'known' ||
       unit.kind.value.value !== 'monster') &&
     unit.name.value.state === 'known'
+  );
+}
+
+function editableProgression(unit: ReaderUnit): boolean {
+  return (
+    unit.key < 50 &&
+    unit.membership.value.state === 'known' &&
+    unit.membership.value.value === 'party'
   );
 }
 
@@ -250,7 +260,7 @@ export function SaveWorkspace({
     guest: null,
     named: null,
   });
-  const [reviewOpen, setReviewOpen] = useState(false);
+  const [reviewRequested, setReviewOpen] = useState(false);
   const [addCharacterOpen, setAddCharacterOpen] = useState(false);
   const [addCharacterType, setAddCharacterType] = useState<
     'generic' | 'named' | 'monster' | 'enemy'
@@ -293,7 +303,7 @@ export function SaveWorkspace({
             !inventoryRows.some((row) => row.key === holding.key),
         )
       : [];
-  const review = context
+  const operationReview = context
     ? collectDraft(
         reader,
         {
@@ -305,8 +315,66 @@ export function SaveWorkspace({
         draft,
       )
     : null;
+  function stageBase(position: number, stat: BaseStatKind, base: number) {
+    const original = units.find((unit) => unit.key === position)?.stored.bases[
+      stat
+    ].value;
+    setDraft((current) => {
+      const unit = current.units[position] ?? emptyUnitDraft();
+      return {
+        ...current,
+        units: {
+          ...current.units,
+          [position]: {
+            ...unit,
+            statBases: {
+              ...Object.fromEntries(
+                Object.entries(unit.statBases ?? {}).filter(
+                  ([key]) => key !== stat,
+                ),
+              ),
+              ...(original?.state === 'known' && original.value === base
+                ? {}
+                : { [stat]: base }),
+            },
+          },
+        },
+      };
+    });
+  }
+  const statsPreview = useDraftProjection(
+    context && operationReview
+      ? {
+          snapshotGeneration: context.snapshotGeneration,
+          manualSlotId: context.manualSlotId,
+          operations: operationReview.operations,
+        }
+      : null,
+    stageBase,
+    reader,
+  );
+  const review = context
+    ? collectDraft(
+        reader,
+        {
+          ...context,
+          jobOptions: (context.jobOptions ?? []).map(
+            (option) => previewOptions[option.unitPosition] ?? option,
+          ),
+        },
+        draft,
+        statsPreview.reader,
+      )
+    : null;
   const dirty =
-    (review?.changes.length ?? 0) > 0 || (review?.errors.length ?? 0) > 0;
+    (review?.changes.length ?? 0) > 0 ||
+    (review?.errors.length ?? 0) > 0 ||
+    statsPreview.inputs.length > 0;
+  const reviewOpen =
+    reviewRequested &&
+    !statsPreview.blocked &&
+    (review?.errors.length ?? 0) === 0 &&
+    (review?.operations.length ?? 0) > 0;
   Object.assign(heldForGear, review?.heldAfter ?? {});
 
   useEffect(() => {
@@ -430,6 +498,7 @@ export function SaveWorkspace({
     position: number,
     update: (current: UnitDraft) => UnitDraft,
   ) {
+    setReviewOpen(false);
     setDraft((current) => ({
       ...current,
       units: {
@@ -490,6 +559,7 @@ export function SaveWorkspace({
   }
 
   function discardAll() {
+    setReviewOpen(false);
     ++previewVersion.current;
     setPreviewBusy(false);
     setDraft({
@@ -502,6 +572,7 @@ export function SaveWorkspace({
       guest: null,
     });
     setAdditionPreview(null);
+    statsPreview.discard();
     setPreviewOptions({});
     setJobWarning(null);
     setSaveError(null);
@@ -706,7 +777,8 @@ export function SaveWorkspace({
       !review ||
       review.errors.length > 0 ||
       review.operations.length === 0 ||
-      busy
+      busy ||
+      statsPreview.blocked
     )
       return;
     setBusy(true);
@@ -1230,7 +1302,7 @@ export function SaveWorkspace({
                             : 'unknown'
                         }
                         aria-pressed={unit?.key === row.key}
-                        aria-label={`Member ${String(index + 1)} ${unitName(row)} ${jobName(row)} Level ${valueText(row.stored.level.value)}`}
+                        aria-label={`Member ${String(index + 1)} ${unitName(row)} ${jobName(row)} Level ${draft.units[row.key]?.level ?? valueText(row.stored.level.value)}`}
                         onClick={() => {
                           setSelectedUnit(row.key);
                         }}
@@ -1271,7 +1343,8 @@ export function SaveWorkspace({
                           <strong>{unitName(row)}</strong>
                           <small>
                             {jobName(row)} · Lv.{' '}
-                            {valueText(row.stored.level.value)}
+                            {draft.units[row.key]?.level ??
+                              valueText(row.stored.level.value)}
                           </small>
                         </span>
                         {row.membership.value.state === 'known' &&
@@ -1321,10 +1394,11 @@ export function SaveWorkspace({
                           <h3>{unitName(unit)}</h3>
                           <p>
                             {jobName(unit)} · Level{' '}
-                            {valueText(unit.stored.level.value)}
+                            {unitDraft.level ??
+                              valueText(unit.stored.level.value)}
                           </p>
                         </div>
-                        {!editableUnit(unit) && (
+                        {!editableUnit(unit) && !editableProgression(unit) && (
                           <span className="workspace-view-only">
                             {unit.membership.value.state === 'known' &&
                             unit.membership.value.value === 'guest'
@@ -1364,8 +1438,35 @@ export function SaveWorkspace({
                         {panel === 'status' && (
                           <WorkspaceStatus
                             unit={unit}
+                            projected={
+                              statsPreview.reader?.roster.value.state ===
+                              'known'
+                                ? (statsPreview.reader.roster.value.value.find(
+                                    (row) => row.key === unit.key,
+                                  ) ?? unit)
+                                : unit
+                            }
+                            statInputs={statsPreview.inputs.filter(
+                              (input) => input.position === unit.key,
+                            )}
+                            onStatChange={(stat, value) => {
+                              setReviewOpen(false);
+                              statsPreview.changeStat(unit.key, stat, value);
+                            }}
+                            onStatCommit={(stat) => {
+                              statsPreview.commitStat(unit.key, stat);
+                            }}
+                            onStatReset={(stat) => {
+                              setReviewOpen(false);
+                              statsPreview.resetStat(unit.key, stat);
+                            }}
+                            projectionError={statsPreview.error}
+                            projecting={statsPreview.busy}
                             draft={unitDraft}
                             editable={!!context && editableUnit(unit)}
+                            progressionEditable={
+                              !!context && editableProgression(unit)
+                            }
                             zodiac={context?.zodiacOptions?.find(
                               (option) => option.unitPosition === unit.key,
                             )}
@@ -2012,6 +2113,7 @@ export function SaveWorkspace({
             {!!review?.errors.length && (
               <span>{review.errors.length} values need attention</span>
             )}
+            {statsPreview.busy && <span role="status">Calculating stats…</span>}
           </div>
 
           <button
@@ -2028,12 +2130,22 @@ export function SaveWorkspace({
             disabled={
               !context ||
               !review ||
-              review.operations.length === 0 ||
+              (review.operations.length === 0 &&
+                statsPreview.inputs.length === 0) ||
               review.errors.length > 0 ||
               busy ||
-              previewBusy
+              previewBusy ||
+              statsPreview.busy ||
+              statsPreview.hasErrors
             }
             onClick={() => {
+              statsPreview.commitAll();
+              setReviewOpen(true);
+            }}
+            onPointerDown={(event) => {
+              if (event.button !== 0) return;
+              // Blur can start the calculation before click fires; retain the review request.
+              statsPreview.commitAll();
               setReviewOpen(true);
             }}
           >
@@ -2103,7 +2215,7 @@ export function SaveWorkspace({
               <button
                 ref={confirmButton}
                 type="button"
-                disabled={busy}
+                disabled={busy || statsPreview.blocked}
                 onClick={() => void commit()}
               >
                 {busy ? 'Saving…' : 'Confirm and save'}

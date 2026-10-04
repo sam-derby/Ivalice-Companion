@@ -37,6 +37,7 @@ pub struct SlotMetadata {
     pub saved_at_unix_seconds: i32,
     pub hero_name_raw: [u8; 17],
     pub next_event_id: i32,
+    // Upstream parity name only: the independent analysis identifies scripted progress.
     pub playtime_minutes: i32,
     pub gil: u32,
     pub difficulty_level: u8,

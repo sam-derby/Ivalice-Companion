@@ -1,0 +1,61 @@
+import type { SavedCombatSet, SavedUnitRecord } from './reader-ipc';
+
+function combatSet(): SavedCombatSet {
+  return {
+    name_raw: Array<number>(16).fill(0),
+    name_padding: Array<number>(50).fill(0),
+    equipment: Array<number>(5).fill(255),
+    skillsets: [0, 0],
+    abilities: [0, 0, 0],
+    job: 0,
+    is_double_hand: false,
+  };
+}
+
+export function savedUnitRecord(): SavedUnitRecord {
+  return {
+    character: 1,
+    unit_index: 0,
+    job: 0,
+    union: 0,
+    sex: 0,
+    birthday: 0,
+    zodiac_sign: 0,
+    secondary_action: 0,
+    reaction_ability: 0,
+    support_ability: 0,
+    movement_ability: 0,
+    equip_items: Array<number>(7).fill(255),
+    exp: 0,
+    level: 1,
+    start_bcp: 0,
+    start_faith: 0,
+    hp_max_base: 0,
+    mp_max_base: 0,
+    wt_base: 0,
+    at_base: 0,
+    mat_base: 0,
+    unlocked_jobs: 0,
+    ability_flags: Array.from({ length: 22 }, () => [0, 0, 0]),
+    job_levels_raw: Array<number>(12).fill(0),
+    job_levels: Array<number>(24).fill(0),
+    job_points: Array<number>(23).fill(0),
+    total_job_points: Array<number>(23).fill(0),
+    nickname_raw: Array<number>(16).fill(0),
+    custom_job_name_raw: Array<number>(16).fill(0),
+    unit_name_trailing: Array<number>(32).fill(0),
+    name_no: 0,
+    in_trip: 0,
+    parasite: 0,
+    egg_color: 0,
+    psp_killed_num: 0,
+    unit_order_id: 0,
+    unit_starting_team: 0,
+    unit_join_id: 0,
+    current_combat_set: 0,
+    combat_sets: [combatSet(), combatSet(), combatSet()],
+    pad: 0,
+    chara_name_key: 0,
+    pad2: Array<number>(38).fill(0),
+  };
+}

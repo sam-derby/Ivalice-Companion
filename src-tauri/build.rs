@@ -6,6 +6,8 @@ fn main() {
             "get_save_selection",
             "set_save_selection",
             "load_reader",
+            "preview_draft",
+            "preview_base_stat",
             "preview_character",
             "preview_job_progress",
             "save_transaction",

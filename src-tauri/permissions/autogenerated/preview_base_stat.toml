@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-preview-base-stat"
+description = "Enables the preview_base_stat command without any pre-configured scope."
+commands.allow = ["preview_base_stat"]
+
+[[permission]]
+identifier = "deny-preview-base-stat"
+description = "Denies the preview_base_stat command without any pre-configured scope."
+commands.deny = ["preview_base_stat"]

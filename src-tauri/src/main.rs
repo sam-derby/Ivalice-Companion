@@ -16,6 +16,8 @@ fn main() {
             ipc::get_save_selection,
             ipc::set_save_selection,
             ipc::load_reader,
+            ipc::preview_draft,
+            ipc::preview_base_stat,
             ipc::preview_character,
             ipc::preview_job_progress,
             ipc::save_transaction,

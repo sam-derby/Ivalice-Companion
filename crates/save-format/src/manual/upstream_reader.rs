@@ -149,11 +149,10 @@ impl DecodedContainer {
                 chapter: unknown(),
                 ramza_level,
                 story: unknown(),
-                // TICSaveEditor.Core/Sections/InfoSection.cs at 07ea857 stores minutes.
-                play_time_seconds: metadata.as_ref().map_or_else(unknown, |value| {
-                    u64::try_from(value.playtime_minutes)
-                        .map_or_else(|_| unknown(), |minutes| known(minutes * 60))
-                }),
+                // Independent analysis: 0x120 mirrors scripted progress, despite upstream's
+                // playtime name. The 0x1b4 seconds counter drops in the
+                // load/retreat trial; neither supplies a reliable total.
+                play_time_seconds: unknown(),
                 // TICSaveEditor.Core/Sections/InfoSection.cs and Records/EventWork.cs at 07ea857.
                 next_event_id: metadata
                     .as_ref()
@@ -195,7 +194,7 @@ fn project_unit(
             level: known(unit.job_levels[index]),
             current_jp: known(unit.job_points[index]),
             // TICSaveEditor UnitSaveData.cs at 07ea857 calls this TotalJobPoint;
-            // an in-game comparison displays the same value as Job EXP.
+            // the owner's T033 game load displays the same value as Job EXP.
             total_jp: known(unit.total_job_points[index]),
         });
     }
@@ -288,6 +287,7 @@ fn project_unit(
             },
         },
         effective: EffectiveStats {
+            breakdown: std::collections::BTreeMap::new(),
             hp: unknown(),
             mp: unknown(),
             speed: unknown(),
@@ -895,7 +895,7 @@ mod tests {
         let progress = &reader.document().progress;
         assert_eq!(progress.title.value, ValueState::Known("Chapter".into()));
         assert_eq!(progress.hero_name.value, ValueState::Known("Hero".into()));
-        assert_eq!(progress.play_time_seconds.value, ValueState::Known(5400));
+        assert_eq!(progress.play_time_seconds.value, ValueState::Unknown);
         assert_eq!(progress.next_event_id.value, ValueState::Known(17));
         assert_eq!(progress.unnamed_event_values.value, ValueState::Known(1));
         assert_eq!(progress.difficulty_code.value, ValueState::Known(2));

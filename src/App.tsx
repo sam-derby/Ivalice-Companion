@@ -16,7 +16,7 @@ import {
 import { readerIdentityKey } from './ReaderRoster';
 import { SaveWorkspace } from './SaveWorkspace';
 import type { WorkspaceView } from './workspace-view';
-import { displaySavedAt, displayTime } from './workspace-fields';
+import { displaySavedAt } from './workspace-fields';
 import { version } from '../package.json';
 
 type SelectionView =
@@ -68,9 +68,6 @@ function slotSummaryText(summary: SlotSummary | undefined): string | null {
     summary.savedAtUnixSeconds > 0
   ) {
     parts.push(displaySavedAt(summary.savedAtUnixSeconds));
-  }
-  if (summary.playTimeSeconds !== null && summary.playTimeSeconds >= 0) {
-    parts.push(`${displayTime(summary.playTimeSeconds)} played`);
   }
   return parts.length ? parts.join(' · ') : null;
 }

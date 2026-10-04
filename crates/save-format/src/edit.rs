@@ -2,6 +2,9 @@
 //! {UmifContainer,PngEnvelope,ManualSaveFile}.cs at 07ea857; only the
 //! owner-verified fields are changed in the decoded payload.
 
+mod progression;
+pub use progression::BaseStatKind;
+
 use flate2::{Compress, Compression, FlushCompress, Status};
 pub use ivalice_domain::ability_flags::LoadoutKind as EquippedSlot;
 use ivalice_domain::ability_flags::ValidatedAbilityFlags;
@@ -49,6 +52,19 @@ pub enum EditOperation {
         slot: GearSlot,
         item_id: Option<u16>,
         source: Option<GearSource>,
+    },
+    CharacterLevel {
+        unit_position: u8,
+        value: u8,
+    },
+    Experience {
+        unit_position: u8,
+        value: u8,
+    },
+    BaseStat {
+        unit_position: u8,
+        stat: BaseStatKind,
+        value: u32,
     },
     Bravery {
         unit_position: u8,
@@ -364,7 +380,8 @@ pub fn edit_enhanced_png(
     slot: u8,
     operations: &[EditOperation],
 ) -> Result<Vec<u8>, GilEditError> {
-    edit_enhanced_png_inner(input, dictionary, slot, operations, None, None)
+    edit_enhanced_png_inner(input, dictionary, slot, operations, None, None, false)
+        .and_then(PreparedEdit::into_bytes)
 }
 
 pub fn edit_enhanced_png_with_jobs(
@@ -374,7 +391,8 @@ pub fn edit_enhanced_png_with_jobs(
     operations: &[EditOperation],
     jobs: &ValidatedJobRequirements,
 ) -> Result<Vec<u8>, GilEditError> {
-    edit_enhanced_png_inner(input, dictionary, slot, operations, Some(jobs), None)
+    edit_enhanced_png_inner(input, dictionary, slot, operations, Some(jobs), None, false)
+        .and_then(PreparedEdit::into_bytes)
 }
 
 pub fn edit_enhanced_png_with_abilities(
@@ -392,7 +410,9 @@ pub fn edit_enhanced_png_with_abilities(
         operations,
         Some(jobs),
         Some(abilities),
+        false,
     )
+    .and_then(PreparedEdit::into_bytes)
 }
 
 fn encode_zodiac(packed: u8, sign: ZodiacSign) -> Result<u8, GilEditError> {
@@ -432,6 +452,31 @@ fn is_character_addition(operation: &EditOperation) -> bool {
     )
 }
 
+/// Field previews skip compression, with the same mutation and verification rules.
+/// Batched character initialization retains the verified container path.
+pub fn preview_enhanced_png(
+    input: &[u8],
+    dictionary: &[u8],
+    slot: u8,
+    operations: &[EditOperation],
+    jobs: Option<&ValidatedJobRequirements>,
+    abilities: Option<&ValidatedAbilityFlags>,
+) -> Result<crate::DecodedContainer, GilEditError> {
+    edit_enhanced_png_inner(input, dictionary, slot, operations, jobs, abilities, true)
+        .map(|prepared| prepared.decoded)
+}
+
+struct PreparedEdit {
+    encoded: Option<Vec<u8>>,
+    decoded: crate::DecodedContainer,
+}
+
+impl PreparedEdit {
+    fn into_bytes(self) -> Result<Vec<u8>, GilEditError> {
+        self.encoded.ok_or(GilEditError::Encoding)
+    }
+}
+
 fn edit_enhanced_png_inner(
     input: &[u8],
     dictionary: &[u8],
@@ -439,7 +484,8 @@ fn edit_enhanced_png_inner(
     operations: &[EditOperation],
     jobs: Option<&ValidatedJobRequirements>,
     abilities: Option<&ValidatedAbilityFlags>,
-) -> Result<Vec<u8>, GilEditError> {
+    preview: bool,
+) -> Result<PreparedEdit, GilEditError> {
     // All initialization precedes field edits; the filesystem caller replaces once.
     // Donors must be active in the immutable input, never another pending addition.
     if operations.len() > 1 && operations.iter().any(is_character_addition) {
@@ -461,7 +507,9 @@ fn edit_enhanced_png_inner(
                     std::slice::from_ref(operation),
                     jobs,
                     abilities,
-                )?;
+                    false,
+                )?
+                .into_bytes()?;
                 continue;
             }
             let (source_slot, source_position, unit_position) = match operation {
@@ -495,7 +543,9 @@ fn edit_enhanced_png_inner(
                 std::slice::from_ref(operation),
                 jobs,
                 abilities,
-            )?;
+                false,
+            )?
+            .into_bytes()?;
         }
         let fields = operations
             .iter()
@@ -513,7 +563,15 @@ fn edit_enhanced_png_inner(
         }) {
             return Err(GilEditError::InvalidField);
         }
-        return edit_enhanced_png_inner(&initialized, dictionary, slot, &fields, jobs, abilities);
+        return edit_enhanced_png_inner(
+            &initialized,
+            dictionary,
+            slot,
+            &fields,
+            jobs,
+            abilities,
+            preview,
+        );
     }
     let decoded = crate::decode_enhanced_png(input, Some(dictionary))?;
     if decoded.stored_adler_status() != StoredAdlerStatus::Matched {
@@ -561,6 +619,7 @@ fn edit_enhanced_png_inner(
     let mut expected_gil = None;
     let mut staged_counts = [None; manual::inventory::PARTY_CAPACITY];
     let mut staged_stats = Vec::new();
+    let mut staged_progression = Vec::new();
     let mut staged_zodiacs = Vec::new();
     let mut staged_sexes = Vec::new();
     let mut staged_jobs = Vec::new();
@@ -651,6 +710,11 @@ fn edit_enhanced_png_inner(
                 *payload.get_mut(base).ok_or(GilEditError::Encoding)? = character;
                 *payload.get_mut(base + 4).ok_or(GilEditError::Encoding)? = sex_byte;
                 staged_sexes.push((base, character, sex_byte));
+            }
+            EditOperation::CharacterLevel { .. }
+            | EditOperation::Experience { .. }
+            | EditOperation::BaseStat { .. } => {
+                progression::apply(&mut payload, slot, operation, &mut staged_progression)?;
             }
             EditOperation::Bravery {
                 unit_position,
@@ -1137,47 +1201,61 @@ fn edit_enhanced_png_inner(
     }
     validate_final_loadout(&decoded, &payload, slot, operations, jobs, abilities)?;
     if payload == decoded.payload() {
-        return Ok(input.to_vec());
+        return Ok(PreparedEdit {
+            encoded: (!preview).then(|| input.to_vec()),
+            decoded,
+        });
     }
     let checksum = png::crc32(&payload[0x10..]);
     payload[4..8].copy_from_slice(&checksum.to_le_bytes());
 
-    let ffto_range = png::single_ffto_range(input)?;
-    let original_umif = input
-        .get(ffto_range.clone())
-        .ok_or(GilEditError::Encoding)?;
-    let umif = pack_umif(original_umif, &payload, dictionary)?;
-    let chunk_start = ffto_range
-        .start
-        .checked_sub(8)
-        .ok_or(GilEditError::Encoding)?;
-    let chunk_end = ffto_range
-        .end
-        .checked_add(4)
-        .ok_or(GilEditError::Encoding)?;
-    let mut output = Vec::with_capacity(
-        input
-            .len()
-            .saturating_sub(original_umif.len())
-            .saturating_add(umif.len()),
-    );
-    output.extend_from_slice(input.get(..chunk_start).ok_or(GilEditError::Encoding)?);
-    output.extend_from_slice(
-        &u32::try_from(umif.len())
-            .map_err(|_| GilEditError::Encoding)?
-            .to_be_bytes(),
-    );
-    output.extend_from_slice(b"ffTo");
-    output.extend_from_slice(&umif);
-    output.extend_from_slice(&png::crc32_parts(b"ffTo", &umif).to_be_bytes());
-    output.extend_from_slice(input.get(chunk_end..).ok_or(GilEditError::Encoding)?);
-    if output.len() > MAX_CONTAINER_BYTES {
-        return Err(GilEditError::Encoding);
-    }
-    let check = crate::decode_enhanced_png(&output, Some(dictionary))?;
-    if check.stored_adler_status() != StoredAdlerStatus::Matched || check.payload() != payload {
-        return Err(GilEditError::Encoding);
-    }
+    let (output, check) = if preview {
+        (
+            None,
+            crate::DecodedContainer {
+                payload: payload.clone().into_boxed_slice(),
+                stored_adler_status: StoredAdlerStatus::Matched,
+            },
+        )
+    } else {
+        let ffto_range = png::single_ffto_range(input)?;
+        let original_umif = input
+            .get(ffto_range.clone())
+            .ok_or(GilEditError::Encoding)?;
+        let umif = pack_umif(original_umif, &payload, dictionary)?;
+        let chunk_start = ffto_range
+            .start
+            .checked_sub(8)
+            .ok_or(GilEditError::Encoding)?;
+        let chunk_end = ffto_range
+            .end
+            .checked_add(4)
+            .ok_or(GilEditError::Encoding)?;
+        let mut output = Vec::with_capacity(
+            input
+                .len()
+                .saturating_sub(original_umif.len())
+                .saturating_add(umif.len()),
+        );
+        output.extend_from_slice(input.get(..chunk_start).ok_or(GilEditError::Encoding)?);
+        output.extend_from_slice(
+            &u32::try_from(umif.len())
+                .map_err(|_| GilEditError::Encoding)?
+                .to_be_bytes(),
+        );
+        output.extend_from_slice(b"ffTo");
+        output.extend_from_slice(&umif);
+        output.extend_from_slice(&png::crc32_parts(b"ffTo", &umif).to_be_bytes());
+        output.extend_from_slice(input.get(chunk_end..).ok_or(GilEditError::Encoding)?);
+        if output.len() > MAX_CONTAINER_BYTES {
+            return Err(GilEditError::Encoding);
+        }
+        let check = crate::decode_enhanced_png(&output, Some(dictionary))?;
+        if check.stored_adler_status() != StoredAdlerStatus::Matched || check.payload() != payload {
+            return Err(GilEditError::Encoding);
+        }
+        (Some(output), check)
+    };
     if expected_gil.is_some_and(|gil| {
         check
             .slot_metadata(slot)
@@ -1208,6 +1286,15 @@ fn edit_enhanced_png_inner(
         check.payload().get(*base) != Some(character) || check.payload().get(*base + 4) != Some(sex)
     }) {
         return Err(GilEditError::Encoding);
+    }
+    if !staged_progression.is_empty() {
+        let records = check.unit_records(slot)?.ok_or(GilEditError::Encoding)?;
+        if staged_progression
+            .iter()
+            .any(|field| !field.verify(&records))
+        {
+            return Err(GilEditError::Encoding);
+        }
     }
     if !staged_stats.is_empty() {
         let records = check.unit_records(slot)?.ok_or(GilEditError::Encoding)?;
@@ -1319,6 +1406,7 @@ fn edit_enhanced_png_inner(
                 && !staged_stats
                     .iter()
                     .any(|(offset, _, _, _)| *offset == index)
+                && !staged_progression.iter().any(|field| field.contains(index))
                 && !staged_job_bytes.contains(&index)
                 && !staged_ability_masks
                     .iter()
@@ -1336,7 +1424,10 @@ fn edit_enhanced_png_inner(
     {
         return Err(GilEditError::Encoding);
     }
-    Ok(output)
+    Ok(PreparedEdit {
+        encoded: output,
+        decoded: check,
+    })
 }
 
 fn normalized_gear(equipment: &[u16; 7]) -> [Option<u16>; 7] {
@@ -1463,7 +1554,7 @@ fn named_character_id(character: u8) -> bool {
 
 /// Creature identities cannot use the human donor initializer: it would inherit
 /// human metadata and fall back to Squire. CharaName/Job tables at d3123d2;
-/// independent creature initialization is implemented in `creature.rs`.
+/// their complete creature construction remains T074/T075.
 pub fn named_human_initialization_supported(character: u8) -> bool {
     matches!(character, 4..=52 | 74..=76 | 120..=127)
 }

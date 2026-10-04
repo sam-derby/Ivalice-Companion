@@ -12,8 +12,9 @@ use crate::{
 
 /// AeroStar's Battle Mechanics Guide, §7.1: floor(raw × job multiplier / 1,638,400),
 /// minimum one, then additive equipment. Job/item inputs come from
-/// fftivc.utility.modloader/TableData XML at d3123d2. Out-of-range or missing
-/// mechanics remain unknown rather than inventing TIC caps or special cases.
+/// fftivc.utility.modloader/TableData XML at d3123d2. PA/MA totals stop at 99
+/// after equipment; out-of-range results for other stats and missing mechanics
+/// remain unknown.
 pub fn apply_effective(document: &mut ReaderDocument, mechanics: Option<&ReaderMechanics>) {
     if let Some(mechanics) = mechanics {
         document.item_details = mechanics
@@ -59,17 +60,17 @@ fn calculate(unit: &ReaderUnit, data: &ReaderMechanics) -> EffectiveStats {
         bonuses.map(|value| value.speed),
         50,
     );
-    let physical_attack = stat(
+    let physical_attack = attack_stat(
         &unit.stored.bases.physical_attack,
         job.map(|value| value.pa_multiplier),
         bonuses.map(|value| value.pa),
-        99,
+        super::stat_edit::BaseStatKind::PhysicalAttack,
     );
-    let magical_attack = stat(
+    let magical_attack = attack_stat(
         &unit.stored.bases.magical_attack,
         job.map(|value| value.ma_multiplier),
         bonuses.map(|value| value.ma),
-        99,
+        super::stat_edit::BaseStatKind::MagicalAttack,
     );
     let movement = movement_bonus(&unit.abilities.movement);
     let movement_tiles = tiles(
@@ -91,6 +92,25 @@ fn calculate(unit: &ReaderUnit, data: &ReaderMechanics) -> EffectiveStats {
         movement_tiles,
         jump_tiles,
         evasion: evasion(job, &unit.equipment, data),
+        breakdown: super::stat_edit::BaseStatKind::ALL
+            .into_iter()
+            .map(|kind| {
+                let inputs = stat_inputs(unit, data, kind);
+                let detail = super::StatBreakdown {
+                    base: stat(
+                        kind.base(&unit.stored.bases),
+                        job.map(|job| stat_multiplier(job, kind)),
+                        Some(0),
+                        u32::MAX,
+                    ),
+                    equipment_bonus: inputs.map_or_else(unknown, |(_, bonus)| known(bonus)),
+                    job_multiplier: job
+                        .map_or_else(unknown, |job| known(stat_multiplier(job, kind))),
+                    maximum: kind.display_limit(),
+                };
+                (kind, detail)
+            })
+            .collect(),
     }
 }
 
@@ -160,18 +180,21 @@ fn stat(
     else {
         return unknown();
     };
-    if multiplier == 0 || *base > 0x00ff_ffff {
+    super::stat_edit::visible(*base, multiplier, bonus, unverified_cap).map_or_else(unknown, known)
+}
+
+fn attack_stat(
+    base: &Fact<u32>,
+    multiplier: Option<u16>,
+    bonus: Option<i32>,
+    kind: super::stat_edit::BaseStatKind,
+) -> Fact<u32> {
+    let (ValueState::Known(base), Some(multiplier), Some(bonus)) = (&base.value, multiplier, bonus)
+    else {
         return unknown();
-    }
-    let scaled = (u64::from(*base) * u64::from(multiplier) / 1_638_400).max(1);
-    let result = i64::try_from(scaled)
-        .ok()
-        .and_then(|value| value.checked_add(i64::from(bonus)));
-    // Classic display caps are only leads for TIC. Keep values beyond them unknown.
-    match result.and_then(|value| u32::try_from(value).ok()) {
-        Some(value) if value > 0 && value <= unverified_cap => known(value),
-        _ => unknown(),
-    }
+    };
+    super::stat_edit::total_with_equipment(*base, multiplier, bonus, kind)
+        .map_or_else(unknown, known)
 }
 
 fn tiles(base: Option<u16>, equipment: Option<i32>, ability: Option<i32>) -> Fact<u16> {
@@ -285,5 +308,35 @@ fn known<T>(value: T) -> Fact<T> {
 fn unknown<T>() -> Fact<T> {
     Fact {
         value: ValueState::Unknown,
+    }
+}
+
+/// Inputs used by both the effective reader and the inverse editor.
+pub(super) fn stat_inputs(
+    unit: &ReaderUnit,
+    data: &ReaderMechanics,
+    stat: super::stat_edit::BaseStatKind,
+) -> Option<(u16, i32)> {
+    use super::stat_edit::BaseStatKind;
+    let job = find_job(data, reference_id(&unit.current_job)?)?;
+    let bonus = equipment_bonuses(&unit.equipment, data)?;
+    let amount = match stat {
+        BaseStatKind::Hp => bonus.hp,
+        BaseStatKind::Mp => bonus.mp,
+        BaseStatKind::Speed => bonus.speed,
+        BaseStatKind::PhysicalAttack => bonus.pa,
+        BaseStatKind::MagicalAttack => bonus.ma,
+    };
+    Some((stat_multiplier(job, stat), amount))
+}
+
+fn stat_multiplier(job: &JobMechanics, kind: super::stat_edit::BaseStatKind) -> u16 {
+    use super::stat_edit::BaseStatKind;
+    match kind {
+        BaseStatKind::Hp => job.hp_multiplier,
+        BaseStatKind::Mp => job.mp_multiplier,
+        BaseStatKind::Speed => job.speed_multiplier,
+        BaseStatKind::PhysicalAttack => job.pa_multiplier,
+        BaseStatKind::MagicalAttack => job.ma_multiplier,
     }
 }

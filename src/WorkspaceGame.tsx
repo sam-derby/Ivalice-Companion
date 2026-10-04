@@ -1,10 +1,5 @@
 import type { ReaderDocument } from './reader-ipc';
-import {
-  displaySavedAt,
-  displayTime,
-  NumericField,
-  valueText,
-} from './workspace-fields';
+import { displaySavedAt, NumericField, valueText } from './workspace-fields';
 
 export function WorkspaceGame({
   reader,
@@ -57,15 +52,6 @@ export function WorkspaceGame({
                 <dd>
                   {valueText(reader.progress.location.value, (area) =>
                     valueText(area.label),
-                  )}
-                </dd>
-              </div>
-              <div>
-                <dt>Play time</dt>
-                <dd>
-                  {valueText(
-                    reader.progress.play_time_seconds.value,
-                    displayTime,
                   )}
                 </dd>
               </div>

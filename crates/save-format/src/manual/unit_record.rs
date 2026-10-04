@@ -5,6 +5,13 @@ use super::ManualParseError;
 use ivalice_domain::reader::{SavedCombatSet, SavedUnitRecord};
 
 pub const SIZE: usize = 600;
+pub(crate) const EXP_OFFSET: usize = 0x1c;
+pub(crate) const LEVEL_OFFSET: usize = 0x1d;
+pub(crate) const HP_BASE_OFFSET: usize = 0x20;
+pub(crate) const MP_BASE_OFFSET: usize = 0x23;
+pub(crate) const SPEED_BASE_OFFSET: usize = 0x26;
+pub(crate) const PA_BASE_OFFSET: usize = 0x29;
+pub(crate) const MA_BASE_OFFSET: usize = 0x2c;
 const COMBAT_SET_OFFSET: usize = 0x126;
 const COMBAT_SET_SIZE: usize = 88;
 
@@ -177,15 +184,15 @@ impl UnitRecord {
             support_ability: u16_le(bytes, 0x0a),
             movement_ability: u16_le(bytes, 0x0c),
             equip_items: std::array::from_fn(|index| u16_le(bytes, 0x0e + index * 2)),
-            exp: bytes[0x1c],
-            level: bytes[0x1d],
+            exp: bytes[EXP_OFFSET],
+            level: bytes[LEVEL_OFFSET],
             start_bcp: bytes[0x1e],
             start_faith: bytes[0x1f],
-            hp_max_base: u24_le(bytes, 0x20),
-            mp_max_base: u24_le(bytes, 0x23),
-            wt_base: u24_le(bytes, 0x26),
-            at_base: u24_le(bytes, 0x29),
-            mat_base: u24_le(bytes, 0x2c),
+            hp_max_base: u24_le(bytes, HP_BASE_OFFSET),
+            mp_max_base: u24_le(bytes, MP_BASE_OFFSET),
+            wt_base: u24_le(bytes, SPEED_BASE_OFFSET),
+            at_base: u24_le(bytes, PA_BASE_OFFSET),
+            mat_base: u24_le(bytes, MA_BASE_OFFSET),
             unlocked_jobs: u24_le(bytes, 0x2f),
             ability_flags,
             job_levels_raw: copy(bytes, 0x74),
