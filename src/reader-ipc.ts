@@ -52,6 +52,17 @@ export interface StoredStats {
 }
 
 export interface EffectiveStats extends StoredBases {
+  breakdown?: Partial<
+    Record<
+      BaseStatKind,
+      {
+        base: Fact<number>;
+        equipment_bonus: Fact<number>;
+        job_multiplier?: Fact<number>;
+        maximum: number;
+      }
+    >
+  >;
   movement_tiles: Fact<number>;
   jump_tiles: Fact<number>;
   evasion: Fact<
@@ -373,6 +384,33 @@ export interface EditContext {
   };
 }
 
+export type BaseStatKind =
+  'hp' | 'mp' | 'speed' | 'physical_attack' | 'magical_attack';
+export const statFields = [
+  ['hp', 'HP'],
+  ['mp', 'MP'],
+  ['physical_attack', 'PA'],
+  ['magical_attack', 'MA'],
+  ['speed', 'Speed'],
+] as const;
+
+export function previewDraft(request: {
+  transaction: SaveTransactionRequest;
+  solve?: { unitPosition: number; stat: BaseStatKind; value: number };
+}): Promise<{ reader: ReaderDocument; solvedBase: number | null }> {
+  return invoke('preview_draft', { request });
+}
+
+export function previewBaseStat(request: {
+  stat: BaseStatKind;
+  previousBase: number;
+  value: number | null;
+  jobMultiplier: number;
+  equipmentBonus: number | null;
+}): Promise<{ storedBase: number; base: Fact<number>; total: Fact<number> }> {
+  return invoke('preview_base_stat', { request });
+}
+
 export interface SaveTransactionRequest {
   snapshotGeneration: number;
   manualSlotId: number;
@@ -385,6 +423,17 @@ export interface SaveTransactionRequest {
       }
     | { kind: 'gil'; value: string }
     | { kind: 'inventory_quantity'; itemPosition: number; quantity: string }
+    | {
+        kind: 'character_level' | 'experience';
+        unitPosition: number;
+        value: string;
+      }
+    | {
+        kind: 'base_stat';
+        unitPosition: number;
+        stat: BaseStatKind;
+        value: number;
+      }
     | { kind: 'bravery'; unitPosition: number; value: string }
     | { kind: 'faith'; unitPosition: number; value: string }
     | { kind: 'zodiac'; unitPosition: number; sign: ZodiacSign }

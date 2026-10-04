@@ -159,6 +159,14 @@ body {
 }
 .app-shell [role='alert'] {
   padding: 0.4rem 0.6rem;
+  color: #fff1e8;
+}
+.workspace-stat-help {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+}
+.workspace-stat-breakdown {
+  display: block;
 }
 
 .workspace-navigation {

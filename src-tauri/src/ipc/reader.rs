@@ -310,9 +310,8 @@ pub(super) fn project_selected_reader(
                 title: metadata.readable_title(),
                 saved_at_unix_seconds: (metadata.saved_at_unix_seconds > 0)
                     .then(|| i64::from(metadata.saved_at_unix_seconds)),
-                play_time_seconds: u64::try_from(metadata.playtime_minutes)
-                    .ok()
-                    .map(|minutes| minutes * 60),
+                // Independent analysis: the upstream playtime field mirrors scripted progress.
+                play_time_seconds: None,
             })
         })
         .collect::<Result<Vec<_>, IpcError>>()?;
@@ -1108,7 +1107,7 @@ fn build_loadout_options(
 
 /// Initial provisioning failures leave the V5 baseline usable. Once a resource is acquired,
 /// every failure invalidates publication of the result, including labels already projected.
-fn with_catalogue(
+pub(super) fn with_catalogue(
     state: &DesktopState,
     generation: u64,
     slot: u8,
@@ -1174,7 +1173,7 @@ fn ensure_resource_current(
     Ok(())
 }
 
-fn token(digest: [u8; 32]) -> String {
+pub(super) fn token(digest: [u8; 32]) -> String {
     digest.iter().map(|byte| format!("{byte:02x}")).collect()
 }
 

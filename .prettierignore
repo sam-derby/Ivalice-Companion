@@ -1,0 +1,11 @@
+package-lock.json
+Cargo.lock
+target/
+dist/
+node_modules/
+.local/
+src-tauri/gen/
+LICENSE
+LICENSES/
+# Runtime resources require their validated canonical byte representation.
+src-tauri/installer-resources/

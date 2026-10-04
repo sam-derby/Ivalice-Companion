@@ -17,10 +17,6 @@ export function valueText<T>(
   }
 }
 
-export function displayTime(seconds: number): string {
-  return `${String(Math.floor(seconds / 3600))}h`;
-}
-
 export function displaySavedAt(seconds: number): string {
   if (!Number.isSafeInteger(seconds) || seconds <= 0 || seconds > 2_147_483_647)
     return 'Unknown';
@@ -41,6 +37,10 @@ export function NumericField({
   value,
   disabled = false,
   onChange,
+  onReset,
+  isChanged,
+  invalid = false,
+  onCommit,
 }: {
   label: string;
   accessibleLabel?: string;
@@ -49,10 +49,14 @@ export function NumericField({
   value: string;
   disabled?: boolean;
   onChange: (value: string) => void;
+  onReset?: () => void;
+  isChanged?: boolean;
+  invalid?: boolean;
+  onCommit?: () => void;
 }) {
   const generatedId = useId();
   const inputId = id ?? generatedId;
-  const changed = value !== String(saved);
+  const changed = isChanged ?? value !== String(saved);
   return (
     <div className="workspace-field" data-changed={changed || undefined}>
       <label htmlFor={inputId}>{label}</label>
@@ -60,6 +64,7 @@ export function NumericField({
         <input
           id={inputId}
           aria-label={accessibleLabel}
+          aria-invalid={invalid || undefined}
           type="text"
           inputMode="numeric"
           autoComplete="off"
@@ -67,6 +72,13 @@ export function NumericField({
           value={value}
           onChange={(event) => {
             onChange(event.target.value);
+          }}
+          onBlur={onCommit}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' && onCommit) {
+              event.preventDefault();
+              onCommit();
+            }
           }}
         />
         {changed && (
@@ -76,7 +88,8 @@ export function NumericField({
             aria-label={`Reset ${accessibleLabel}`}
             disabled={disabled}
             onClick={() => {
-              onChange(String(saved));
+              if (onReset) onReset();
+              else onChange(String(saved));
             }}
           >
             Reset

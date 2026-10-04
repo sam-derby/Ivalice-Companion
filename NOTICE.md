@@ -2,7 +2,7 @@
 
 Ivalice Companion's application code is [GPL-3.0-only](LICENSE). The Rust
 adaptation adds bounds checks, scoped save edits, snapshots and backup handling;
-last modified 2026-10-03. These terms do not relicense third-party assets.
+last modified 2026-10-04. These terms do not relicense third-party assets.
 
 ## Save code and data sources
 

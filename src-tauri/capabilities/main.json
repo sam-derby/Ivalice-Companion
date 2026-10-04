@@ -8,6 +8,8 @@
     "allow-get-save-selection",
     "allow-set-save-selection",
     "allow-load-reader",
+    "allow-preview-draft",
+    "allow-preview-base-stat",
     "allow-preview-character",
     "allow-preview-job-progress",
     "allow-save-transaction",

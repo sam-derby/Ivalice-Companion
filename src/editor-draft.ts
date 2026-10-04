@@ -1,4 +1,6 @@
+import { statFields } from './reader-ipc';
 import type {
+  BaseStatKind,
   EditContext,
   ReaderDocument,
   ReaderUnit,
@@ -12,6 +14,9 @@ export interface JobDraft {
 }
 
 export interface UnitDraft {
+  level?: string;
+  exp?: string;
+  statBases?: Partial<Record<BaseStatKind, number>>;
   zodiac?: string;
   sex?: string;
   bravery?: string;
@@ -118,6 +123,7 @@ export function collectDraft(
   reader: ReaderDocument | null,
   context: EditContext,
   draft: EditorDraft,
+  projected?: ReaderDocument | null,
 ): DraftReview {
   const review: DraftReview = {
     operations: [],
@@ -202,6 +208,66 @@ export function collectDraft(
       continue;
     }
     const group = unitLabel(unit);
+    for (const [field, label, value, original, minimum] of [
+      ['character_level', 'Level', unitDraft.level, unit.saved.level, 1],
+      ['experience', 'EXP', unitDraft.exp, unit.saved.exp, 0],
+    ] as const) {
+      if (value === undefined || value === String(original)) continue;
+      if (
+        !/^\d{1,2}$/.test(value) ||
+        Number(value) < minimum ||
+        Number(value) > 99
+      ) {
+        review.errors.push(
+          `${group}: ${label} must be from ${String(minimum)} to 99.`,
+        );
+      } else {
+        review.operations.push({ kind: field, unitPosition: position, value });
+        add(review, group, label, original, value);
+      }
+    }
+    const projectedRoster = projected?.roster.value;
+    const projectedUnit =
+      projectedRoster?.state === 'known'
+        ? projectedRoster.value.find((row) => row.key === position)
+        : undefined;
+    for (const [stat, label] of statFields) {
+      const base = unitDraft.statBases?.[stat];
+      const originalBase = unit.stored.bases[stat].value;
+      if (
+        base === undefined ||
+        (originalBase.state === 'known' && base === originalBase.value)
+      )
+        continue;
+      if (
+        !Number.isSafeInteger(base) ||
+        base < 0 ||
+        base > 0xffffff ||
+        originalBase.state !== 'known'
+      ) {
+        review.errors.push(`${group}: ${label} edit is unavailable.`);
+        continue;
+      }
+      review.operations.push({
+        kind: 'base_stat',
+        unitPosition: position,
+        stat,
+        value: base,
+      });
+      const before = unit.effective[stat].value;
+      const after = projectedUnit?.effective[stat].value;
+      add(
+        review,
+        group,
+        label,
+        before.state === 'known' ? before.value : 'Unknown',
+        after?.state === 'known'
+          ? after.value
+          : after
+            ? 'Unknown'
+            : 'Updating…',
+      );
+    }
     const gearOptions = context.gearOptions?.find(
       (option) => option.unitPosition === position,
     );

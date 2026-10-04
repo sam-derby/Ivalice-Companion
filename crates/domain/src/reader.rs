@@ -4,6 +4,8 @@ use crate::{SamuraiPrerequisiteProgress, SteelCostProgress, ValueState};
 use serde::{Deserialize, Serialize};
 
 pub mod commands;
+pub mod level_growth;
+pub mod stat_edit;
 pub mod stats;
 mod validation;
 pub use validation::{ReaderError, ValidatedReader};
@@ -142,6 +144,18 @@ pub struct EffectiveStats {
     pub movement_tiles: Fact<u16>,
     pub jump_tiles: Fact<u16>,
     pub evasion: Fact<Vec<Evasion>>,
+    #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
+    pub breakdown: std::collections::BTreeMap<stat_edit::BaseStatKind, StatBreakdown>,
+}
+
+/// Game-visible value before equipment, not the stored fixed-point integer.
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct StatBreakdown {
+    pub base: Fact<u32>,
+    pub equipment_bonus: Fact<i32>,
+    pub job_multiplier: Fact<u16>,
+    pub maximum: u32,
 }
 
 #[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd, Serialize, Deserialize)]

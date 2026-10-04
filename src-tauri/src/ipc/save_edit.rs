@@ -10,7 +10,7 @@ use ivalice_infrastructure::{
     AbilityFlagsLoader, JobRequirementsLoader, SaveEditError,
 };
 use ivalice_save_format::{
-    edit_enhanced_png, edit_enhanced_png_with_abilities, edit_enhanced_png_with_jobs,
+    edit_enhanced_png, edit_enhanced_png_with_abilities, edit_enhanced_png_with_jobs, BaseStatKind,
     EditOperation, EquippedSlot, GearSlot, GearSource, GilEditError,
 };
 
@@ -47,6 +47,19 @@ enum RequestedOperation {
         slot: GearSlot,
         item_key: String,
         source: Option<GearSource>,
+    },
+    CharacterLevel {
+        unit_position: u8,
+        value: String,
+    },
+    Experience {
+        unit_position: u8,
+        value: String,
+    },
+    BaseStat {
+        unit_position: u8,
+        stat: BaseStatKind,
+        value: u32,
     },
     Bravery {
         unit_position: u8,
@@ -304,6 +317,53 @@ pub(super) fn parse_transaction_request(
                     slot: *slot,
                     item_id,
                     source: *source,
+                })
+            }
+            RequestedOperation::CharacterLevel {
+                unit_position,
+                value,
+            }
+            | RequestedOperation::Experience {
+                unit_position,
+                value,
+            } => {
+                let level = matches!(operation, RequestedOperation::CharacterLevel { .. });
+                let parsed = parse_job_number::<u8>(value, 2)?;
+                if *unit_position >= 50 || parsed > 99 || (level && parsed == 0) {
+                    return Err(IpcError::simple(
+                        IpcErrorCategory::Input,
+                        "invalid_character_progress",
+                        false,
+                    ));
+                }
+                Ok(if level {
+                    EditOperation::CharacterLevel {
+                        unit_position: *unit_position,
+                        value: parsed,
+                    }
+                } else {
+                    EditOperation::Experience {
+                        unit_position: *unit_position,
+                        value: parsed,
+                    }
+                })
+            }
+            RequestedOperation::BaseStat {
+                unit_position,
+                stat,
+                value,
+            } => {
+                if *unit_position >= 50 || *value > ivalice_domain::reader::stat_edit::MAX_BASE {
+                    return Err(IpcError::simple(
+                        IpcErrorCategory::Input,
+                        "invalid_base_stat",
+                        false,
+                    ));
+                }
+                Ok(EditOperation::BaseStat {
+                    unit_position: *unit_position,
+                    stat: *stat,
+                    value: *value,
                 })
             }
             RequestedOperation::Bravery {
@@ -666,6 +726,27 @@ pub(super) fn parse_transaction_request(
                         GearSlot::Accessory => 4,
                     }
             }
+            EditOperation::CharacterLevel { unit_position, .. } => {
+                900_000 + u32::from(*unit_position) * 7
+            }
+            EditOperation::Experience { unit_position, .. } => {
+                900_001 + u32::from(*unit_position) * 7
+            }
+            EditOperation::BaseStat {
+                unit_position,
+                stat,
+                ..
+            } => {
+                900_002
+                    + u32::from(*unit_position) * 7
+                    + match stat {
+                        BaseStatKind::Hp => 0,
+                        BaseStatKind::Mp => 1,
+                        BaseStatKind::Speed => 2,
+                        BaseStatKind::PhysicalAttack => 3,
+                        BaseStatKind::MagicalAttack => 4,
+                    }
+            }
             EditOperation::Bravery { unit_position, .. } => 261 + u32::from(*unit_position) * 2,
             EditOperation::Faith { unit_position, .. } => 262 + u32::from(*unit_position) * 2,
             EditOperation::Zodiac { unit_position, .. } => 750_000 + u32::from(*unit_position),
@@ -732,7 +813,7 @@ pub async fn save_transaction(
     .map_err(|_| worker_error())?
 }
 
-fn save_selected_operations(
+pub(super) fn save_selected_operations(
     state: &DesktopState,
     generation: u64,
     slot: u8,
@@ -784,6 +865,9 @@ fn save_selected_operations(
             EditOperation::Gil { value } => Some(*value),
             EditOperation::InventoryQuantity { .. }
             | EditOperation::Gear { .. }
+            | EditOperation::CharacterLevel { .. }
+            | EditOperation::Experience { .. }
+            | EditOperation::BaseStat { .. }
             | EditOperation::Bravery { .. }
             | EditOperation::Faith { .. }
             | EditOperation::Zodiac { .. }
@@ -805,10 +889,97 @@ fn save_selected_operations(
             backup_created: false,
         });
     }
+    let replacement = prepare_replacement(state, &loaded, snapshot.bytes(), operations)?;
+    if replacement == snapshot.bytes() {
+        return Ok(SaveTransactionResponse {
+            gil,
+            backup_created: false,
+        });
+    }
+    ensure_current(state, generation)?;
+    let backup = replace_save_with_backup_if_unchanged(
+        &loaded.path,
+        loaded.sha256,
+        snapshot.bytes(),
+        &replacement,
+    )
+    .map_err(map_save_edit_error)?;
+    *lock_recover(&state.last_backup) = Some(BackupReceipt {
+        path: loaded.path,
+        slot,
+        edited_sha256: backup.edited_sha256(),
+        backup,
+    });
+    state.cancel_load();
+    Ok(SaveTransactionResponse {
+        gil,
+        backup_created: true,
+    })
+}
+
+/// The same catalogue and operation validation is used by previews and save writes.
+pub(super) fn prepare_replacement(
+    state: &DesktopState,
+    loaded: &LoadedEdit,
+    input: &[u8],
+    operations: &[EditOperation],
+) -> Result<Vec<u8>, IpcError> {
+    with_edit_resources(
+        state,
+        loaded,
+        operations,
+        |dictionary, jobs, abilities| match (jobs, abilities) {
+            (Some(jobs), Some(abilities)) => edit_enhanced_png_with_abilities(
+                input,
+                dictionary,
+                loaded.slot,
+                operations,
+                jobs,
+                abilities,
+            ),
+            (Some(jobs), None) => {
+                edit_enhanced_png_with_jobs(input, dictionary, loaded.slot, operations, jobs)
+            }
+            (None, None) => edit_enhanced_png(input, dictionary, loaded.slot, operations),
+            (None, Some(_)) => Err(ivalice_save_format::GilEditError::InvalidField),
+        },
+    )
+}
+
+pub(super) fn prepare_preview(
+    state: &DesktopState,
+    loaded: &LoadedEdit,
+    input: &[u8],
+    operations: &[EditOperation],
+) -> Result<ivalice_save_format::DecodedContainer, IpcError> {
+    with_edit_resources(state, loaded, operations, |dictionary, jobs, abilities| {
+        ivalice_save_format::preview_enhanced_png(
+            input,
+            dictionary,
+            loaded.slot,
+            operations,
+            jobs,
+            abilities,
+        )
+    })
+}
+
+fn with_edit_resources<T>(
+    state: &DesktopState,
+    loaded: &LoadedEdit,
+    operations: &[EditOperation],
+    action: impl FnOnce(
+        &[u8],
+        Option<&ivalice_domain::job_eligibility::ValidatedJobRequirements>,
+        Option<&ivalice_domain::ability_flags::ValidatedAbilityFlags>,
+    ) -> Result<T, ivalice_save_format::GilEditError>,
+) -> Result<T, IpcError> {
     if operations.iter().any(|operation| {
         matches!(
             operation,
-            EditOperation::InventoryQuantity { .. } | EditOperation::Gear { .. }
+            EditOperation::InventoryQuantity { .. }
+                | EditOperation::Gear { .. }
+                | EditOperation::BaseStat { .. }
         )
     }) {
         let token = loaded
@@ -860,72 +1031,35 @@ fn save_selected_operations(
             EditOperation::LearnedAbility { .. } | EditOperation::EquippedSlot { .. }
         )
     });
-    let replacement = if has_abilities
+    let graph = if has_abilities
         || operations
             .iter()
             .any(|operation| matches!(operation, EditOperation::JobProgress { .. }))
     {
-        let graph = JobRequirementsLoader::load(&state.resource_root).map_err(|_| {
-            IpcError::simple(
-                IpcErrorCategory::Resource,
-                "job_requirements_unavailable",
-                false,
-            )
-        })?;
-        if has_abilities {
-            let abilities = AbilityFlagsLoader::load(&state.resource_root).map_err(|_| {
+        Some(
+            JobRequirementsLoader::load(&state.resource_root).map_err(|_| {
                 IpcError::simple(
                     IpcErrorCategory::Resource,
-                    "ability_flags_unavailable",
+                    "job_requirements_unavailable",
                     false,
                 )
-            })?;
-            edit_enhanced_png_with_abilities(
-                snapshot.bytes(),
-                &dictionary,
-                loaded.slot,
-                operations,
-                &graph,
-                &abilities,
-            )
-        } else {
-            edit_enhanced_png_with_jobs(
-                snapshot.bytes(),
-                &dictionary,
-                loaded.slot,
-                operations,
-                &graph,
-            )
-        }
+            })?,
+        )
     } else {
-        edit_enhanced_png(snapshot.bytes(), &dictionary, loaded.slot, operations)
-    }
-    .map_err(map_gil_edit_error)?;
-    if replacement == snapshot.bytes() {
-        return Ok(SaveTransactionResponse {
-            gil,
-            backup_created: false,
-        });
-    }
-    ensure_current(state, generation)?;
-    let backup = replace_save_with_backup_if_unchanged(
-        &loaded.path,
-        loaded.sha256,
-        snapshot.bytes(),
-        &replacement,
-    )
-    .map_err(map_save_edit_error)?;
-    *lock_recover(&state.last_backup) = Some(BackupReceipt {
-        path: loaded.path,
-        slot,
-        edited_sha256: backup.edited_sha256(),
-        backup,
-    });
-    state.cancel_load();
-    Ok(SaveTransactionResponse {
-        gil,
-        backup_created: true,
-    })
+        None
+    };
+    let abilities = if has_abilities {
+        Some(AbilityFlagsLoader::load(&state.resource_root).map_err(|_| {
+            IpcError::simple(
+                IpcErrorCategory::Resource,
+                "ability_flags_unavailable",
+                false,
+            )
+        })?)
+    } else {
+        None
+    };
+    action(&dictionary, graph.as_ref(), abilities.as_ref()).map_err(map_gil_edit_error)
 }
 
 #[tauri::command]
@@ -1043,6 +1177,56 @@ fn map_save_edit_error(error: SaveEditError) -> IpcError {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn progression_operations_are_independent_strict_and_duplicate_checked() {
+        use serde_json::json;
+        let request =
+            |operations| json!({"snapshotGeneration":1,"manualSlotId":0,"operations":operations});
+        let operations = json!([
+            {"kind":"character_level","unitPosition":0,"value":"10"},
+            {"kind":"experience","unitPosition":0,"value":"73"},
+            {"kind":"base_stat","unitPosition":0,"stat":"hp","value":9830400}
+        ]);
+        let (_, parsed) = parse_transaction_request(request(operations))
+            .unwrap_or_else(|error| panic!("{error:?}"));
+        assert_eq!(
+            parsed,
+            vec![
+                EditOperation::CharacterLevel {
+                    unit_position: 0,
+                    value: 10
+                },
+                EditOperation::Experience {
+                    unit_position: 0,
+                    value: 73
+                },
+                EditOperation::BaseStat {
+                    unit_position: 0,
+                    stat: super::BaseStatKind::Hp,
+                    value: 9_830_400
+                }
+            ]
+        );
+        for invalid in [
+            json!({"kind":"character_level","unitPosition":0,"value":"0"}),
+            json!({"kind":"experience","unitPosition":0,"value":"100"}),
+            json!({"kind":"base_stat","unitPosition":0,"stat":"hp","value":16777216}),
+            json!({"kind":"base_stat","unitPosition":0,"stat":"hp","value":-1}),
+            json!({"kind":"base_stat","unitPosition":0,"stat":"hp","value":1.5}),
+            json!({"kind":"character_level","unitPosition":50,"value":"10"}),
+            json!({"kind":"character_level","unitPosition":0,"value":"10","exp":"0"}),
+        ] {
+            assert!(parse_transaction_request(request(json!([invalid]))).is_err());
+        }
+        let base = json!({"kind":"base_stat","unitPosition":0,"stat":"hp","value":1});
+        assert_eq!(
+            parse_transaction_request(request(json!([base.clone(), base])))
+                .err()
+                .map(|error| error.code),
+            Some("duplicate_edit_field")
+        );
+    }
+
     #[test]
     fn creature_requests_are_explicit_bounded_and_share_addition_capacity() {
         let valid =
