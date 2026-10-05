@@ -47,6 +47,7 @@ import { useDraftProjection } from './use-draft-projection';
 import { EquippedGear, description } from './WorkspaceEquipment';
 import { InfoHint, Tooltip } from './Tooltip';
 import { WorkspaceQuests } from './WorkspaceQuests';
+import { showWip } from './wip';
 import { WorkspaceUtilities } from './WorkspaceUtilities';
 import { NumericField, stagedNumber, valueText } from './workspace-fields';
 import type {
@@ -67,6 +68,8 @@ interface Props {
   initialView: WorkspaceView | undefined;
   /** Section shown when this slot has no remembered view. */
   defaultSection?: WorkspaceSection;
+  /** Shows the read-only Quests section (local work in progress). */
+  showQuests?: boolean;
   onViewChange: (slot: number, view: WorkspaceView) => void;
 }
 
@@ -183,6 +186,7 @@ export function SaveWorkspace({
   slotSummaries = [],
   initialView,
   defaultSection = 'game',
+  showQuests = showWip,
   onViewChange,
 }: Props) {
   const [additionPreview, setAdditionPreview] = useState<{
@@ -229,7 +233,9 @@ export function SaveWorkspace({
   );
   const art = useReaderArt();
   const [section, setSection] = useState<WorkspaceSection>(
-    initialView?.section ?? defaultSection,
+    initialView?.section === 'quests' && !showQuests
+      ? defaultSection
+      : (initialView?.section ?? defaultSection),
   );
   const [panel, setPanel] = useState<UnitPanel>(initialView?.panel ?? 'status');
   const roster = reader?.roster.value;
@@ -985,18 +991,20 @@ export function SaveWorkspace({
             ['inventory', 'Inventory'],
             ['utilities', 'Utilities'],
           ] as const
-        ).map(([key, label]) => (
-          <button
-            key={key}
-            type="button"
-            aria-pressed={section === key}
-            onClick={() => {
-              setSection(key);
-            }}
-          >
-            {label}
-          </button>
-        ))}
+        )
+          .filter(([key]) => key !== 'quests' || showQuests)
+          .map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              aria-pressed={section === key}
+              onClick={() => {
+                setSection(key);
+              }}
+            >
+              {label}
+            </button>
+          ))}
         {context?.backupAvailable && (
           <button
             type="button"
@@ -1043,7 +1051,9 @@ export function SaveWorkspace({
           />
         )}
 
-        {section === 'quests' && <WorkspaceQuests context={context} />}
+        {section === 'quests' && showQuests && (
+          <WorkspaceQuests context={context} />
+        )}
 
         {section === 'utilities' && (
           <WorkspaceUtilities

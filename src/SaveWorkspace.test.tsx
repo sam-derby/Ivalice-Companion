@@ -293,3 +293,39 @@ test('pointer-down review applies pending input even when blur starts calculatio
     });
   });
 });
+
+test('shows the Quests section only when work in progress is enabled', () => {
+  const props = {
+    reader: draftDocument(),
+    context: draftContext(),
+    onDirtyChange: vi.fn(),
+    onReload: vi.fn().mockResolvedValue(undefined),
+    manualSlotId: 0,
+    onViewChange: vi.fn(),
+  };
+  const { unmount } = render(
+    <SaveWorkspace
+      {...props}
+      initialView={{
+        section: 'quests',
+        panel: 'status',
+        selectedUnit: null,
+        selectedJobs: {},
+        abilityKind: 'action',
+        unitQuery: '',
+        itemQuery: '',
+        itemCategory: '',
+        itemView: 'held',
+        selectedItem: null,
+      }}
+    />,
+  );
+  expect(screen.queryByRole('button', { name: 'Quests' })).toBeNull();
+  expect(
+    screen.getByRole('button', { name: 'Game' }).getAttribute('aria-pressed'),
+  ).toBe('true');
+  unmount();
+  render(<SaveWorkspace {...props} initialView={undefined} showQuests />);
+  fireEvent.click(screen.getByRole('button', { name: 'Quests' }));
+  expect(screen.getByRole('heading', { name: 'Quests' })).toBeTruthy();
+});

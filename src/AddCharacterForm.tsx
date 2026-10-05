@@ -161,8 +161,8 @@ export function AddCharacterForm({
           </label>
           <p className="workspace-add-note">
             {kind === 'monster'
-              ? 'Experimental level-1 creatures. Appearance and battle control may not work.'
-              : 'Experimental level-1 enemies. Boss commands, appearance and battle control may not work. High Seraph uses an experimental Ultima secondary command.'}
+              ? 'Adds a level-1 creature.'
+              : 'Adds a level-1 enemy. High Seraph uses an Ultima secondary command.'}
           </p>
         </>
       ) : kind === 'generic' ? (
@@ -210,8 +210,8 @@ export function AddCharacterForm({
             </select>
           </label>
           <p className="workspace-add-note">
-            Named additions are experimental. Story events are unchanged. Base
-            stats come from a saved starting record.
+            Story events are unchanged. Base stats come from a saved starting
+            record.
           </p>
         </>
       ) : (

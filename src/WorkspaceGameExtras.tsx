@@ -67,7 +67,6 @@ export function CalendarField({
           </button>
         )}
       </div>
-      <small>Effect on errands already under way is untested.</small>
     </fieldset>
   );
 }
@@ -95,10 +94,7 @@ export function AchievementList({
           {unlockedCount} of {achievements.length} unlocked
         </span>
       </div>
-      <p>
-        Changes edit only this save. Whether the game or Steam then grants or
-        withdraws the achievement is untested.
-      </p>
+      <p>Changes edit only this save.</p>
       <ul>
         {achievements.map((achievement) => {
           const unlocked = draft?.[achievement.index] ?? achievement.unlocked;
