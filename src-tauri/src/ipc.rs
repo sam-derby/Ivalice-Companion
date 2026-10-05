@@ -35,9 +35,15 @@ pub use job_preview::{
 };
 pub use reader::{__cmd__load_reader, __tauri_command_name_load_reader, load_reader};
 mod save_edit;
+mod slots;
 pub use save_edit::{
     __cmd__restore_last_backup, __cmd__save_transaction, __tauri_command_name_restore_last_backup,
     __tauri_command_name_save_transaction, restore_last_backup, save_transaction,
+};
+pub use slots::{
+    __cmd__export_save_slot, __cmd__inspect_save_file, __cmd__slot_operation,
+    __tauri_command_name_export_save_slot, __tauri_command_name_inspect_save_file,
+    __tauri_command_name_slot_operation, export_save_slot, inspect_save_file, slot_operation,
 };
 
 const MAX_SELECTION_UTF16: usize = 32_767;

@@ -15,6 +15,7 @@ pub enum SaveEditError {
     BackupFailed,
     RecoveryRequired,
     Io,
+    Exists,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -176,6 +177,46 @@ fn move_without_replace(from: &Path, to: &Path) -> Result<(), SaveEditError> {
     .map_err(|_| SaveEditError::Io)
 }
 
+/// Write a verified sibling copy, then publish it at `path`. An existing file is
+/// replaced only with `overwrite` and only when it is a regular, single-link file.
+pub fn write_new_save_file(
+    path: &Path,
+    bytes: &[u8],
+    overwrite: bool,
+) -> Result<(), SaveEditError> {
+    if bytes.is_empty() || bytes.len() as u64 > MAX_SNAPSHOT_BYTES {
+        return Err(SaveEditError::TooLarge);
+    }
+    let parent = path.parent().ok_or(SaveEditError::UnsafePath)?;
+    let guard = DirectoryGuard::pin(parent).map_err(|_| SaveEditError::UnsafePath)?;
+    let exists = match fs::symlink_metadata(path) {
+        Ok(_) if !overwrite => return Err(SaveEditError::Exists),
+        Ok(_) => {
+            windows_fs::safe_single_link_file(path).map_err(|_| SaveEditError::UnsafePath)?;
+            true
+        }
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => false,
+        Err(_) => return Err(SaveEditError::Io),
+    };
+    let copy_path = sibling_path(path, "copy")?;
+    write_copy(&copy_path, bytes)?;
+    let result = (|| {
+        guard.validate().map_err(|_| SaveEditError::UnsafePath)?;
+        if hash_file(&copy_path)? != <[u8; 32]>::from(Sha256::digest(bytes)) {
+            return Err(SaveEditError::Io);
+        }
+        if exists {
+            fs::rename(&copy_path, path).map_err(|_| SaveEditError::Io)
+        } else {
+            move_without_replace(&copy_path, path)
+        }
+    })();
+    if result.is_err() {
+        let _ = fs::remove_file(&copy_path);
+    }
+    result
+}
+
 /// Restore only the file that still has the expected edited digest. The
 /// backup remains on disk after restoration for independent recovery.
 pub fn restore_save_from_backup_if_unchanged(
@@ -280,8 +321,34 @@ mod tests {
 
     use super::{
         replace_save_if_unchanged, replace_save_with_backup_if_unchanged,
-        restore_save_from_backup_if_unchanged, SaveEditError,
+        restore_save_from_backup_if_unchanged, write_new_save_file, SaveEditError,
     };
+
+    #[test]
+    fn new_files_never_replace_without_consent() -> Result<(), Box<dyn std::error::Error>> {
+        let root = std::env::temp_dir().join(format!("ivalice-export-{}", std::process::id()));
+        fs::create_dir_all(&root)?;
+        let path = root.join("export.png");
+        write_new_save_file(&path, b"first", false)
+            .map_err(|error| format!("export failed: {error:?}"))?;
+        assert_eq!(fs::read(&path)?, b"first");
+        assert_eq!(
+            write_new_save_file(&path, b"second", false),
+            Err(SaveEditError::Exists)
+        );
+        assert_eq!(fs::read(&path)?, b"first");
+        write_new_save_file(&path, b"second", true)
+            .map_err(|error| format!("overwrite failed: {error:?}"))?;
+        assert_eq!(fs::read(&path)?, b"second");
+        assert_eq!(
+            write_new_save_file(&path, b"", true),
+            Err(SaveEditError::TooLarge)
+        );
+        assert_eq!(fs::read_dir(&root)?.count(), 1);
+        fs::remove_file(path)?;
+        fs::remove_dir(root)?;
+        Ok(())
+    }
 
     #[test]
     fn disposable_file_replacement_requires_matching_digest(

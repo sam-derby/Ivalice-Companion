@@ -21,7 +21,10 @@ fn main() {
             ipc::preview_character,
             ipc::preview_job_progress,
             ipc::save_transaction,
-            ipc::restore_last_backup
+            ipc::restore_last_backup,
+            ipc::slot_operation,
+            ipc::export_save_slot,
+            ipc::inspect_save_file
         ])
         .run(tauri::generate_context!());
     if let Err(error) = result {

@@ -48,18 +48,22 @@ export function EquippedGear({
     const details =
       value.state === 'known' ? (itemDetails[value.value.id] ?? []) : [];
     return (
-      <Tooltip
-        text={[label, description(fact), ...details].filter(Boolean).join('\n')}
-      >
+      <span className="workspace-gear-item">
         {value.state === 'known' && (
-          <ArtImage
-            src={itemArt(art, value.value.id)}
-            label={`${label} icon`}
-            variant="item"
-          />
+          <Tooltip
+            text={[label, description(fact), ...details]
+              .filter(Boolean)
+              .join('\n')}
+          >
+            <ArtImage
+              src={itemArt(art, value.value.id)}
+              label={`${label} icon`}
+              variant="item"
+            />
+          </Tooltip>
         )}
         <span className="workspace-gear-name">{label}</span>
-      </Tooltip>
+      </span>
     );
   }
   return (

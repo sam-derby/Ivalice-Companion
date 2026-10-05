@@ -1,10 +1,11 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "main",
-  "description": "The main window can choose one save and invoke bounded save commands.",
+  "description": "The main window can choose one save, invoke bounded save commands and manage its slots.",
   "windows": ["main"],
   "permissions": [
     "dialog:allow-open",
+    "dialog:allow-save",
     "allow-get-save-selection",
     "allow-set-save-selection",
     "allow-load-reader",
@@ -13,6 +14,9 @@
     "allow-preview-character",
     "allow-preview-job-progress",
     "allow-save-transaction",
-    "allow-restore-last-backup"
+    "allow-restore-last-backup",
+    "allow-slot-operation",
+    "allow-export-save-slot",
+    "allow-inspect-save-file"
   ]
 }

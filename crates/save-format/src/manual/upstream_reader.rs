@@ -147,13 +147,23 @@ impl DecodedContainer {
                     .as_ref()
                     .map_or_else(unknown, |value| known(value.difficulty_level)),
                 chapter: unknown(),
+                // Independent analysis: User GameProgressRaw track 0 is the main story;
+                // labels are joined later from the story progress resource.
+                story_progress: metadata
+                    .as_ref()
+                    .map_or_else(unknown, |value| known(value.story_progress[0])),
+                objective: unknown(),
+                area_index: metadata.as_ref().map_or_else(unknown, |value| {
+                    value.current_area_index().map_or_else(unknown, known)
+                }),
                 ramza_level,
                 story: unknown(),
                 // Independent analysis: 0x120 mirrors scripted progress, despite upstream's
                 // playtime name. The 0x1b4 seconds counter drops in the
                 // load/retreat trial; neither supplies a reliable total.
                 play_time_seconds: unknown(),
-                // TICSaveEditor.Core/Sections/InfoSection.cs and Records/EventWork.cs at 07ea857.
+                // TICSaveEditor.Core/Sections/InfoSection.cs at 07ea857; event values
+                // use the 4-aligned variable array, not upstream's EventWork window.
                 next_event_id: metadata
                     .as_ref()
                     .map_or_else(unknown, |value| known(value.next_event_id)),
@@ -886,8 +896,10 @@ mod tests {
         slot[0x518 + 0x32] = 0b0000_0011;
         slot[0x518 + 0x34] = 0b1000_0001;
         slot[0x518 + 50 * 600 + 2] = 0x5e;
-        let event = 0x0518 + 54 * 600 + 0x105 + 0x105 + 0x80;
+        let event = 0x0518 + 54 * 600 + 0x105 + 0x105 + 0x80 + 2;
         slot[event..event + 4].copy_from_slice(&1_i32.to_le_bytes());
+        slot[0x9460..0x9464].copy_from_slice(&465_i32.to_le_bytes());
+        slot[event + 0x31 * 4..event + 0x32 * 4].copy_from_slice(&25_i32.to_le_bytes());
         let before = decoded.payload().to_vec();
         let reader = decoded
             .reader_manual_save_v2(identity(0), |_, _| None)
@@ -897,11 +909,14 @@ mod tests {
         assert_eq!(progress.hero_name.value, ValueState::Known("Hero".into()));
         assert_eq!(progress.play_time_seconds.value, ValueState::Unknown);
         assert_eq!(progress.next_event_id.value, ValueState::Known(17));
-        assert_eq!(progress.unnamed_event_values.value, ValueState::Known(1));
+        assert_eq!(progress.unnamed_event_values.value, ValueState::Known(2));
         assert_eq!(progress.difficulty_code.value, ValueState::Known(2));
         assert_eq!(progress.difficulty.value, ValueState::Unknown);
         assert_eq!(progress.location.value, ValueState::Unknown);
         assert_eq!(progress.chapter.value, ValueState::Unknown);
+        assert_eq!(progress.story_progress.value, ValueState::Known(465));
+        assert_eq!(progress.objective.value, ValueState::Unknown);
+        assert_eq!(progress.area_index.value, ValueState::Known(25));
         let ValueState::Known(units) = &reader.document().roster.value else {
             panic!("roster expected")
         };

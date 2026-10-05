@@ -7,12 +7,18 @@
 use serde::{Deserialize, Serialize};
 
 pub mod ability_flags;
+pub mod achievements;
+pub mod calendar;
 pub mod equipment_facts;
 pub mod equipment_rules;
+pub mod errands;
 pub mod game_data;
 pub mod identity;
 pub mod job_eligibility;
 pub mod reader;
+pub mod side_quests;
+pub mod story_progress;
+pub mod story_roster;
 
 /// The first stable wire schema for normalized save values.
 ///

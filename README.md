@@ -5,23 +5,38 @@ Ivalice Chronicles (Steam Enhanced).
 
 ## Download
 
-[Download the 0.1.4 Windows installer](https://github.com/sam-derby/Ivalice-Companion/releases/download/v0.1.4/Ivalice.Companion_0.1.4_x64-setup.exe)
+[Download the 0.1.5 Windows installer](https://github.com/sam-derby/Ivalice-Companion/releases/download/v0.1.5/Ivalice.Companion_0.1.5_x64-setup.exe)
 or
-[the portable ZIP](https://github.com/sam-derby/Ivalice-Companion/releases/download/v0.1.4/Ivalice.Companion_0.1.4_x64-portable.zip).
+[the portable ZIP](https://github.com/sam-derby/Ivalice-Companion/releases/download/v0.1.5/Ivalice.Companion_0.1.5_x64-portable.zip).
 SHA-256 checksums are listed in the
-[release notes](https://github.com/sam-derby/Ivalice-Companion/releases/tag/v0.1.4).
+[release notes](https://github.com/sam-derby/Ivalice-Companion/releases/tag/v0.1.5).
 
-Version 0.1.4 adds level and experience editing, base-stat editing before
-equipment bonuses, and live previews of staged changes. PA and MA totals respect
-the game's cap of 99 after equipment.
+## Features
+
+- **Units:** party roster with sprites, jobs, abilities, equipment and displayed
+  stats. Edit levels, experience, base stats, job progress, learned and equipped
+  abilities, and equipment; add recruits and creatures.
+- **Game:** saved chapter, objective and world-map area; edit gil, the in-game
+  date and achievement unlocks. Story-step editing is experimental: it rebuilds
+  story members, guests, Ramza's form, the world map and side-quest progress for
+  the chosen step.
+- **Quests:** Chapter 4 side-quest scenes seen, every errand posting, and the
+  artefacts and wonders. Units away on an errand are marked in the roster.
+- **Utilities:** copy, move, swap, delete or import whole save slots, or save
+  one slot as a separate save file.
+
+Version 0.1.5 adds the Game story view and editing, the Quests and Utilities
+tabs, and opens on the Game tab. Version 0.1.4 added level, experience and
+base-stat editing with live previews.
 
 For the portable ZIP, extract the whole folder and run `ivalice-companion.exe`.
 Keep `resources/` and `licenses/` beside it. Windows 10/11 and WebView2 are
 required; the ZIP does not install WebView2. Settings remain in LocalAppData.
 
-Edits are staged until Save. Saving checks that the loaded file is unchanged and
-creates a recoverable backup. Creature additions are experimental; their in-game
-behavior is unverified.
+Edits are staged until Save. Every write checks that the loaded file is
+unchanged and creates a recoverable backup first. Try changes on a copy of your
+save. Creature additions, story-step edits and copied, moved or imported slots
+have not all been confirmed in the game.
 
 ## Build from source
 

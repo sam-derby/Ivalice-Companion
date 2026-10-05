@@ -9,11 +9,13 @@ use ivalice_domain::{
     game_data::SpoilerLevel,
     job_eligibility::JOB_LEVEL_TOTAL_JP,
     reader::{ReaderDocument, ReaderIdentity, ValidatedReader},
+    story_roster::RosterUnit,
     ValueState,
 };
 use ivalice_infrastructure::{
-    AbilityFlagsLoader, JobRequirementsLoader, ReaderCatalogueLoadError,
-    ReaderCatalogueLoadErrorCode, ReaderCatalogueResource,
+    AbilityFlagsLoader, AchievementsLoader, ErrandsLoader, JobRequirementsLoader,
+    ReaderCatalogueLoadError, ReaderCatalogueLoadErrorCode, ReaderCatalogueResource,
+    StoryProgressLoader, StoryRosterLoader,
 };
 
 #[derive(Clone, Copy, Debug, Deserialize)]
@@ -42,6 +44,15 @@ pub struct EditContext {
     pub snapshot_generation: u64,
     pub manual_slot_id: u8,
     pub gil: u32,
+    pub story_step: i32,
+    pub story_choices: Vec<StoryStepChoice>,
+    pub calendar: Option<CalendarDate>,
+    pub achievements: Vec<AchievementState>,
+    pub side_quests: Vec<SideQuestState>,
+    pub errands: Vec<ErrandInfo>,
+    pub collection: Vec<CollectionInfo>,
+    /// Active unit positions whose saved errand byte (InTrip) is set.
+    pub units_on_errands: Vec<u8>,
     pub backup_available: bool,
     pub job_options: Vec<EditJobOptions>,
     pub zodiac_options: Vec<EditZodiacOptions>,
@@ -55,6 +66,78 @@ pub struct EditContext {
     pub guest_addition: GenericCreationContext,
     pub named_addition: NamedAdditionContext,
     pub creature_addition: CreatureAdditionContext,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct StoryStepChoice {
+    pub progress: i32,
+    pub chapter: Option<String>,
+    pub objective: Option<String>,
+    /// Guests the step edit rebuilds, in guest-position order.
+    pub guests: Vec<String>,
+    /// Story members the step edit adds to or removes from the saved party.
+    pub joins: Vec<String>,
+    pub leaves: Vec<String>,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct CalendarDate {
+    pub month: u8,
+    pub day: u8,
+    /// Days in each month, January first, for choosing a valid day.
+    pub month_lengths: [u8; 12],
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct ErrandInfo {
+    pub index: u8,
+    pub title: String,
+    pub client: String,
+    pub posting: String,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct CollectionInfo {
+    pub index: u8,
+    pub kind: ivalice_domain::errands::CollectionKind,
+    pub name: String,
+    pub description: String,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct SideQuestState {
+    pub name: String,
+    pub scenes: Vec<SideQuestSceneState>,
+    pub counter: Option<SideQuestCounterState>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct SideQuestCounterState {
+    pub label: String,
+    pub value: i32,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct SideQuestSceneState {
+    pub label: String,
+    pub seen: bool,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct AchievementState {
+    pub index: u8,
+    pub description: String,
+    pub unlocked: bool,
+    /// Raw FftoAchievement progress counter; its unit depends on the award.
+    pub progress: u8,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq, Serialize)]
@@ -541,11 +624,55 @@ pub(super) fn project_selected_reader(
                     })
                 })
                 .unwrap_or_default();
+            let errands = ErrandsLoader::load(&state.resource_root).ok();
             response.edit_context = Some(EditContext {
                 ability_descriptions: std::collections::BTreeMap::new(),
                 snapshot_generation: generation,
                 manual_slot_id: slot,
                 gil: metadata.gil,
+                story_step: metadata.story_progress[0],
+                story_choices: StoryProgressLoader::load(&state.resource_root)
+                    .map(|story| {
+                        story
+                            .steps()
+                            .map(|progress| StoryStepChoice {
+                                progress,
+                                chapter: story.chapter(progress).map(Into::into),
+                                objective: story.objective(progress).map(Into::into),
+                                guests: Vec::new(),
+                                joins: Vec::new(),
+                                leaves: Vec::new(),
+                            })
+                            .collect()
+                    })
+                    .unwrap_or_default(),
+                calendar: metadata
+                    .calendar()
+                    .filter(|(month, day)| {
+                        ivalice_domain::calendar::day_of_year(*month, *day).is_some()
+                    })
+                    .map(|(month, day)| CalendarDate {
+                        month,
+                        day,
+                        month_lengths: ivalice_domain::calendar::month_lengths(),
+                    }),
+                achievements: achievement_states(&state.resource_root, &metadata),
+                side_quests: side_quest_states(&metadata),
+                errands: errands.as_ref().map(errand_infos).unwrap_or_default(),
+                collection: errands.as_ref().map(collection_infos).unwrap_or_default(),
+                units_on_errands: targets
+                    .as_ref()
+                    .map(|units| {
+                        units
+                            .iter()
+                            .enumerate()
+                            .filter(|(position, unit)| {
+                                unit.is_active(*position) && unit.in_trip != 0
+                            })
+                            .filter_map(|(position, _)| u8::try_from(position).ok())
+                            .collect()
+                    })
+                    .unwrap_or_default(),
                 backup_available: lock_recover(&state.last_backup).as_ref().is_some_and(
                     |receipt| {
                         receipt.path == path
@@ -683,6 +810,34 @@ pub(super) fn project_selected_reader(
                     .collect();
             }
             let records = decoded.unit_records(slot).map_err(map_manual_error)?;
+            if let (Some(context), Ok(roster)) = (
+                &mut response.edit_context,
+                StoryRosterLoader::load(&state.resource_root),
+            ) {
+                let name = |unit: &RosterUnit| {
+                    resource
+                        .lookup(&format!("character_name:{}", unit.name), SpoilerLevel::Full)
+                        .and_then(|entry| match entry.label {
+                            ValueState::Known(label) => Some(label),
+                            _ => None,
+                        })
+                        .unwrap_or_else(|| "Unnamed unit".into())
+                };
+                let active: Vec<(u8, u16)> = records
+                    .iter()
+                    .flatten()
+                    .enumerate()
+                    .take(50)
+                    .filter(|(position, unit)| unit.is_active(*position))
+                    .map(|(_, unit)| (unit.character, unit.chara_name_key))
+                    .collect();
+                for choice in &mut context.story_choices {
+                    choice.guests = roster.guests_at(choice.progress).map(name).collect();
+                    let (joins, leaves) = roster.member_changes(choice.progress, &active);
+                    choice.joins = joins.into_iter().map(name).collect();
+                    choice.leaves = leaves.into_iter().map(name).collect();
+                }
+            }
             if let Some(context) = &mut response.edit_context {
                 context.gear_options = records
                     .as_deref()
@@ -866,6 +1021,9 @@ pub(super) fn project_selected_reader(
             ivalice_domain::reader::commands::apply_primary_commands(&mut document, |job| {
                 resource.command_for_job(job)
             });
+            if let Ok(story) = StoryProgressLoader::load(&state.resource_root) {
+                story.apply(&mut document.progress);
+            }
             ValidatedReader::validate(document).map_err(|_| worker_error())
         })?;
         match projection {
@@ -1185,6 +1343,92 @@ fn generation_exhausted() -> IpcError {
     )
 }
 
+/// Errand postings from the game's Profit table; their saved status is not decoded.
+fn errand_infos(errands: &ivalice_domain::errands::ValidatedErrands) -> Vec<ErrandInfo> {
+    errands
+        .errands()
+        .iter()
+        .map(|errand| ErrandInfo {
+            index: errand.index,
+            title: errand.title.clone(),
+            client: errand.client.clone(),
+            posting: errand.posting.clone(),
+        })
+        .collect()
+}
+
+/// Artefacts and wonders from the game's Collection table; found status is not decoded.
+fn collection_infos(errands: &ivalice_domain::errands::ValidatedErrands) -> Vec<CollectionInfo> {
+    errands
+        .collection()
+        .iter()
+        .map(|entry| CollectionInfo {
+            index: entry.index,
+            kind: entry.kind,
+            name: entry.name.clone(),
+            description: entry.description.clone(),
+        })
+        .collect()
+}
+
+/// Side-quest scenes seen in the slot, from the domain's event-flag table.
+fn side_quest_states(metadata: &ivalice_save_format::SlotMetadata) -> Vec<SideQuestState> {
+    ivalice_domain::side_quests::SIDE_QUESTS
+        .iter()
+        .filter_map(|quest| {
+            let seen =
+                ivalice_domain::side_quests::scenes_seen(quest, |id| metadata.event_flag(id))?;
+            Some(SideQuestState {
+                name: quest.name.into(),
+                scenes: quest
+                    .scenes
+                    .iter()
+                    .zip(seen)
+                    .map(|(scene, seen)| SideQuestSceneState {
+                        label: scene.label.into(),
+                        seen,
+                    })
+                    .collect(),
+                counter: quest.counter.and_then(|counter| {
+                    Some(SideQuestCounterState {
+                        label: counter.label.into(),
+                        value: *metadata
+                            .event_variables
+                            .get(usize::from(counter.variable))?,
+                    })
+                }),
+            })
+        })
+        .collect()
+}
+
+/// Achievement descriptions joined to the slot's unlocked bytes and counters;
+/// empty when the description resource or the save fields are unavailable.
+fn achievement_states(
+    resource_root: &std::path::Path,
+    metadata: &ivalice_save_format::SlotMetadata,
+) -> Vec<AchievementState> {
+    let (Ok(table), Some((unlocked, progress))) = (
+        AchievementsLoader::load(resource_root),
+        metadata.achievements(),
+    ) else {
+        return Vec::new();
+    };
+    table
+        .achievements()
+        .iter()
+        .filter_map(|achievement| {
+            let index = usize::from(achievement.index);
+            Some(AchievementState {
+                index: achievement.index,
+                description: achievement.description.clone(),
+                unlocked: *unlocked.get(index)? != 0,
+                progress: *progress.get(index)?,
+            })
+        })
+        .collect()
+}
+
 pub(super) fn map_catalogue_error(error: ReaderCatalogueLoadError) -> IpcError {
     let (category, code, retryable) = match error.code {
         ReaderCatalogueLoadErrorCode::KnownFolderUnavailable => (
@@ -1267,7 +1511,51 @@ mod tests {
             snapshot_generation: 1,
             manual_slot_id: 33,
             gil: 100,
+            story_step: 940,
+            calendar: Some(CalendarDate {
+                month: 10,
+                day: 21,
+                month_lengths: ivalice_domain::calendar::month_lengths(),
+            }),
+            achievements: vec![AchievementState {
+                index: 7,
+                description: "Reach level 99.".into(),
+                unlocked: false,
+                progress: 42,
+            }],
+            side_quests: vec![SideQuestState {
+                name: "Into the Dark".into(),
+                scenes: vec![SideQuestSceneState {
+                    label: "Terminus".into(),
+                    seen: true,
+                }],
+                counter: Some(SideQuestCounterState {
+                    label: "Deeper passages found".into(),
+                    value: 3,
+                }),
+            }],
+            story_choices: vec![StoryStepChoice {
+                progress: 940,
+                chapter: Some("Chapter 3".into()),
+                objective: None,
+                guests: vec!["Agrias".into()],
+                joins: vec!["Mustadio".into()],
+                leaves: Vec::new(),
+            }],
             backup_available: false,
+            errands: vec![ErrandInfo {
+                index: 0,
+                title: "The Fate of Our Company".into(),
+                client: "Client".into(),
+                posting: "Salvage the ship.".into(),
+            }],
+            collection: vec![CollectionInfo {
+                index: 16,
+                kind: ivalice_domain::errands::CollectionKind::Artefact,
+                name: "Four-Deity Plate".into(),
+                description: "Brooches.".into(),
+            }],
+            units_on_errands: vec![5, 6],
             zodiac_options: vec![EditZodiacOptions {
                 unit_position: 0,
                 current: ivalice_domain::identity::ZodiacSign::Aries,
@@ -1377,6 +1665,23 @@ mod tests {
             },
         };
         let wire = serde_json::to_value(context)?;
+        assert_eq!(wire["storyStep"], 940);
+        assert_eq!(wire["calendar"]["month"], 10);
+        assert_eq!(wire["calendar"]["day"], 21);
+        assert_eq!(wire["calendar"]["monthLengths"][1], 28);
+        assert_eq!(wire["achievements"][0]["index"], 7);
+        assert_eq!(wire["achievements"][0]["unlocked"], false);
+        assert_eq!(wire["achievements"][0]["progress"], 42);
+        assert_eq!(wire["sideQuests"][0]["name"], "Into the Dark");
+        assert_eq!(wire["sideQuests"][0]["scenes"][0]["seen"], true);
+        assert_eq!(wire["sideQuests"][0]["counter"]["value"], 3);
+        assert_eq!(wire["errands"][0]["posting"], "Salvage the ship.");
+        assert_eq!(wire["collection"][0]["kind"], "artefact");
+        assert_eq!(wire["unitsOnErrands"][1], 6);
+        assert_eq!(wire["storyChoices"][0]["chapter"], "Chapter 3");
+        assert!(wire["storyChoices"][0]["objective"].is_null());
+        assert_eq!(wire["storyChoices"][0]["guests"][0], "Agrias");
+        assert_eq!(wire["storyChoices"][0]["joins"][0], "Mustadio");
         assert_eq!(
             wire["abilityDescriptions"]["ability:394"],
             "Jump one tile farther."

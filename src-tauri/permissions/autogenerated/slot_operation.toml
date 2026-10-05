@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-slot-operation"
+description = "Enables the slot_operation command without any pre-configured scope."
+commands.allow = ["slot_operation"]
+
+[[permission]]
+identifier = "deny-slot-operation"
+description = "Denies the slot_operation command without any pre-configured scope."
+commands.deny = ["slot_operation"]

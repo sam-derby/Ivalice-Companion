@@ -368,6 +368,9 @@ impl Validator {
         self.catalogue(&progress.difficulty)?;
         self.scalar(&progress.difficulty_code)?;
         self.text(&progress.chapter)?;
+        self.scalar(&progress.story_progress)?;
+        self.text(&progress.objective)?;
+        self.scalar(&progress.area_index)?;
         self.scalar(&progress.ramza_level)?;
         self.fact(&progress.play_time_seconds, safe_integer)?;
         self.scalar(&progress.next_event_id)?;

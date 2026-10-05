@@ -122,6 +122,22 @@ test('typing and invalid ranges perform no calculations, committing calculates o
   expect(mocks.preview).not.toHaveBeenCalled();
 });
 
+test('a story step is previewed so the overview can show its chapter', async () => {
+  const projected = draftDocument();
+  projected.progress.chapter = knownFact('Chapter 2');
+  mocks.preview.mockResolvedValue({ reader: projected, solvedBase: null });
+  const { result } = setup({
+    ...empty,
+    operations: [{ kind: 'story_step', progress: '465' }],
+  });
+  await waitFor(() => {
+    expect(result.current.reader?.progress.chapter).toEqual(
+      knownFact('Chapter 2'),
+    );
+  });
+  expect(mocks.preview).toHaveBeenCalledTimes(1);
+});
+
 test('committing an unchanged value skips even the arithmetic request', async () => {
   const { result } = setup();
   act(() => {

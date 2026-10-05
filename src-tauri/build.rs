@@ -12,6 +12,9 @@ fn main() {
             "preview_job_progress",
             "save_transaction",
             "restore_last_backup",
+            "slot_operation",
+            "export_save_slot",
+            "inspect_save_file",
         ]),
     ));
     if let Err(error) = result {

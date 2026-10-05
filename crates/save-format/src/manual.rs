@@ -169,6 +169,53 @@ pub(crate) fn gil_payload_offset(
         .ok_or(ManualParseError::SlotBounds)
 }
 
+/// Payload byte range of manual slot `index`, occupied or empty.
+pub(crate) fn slot_payload_range(
+    payload: &[u8],
+    index: u8,
+) -> Result<std::ops::Range<usize>, ManualParseError> {
+    let parsed = ManualPayload::parse(payload)?;
+    parsed.slot_record(usize::from(index))?;
+    let start = PAYLOAD_HEADER_SIZE + usize::from(index) * MANUAL_SLOT_SIZE;
+    Ok(start..start + MANUAL_SLOT_SIZE)
+}
+
+pub(crate) const SLOT_RECORD_SIZE: usize = MANUAL_SLOT_SIZE;
+pub(crate) const SLOT_COUNT: u8 = 50;
+
+pub(crate) fn record_is_occupied(record: &[u8]) -> Result<bool, ManualParseError> {
+    Ok(occupancy_marker(record)? != 0)
+}
+
+pub(crate) fn occupied_slot_payload_base(
+    payload: &[u8],
+    selected_slot_index: u8,
+) -> Result<usize, ManualParseError> {
+    let parsed = ManualPayload::parse(payload)?;
+    let record = parsed.slot_record(usize::from(selected_slot_index))?;
+    if occupancy_marker(record)? == 0 {
+        return Err(ManualParseError::SlotEmpty);
+    }
+    PAYLOAD_HEADER_SIZE
+        .checked_add(usize::from(selected_slot_index) * MANUAL_SLOT_SIZE)
+        .ok_or(ManualParseError::SlotBounds)
+}
+
+/// All 54 unit records: party positions 0..49 and story guests 50..53.
+pub(crate) fn unit_block_payload_range(
+    payload: &[u8],
+    selected_slot_index: u8,
+) -> Result<std::ops::Range<usize>, ManualParseError> {
+    let start = occupied_slot_payload_base(payload, selected_slot_index)?
+        .checked_add(BATTLE_OFFSET)
+        .ok_or(ManualParseError::UnitBounds)?;
+    let end = start + UNIT_COUNT * UNIT_SIZE;
+    payload
+        .get(start..end)
+        .ok_or(ManualParseError::UnitBounds)?;
+    Ok(start..end)
+}
+
 pub(crate) fn party_count_payload_offset(
     payload: &[u8],
     selected_slot_index: u8,

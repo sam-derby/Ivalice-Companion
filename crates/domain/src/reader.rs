@@ -370,6 +370,11 @@ pub struct SavedProgress {
     pub difficulty: Fact<CatalogueRef>,
     pub difficulty_code: Fact<u8>,
     pub chapter: Fact<String>,
+    /// Saved main story track value, before any table join.
+    pub story_progress: Fact<i32>,
+    pub objective: Fact<String>,
+    /// Saved world-map area index, before any table join.
+    pub area_index: Fact<u8>,
     pub ramza_level: Fact<u8>,
     pub story: Fact<Vec<ProgressEntry>>,
     pub play_time_seconds: Fact<u64>,
