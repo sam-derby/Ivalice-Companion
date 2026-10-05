@@ -102,6 +102,7 @@ fn project_draft(
         if loaded.catalogue_token.as_ref() != Some(&token) {
             return Err(IpcError::stale());
         }
+        let story = ivalice_infrastructure::StoryProgressLoader::load(&state.resource_root).ok();
         let project =
             |decoded: &ivalice_save_format::DecodedContainer| -> Result<ReaderDocument, IpcError> {
                 let reader = decoded
@@ -114,6 +115,9 @@ fn project_draft(
                 ivalice_domain::reader::commands::apply_primary_commands(&mut document, |job| {
                     resource.command_for_job(job)
                 });
+                if let Some(story) = &story {
+                    story.apply(&mut document.progress);
+                }
                 Ok(document)
             };
         let mut document = project(&decoded)?;

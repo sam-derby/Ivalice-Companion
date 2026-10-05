@@ -17,6 +17,17 @@ interface StatInput {
   reset?: boolean;
 }
 
+type Operation = SaveTransactionRequest['operations'][number];
+
+function projected(operation: Operation): boolean {
+  return (
+    operation.kind === 'base_stat' ||
+    operation.kind === 'gear' ||
+    operation.kind === 'story_step' ||
+    (operation.kind === 'equipped_slot' && operation.slot === 'movement')
+  );
+}
+
 /** Only operations which affect these mechanics invalidate their projection. */
 function transactionKey(transaction: SaveTransactionRequest | null): string {
   return transaction
@@ -24,13 +35,7 @@ function transactionKey(transaction: SaveTransactionRequest | null): string {
         transaction.snapshotGeneration,
         transaction.manualSlotId,
         transaction.operations
-          .filter(
-            (operation) =>
-              operation.kind === 'base_stat' ||
-              operation.kind === 'gear' ||
-              (operation.kind === 'equipped_slot' &&
-                operation.slot === 'movement'),
-          )
+          .filter(projected)
           .map((operation) => JSON.stringify(operation))
           .sort(),
       ])
@@ -52,13 +57,7 @@ export function useDraftProjection(
     key: string;
     message: string;
   } | null>(null);
-  const required =
-    transaction?.operations.some(
-      (operation) =>
-        operation.kind === 'base_stat' ||
-        operation.kind === 'gear' ||
-        (operation.kind === 'equipped_slot' && operation.slot === 'movement'),
-    ) ?? false;
+  const required = transaction?.operations.some(projected) ?? false;
   const key = transactionKey(transaction);
   const pending = inputs.find((input) => input.ready && input.error === null);
   const inputKey = pending ? JSON.stringify(pending) : '';

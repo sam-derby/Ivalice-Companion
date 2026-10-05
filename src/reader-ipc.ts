@@ -234,6 +234,9 @@ export interface SavedProgress {
   difficulty: Fact<CatalogueRef>;
   difficulty_code: Fact<number>;
   chapter: Fact<string>;
+  story_progress: Fact<number>;
+  objective: Fact<string>;
+  area_index: Fact<number>;
   ramza_level: Fact<number>;
   story: Fact<ProgressEntry[]>;
   play_time_seconds: Fact<number>;
@@ -320,7 +323,36 @@ export interface EditContext {
   snapshotGeneration: number;
   manualSlotId: number;
   gil: number;
+  storyStep?: number;
+  storyChoices?: {
+    progress: number;
+    chapter: string | null;
+    objective: string | null;
+    guests?: string[];
+    joins?: string[];
+    leaves?: string[];
+  }[];
   backupAvailable?: boolean;
+  calendar?: { month: number; day: number; monthLengths: number[] } | null;
+  achievements?: {
+    index: number;
+    description: string;
+    unlocked: boolean;
+    progress: number;
+  }[];
+  sideQuests?: {
+    name: string;
+    scenes: { label: string; seen: boolean }[];
+    counter?: { label: string; value: number } | null;
+  }[];
+  errands?: { index: number; title: string; client: string; posting: string }[];
+  collection?: {
+    index: number;
+    kind: 'artefact' | 'wonder';
+    name: string;
+    description: string;
+  }[];
+  unitsOnErrands?: number[];
   jobOptions?: {
     unitPosition: number;
     jobSlots: number[];
@@ -422,6 +454,9 @@ export interface SaveTransactionRequest {
         name: string;
       }
     | { kind: 'gil'; value: string }
+    | { kind: 'story_step'; progress: string }
+    | { kind: 'calendar_date'; month: number; day: number }
+    | { kind: 'achievement'; index: number; unlocked: boolean }
     | { kind: 'inventory_quantity'; itemPosition: number; quantity: string }
     | {
         kind: 'character_level' | 'experience';
@@ -516,6 +551,45 @@ export interface SlotSummary {
   title: string | null;
   savedAtUnixSeconds: number | null;
   playTimeSeconds: number | null;
+}
+
+export type SlotOperationRequest =
+  | { kind: 'copy'; from: number; to: number; replace: boolean }
+  | { kind: 'move'; from: number; to: number }
+  | { kind: 'swap'; first: number; second: number }
+  | { kind: 'delete'; slot: number }
+  | {
+      kind: 'import';
+      sourcePath: string;
+      sourceSlot: number;
+      slot: number;
+      replace: boolean;
+    };
+
+export function slotOperation(request: {
+  snapshotGeneration: number;
+  operation: SlotOperationRequest;
+}): Promise<null> {
+  return invoke<null>('slot_operation', { request });
+}
+
+export function exportSaveSlot(request: {
+  snapshotGeneration: number;
+  slot: number;
+  path: string;
+  overwrite: boolean;
+}): Promise<null> {
+  return invoke<null>('export_save_slot', { request });
+}
+
+export function inspectSaveFile(path: string): Promise<{
+  slots: {
+    slot: number;
+    title: string | null;
+    savedAtUnixSeconds: number | null;
+  }[];
+}> {
+  return invoke('inspect_save_file', { path });
 }
 
 export function loadReader(

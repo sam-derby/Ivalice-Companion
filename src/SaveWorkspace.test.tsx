@@ -93,6 +93,7 @@ function openWorkspace(reader = draftDocument()) {
       onReload={vi.fn().mockResolvedValue(undefined)}
       manualSlotId={0}
       initialView={undefined}
+      defaultSection="units"
       onViewChange={vi.fn()}
     />,
   );

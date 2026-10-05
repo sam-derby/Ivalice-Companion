@@ -29,6 +29,7 @@ const mocks = vi.hoisted(() => ({
   previewJobProgress: vi.fn(),
   previewCharacter: vi.fn(),
   previewDraft: vi.fn(),
+  slotOperation: vi.fn(),
 }));
 
 vi.mock('./ipc', async (importOriginal) => ({
@@ -45,6 +46,7 @@ vi.mock('./reader-ipc', async (importOriginal) => ({
   previewJobProgress: mocks.previewJobProgress,
   previewCharacter: mocks.previewCharacter,
   previewDraft: mocks.previewDraft,
+  slotOperation: mocks.slotOperation,
 }));
 
 import { App } from './App';
@@ -213,6 +215,9 @@ function readerFor(
       difficulty: unknown(),
       difficulty_code: unknown(),
       chapter: unknown(),
+      story_progress: unknown(),
+      objective: unknown(),
+      area_index: unknown(),
       ramza_level: unknown(),
       story: unknown(),
       play_time_seconds: unknown(),
@@ -247,6 +252,7 @@ function readerResponse(
 
 async function openRoster() {
   await chooseSlot(1);
+  fireEvent.click(await screen.findByRole('button', { name: 'Units' }));
   await screen.findByRole('heading', { name: 'Units' });
 }
 
@@ -281,6 +287,12 @@ async function chooseSlot(displayNumber: number) {
     name: new RegExp(`^Slot ${String(displayNumber)}(?:\\b|$)`),
   });
   fireEvent.change(select, { target: { value: String(displayNumber - 1) } });
+}
+
+/** Choose a slot, then open Units; Game is the default section. */
+async function chooseUnits(displayNumber: number) {
+  await chooseSlot(displayNumber);
+  fireEvent.click(await screen.findByRole('button', { name: 'Units' }));
 }
 
 beforeEach(() => {
@@ -558,21 +570,27 @@ describe('workspace cleanup', () => {
       rendered.container.querySelector('.workspace-readonly-mark'),
     ).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Jobs' }));
-    fireEvent.mouseEnter(screen.getByText('Action one'));
+    const actionIcon = screen.getByRole('img', { name: /^Action one icon/ });
+    fireEvent.mouseEnter(actionIcon);
     expect(screen.getByRole('tooltip').textContent).toBe('Action description.');
-    fireEvent.mouseLeave(screen.getByText('Action one'));
+    fireEvent.mouseLeave(actionIcon);
     await waitFor(() => {
       expect(screen.queryByRole('tooltip')).toBeNull();
     });
     fireEvent.click(screen.getByRole('button', { name: 'reaction' }));
-    fireEvent.focus(screen.getByText('Reaction one'));
+    const reactionIcon = screen.getByRole('img', {
+      name: /^Reaction one icon/,
+    });
+    fireEvent.focus(reactionIcon);
     expect(screen.getByRole('tooltip').textContent).toBe(
       'First reaction description.',
     );
-    fireEvent.blur(screen.getByText('Reaction one'));
+    fireEvent.blur(reactionIcon);
     fireEvent.click(screen.getByRole('button', { name: 'Equipment' }));
     const choice = screen.getByRole('combobox', { name: 'Active reaction' });
     fireEvent.focus(choice);
+    expect(screen.queryByRole('tooltip')).toBeNull();
+    fireEvent.focus(screen.getByRole('img', { name: 'About Active reaction' }));
     expect(screen.getByRole('tooltip').textContent).toBe(
       'First reaction description.',
     );
@@ -587,6 +605,81 @@ describe('workspace cleanup', () => {
     expect(choice).toHaveProperty('value', 'ability:2');
     expect(mocks.saveTransaction).not.toHaveBeenCalled();
   });
+  test('marks units away on an errand and opens the Quests section', async () => {
+    mocks.getSaveSelection.mockResolvedValue({ state: 'selected' });
+    mocks.loadReader.mockImplementation((request) =>
+      Promise.resolve({
+        ...readerResponse(
+          request,
+          request.manualSlotId === null
+            ? null
+            : readerFor(request.manualSlotId, request.requestId, [
+                readerUnit(0, 'Ramza'),
+                readerUnit(5, 'Away'),
+              ]),
+        ),
+        editContext:
+          request.manualSlotId === null
+            ? null
+            : {
+                ...unavailableAdditions,
+                snapshotGeneration: request.requestId,
+                manualSlotId: request.manualSlotId,
+                gil: 100,
+                unitsOnErrands: [5],
+                errands: [
+                  {
+                    index: 0,
+                    title: 'The Fate of Our Company',
+                    client: 'Psalmba Exports',
+                    posting: 'Salvage the ship.',
+                  },
+                ],
+              },
+      }),
+    );
+    render(<App />);
+    await openRoster();
+    expect(screen.getByRole('button', { name: /Away/ }).textContent).toContain(
+      'On an errand',
+    );
+    expect(
+      screen.getByRole('button', { name: /Ramza/ }).textContent,
+    ).not.toContain('On an errand');
+    fireEvent.click(screen.getByRole('button', { name: 'Quests' }));
+    expect(
+      screen.getByRole('article', { name: 'Errands' }).textContent,
+    ).toContain('The Fate of Our Company');
+    expect(mocks.saveTransaction).not.toHaveBeenCalled();
+  });
+
+  test('opens on Game and stays on Utilities after a slot action reloads another slot', async () => {
+    setup([readerUnit(0, 'Ramza')]);
+    mocks.slotOperation.mockResolvedValue(null);
+    render(<App />);
+    await chooseSlot(1);
+    expect(
+      await screen.findByRole('heading', { name: 'Save overview' }),
+    ).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Utilities' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Copy to…' }));
+    fireEvent.change(screen.getByRole('combobox', { name: 'Target slot' }), {
+      target: { value: '5' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+    await waitFor(() => {
+      expect(mocks.loadReader).toHaveBeenLastCalledWith(
+        expect.objectContaining({ manualSlotId: 5 }),
+      );
+    });
+    expect(
+      await screen.findByRole('list', { name: 'Save slots' }),
+    ).toBeTruthy();
+    expect(mocks.slotOperation.mock.lastCall?.[0]).toMatchObject({
+      operation: { kind: 'copy', from: 0, to: 5, replace: false },
+    });
+  });
+
   function setup(units: ReaderUnit[], inventory?: ReaderDocument['inventory']) {
     mocks.getSaveSelection.mockResolvedValue({ state: 'selected' });
     mocks.loadReader.mockImplementation((request) => {
@@ -816,11 +909,12 @@ describe('workspace cleanup', () => {
       'First description',
     );
     fireEvent.click(screen.getByRole('button', { name: 'Equipment' }));
-    fireEvent.focus(screen.getByText('Saved reaction'));
+    const reactionHint = screen.getByRole('img', { name: 'About Reaction' });
+    fireEvent.focus(reactionHint);
     expect(screen.getByRole('tooltip').textContent).toBe(
       'A useful reaction description.',
     );
-    fireEvent.keyDown(screen.getByText('Saved reaction'), { key: 'Escape' });
+    fireEvent.keyDown(reactionHint, { key: 'Escape' });
     expect(screen.queryByRole('tooltip')).toBeNull();
     expect(mocks.saveTransaction).not.toHaveBeenCalled();
   });
@@ -1095,7 +1189,7 @@ describe('verified save inspection', () => {
       fetch.mockRestore();
     }
   });
-  test('shows current-job growth in its Status panel and missing rates as unknown', async () => {
+  test('keeps the Status panel to editable character facts and stats', async () => {
     mocks.getSaveSelection.mockResolvedValue({ state: 'selected' });
     const ramza = readerUnit(0, 'Ramza');
     ramza.growth = known({
@@ -1105,36 +1199,25 @@ describe('verified save inspection', () => {
       physical_attack: 40,
       magical_attack: 50,
     });
-    const agrias = readerUnit(1, 'Agrias');
     mocks.loadReader.mockImplementation((request) =>
       Promise.resolve(
         readerResponse(
           request,
           request.manualSlotId === null
             ? null
-            : readerFor(0, request.requestId, [ramza, agrias]),
+            : readerFor(0, request.requestId, [ramza]),
         ),
       ),
     );
-    render(<App />);
+    const rendered = render(<App />);
     await openRoster();
-    fireEvent.click(screen.getByRole('button', { name: /^Member 1 Ramza/ }));
-    const panel = screen.getByRole('region', { name: 'Synthetic job Growth' });
+    const cards = rendered.container.querySelectorAll(
+      '.workspace-status-grid > section',
+    );
     expect(
-      within(panel).getByRole('heading', { name: 'Synthetic job Growth' }),
-    ).toBeTruthy();
-    expect(panel.querySelector('details')).toBeNull();
-    expect(within(panel).queryByText(/description|coefficients/i)).toBeNull();
-    expect(
-      [...panel.querySelectorAll('dd')].map((row) => row.textContent),
-    ).toEqual(['11', '12', '100', '40', '50']);
-    expect(within(panel).queryByRole('textbox')).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: /^Member 2 Agrias/ }));
-    expect(
-      within(
-        screen.getByRole('region', { name: 'Synthetic job Growth' }),
-      ).getAllByText('Unknown'),
-    ).toHaveLength(5);
+      [...cards].map((card) => card.querySelector('h3')?.textContent),
+    ).toEqual(['Character details', 'Base stats']);
+    expect(screen.queryByRole('region', { name: /Growth/ })).toBeNull();
     expect(mocks.saveTransaction).not.toHaveBeenCalled();
   });
   test('offers accessible manual selection when no saved selection exists', async () => {
@@ -1325,7 +1408,7 @@ describe('verified save inspection', () => {
     );
     mocks.saveTransaction.mockResolvedValue({ gil: 100, backupCreated: true });
     render(<App />);
-    await chooseSlot(32);
+    await chooseUnits(32);
     fireEvent.click(
       await screen.findByRole('button', { name: 'Add character' }),
     );
@@ -1405,7 +1488,7 @@ describe('verified save inspection', () => {
     );
     mocks.previewCharacter.mockRejectedValueOnce(new Error('Preview failed'));
     render(<App />);
-    await chooseSlot(32);
+    await chooseUnits(32);
     fireEvent.click(
       await screen.findByRole('button', { name: 'Add character' }),
     );
@@ -1495,7 +1578,7 @@ describe('verified save inspection', () => {
       }),
     );
     render(<App />);
-    await chooseSlot(32);
+    await chooseUnits(32);
     fireEvent.click(
       await screen.findByRole('button', { name: 'Add character' }),
     );
@@ -1659,7 +1742,7 @@ describe('verified save inspection', () => {
         }),
       );
       render(<App />);
-      await chooseSlot(32);
+      await chooseUnits(32);
       expect(screen.queryByText('Add a story character')).toBeNull();
       expect(screen.queryByText('Add a guest character')).toBeNull();
       fireEvent.click(
@@ -1833,7 +1916,7 @@ describe('verified save inspection', () => {
       backupCreated: true,
     });
     render(<App />);
-    await chooseSlot(34);
+    await chooseUnits(34);
     const brave = await screen.findByRole('textbox', { name: 'Bravery' });
     const faith = screen.getByRole('textbox', { name: 'Faith' });
     fireEvent.change(brave, { target: { value: '101' } });
@@ -1908,7 +1991,7 @@ describe('verified save inspection', () => {
       backupCreated: true,
     });
     render(<App />);
-    await chooseSlot(9);
+    await chooseUnits(9);
     fireEvent.click(await screen.findByRole('button', { name: 'Jobs' }));
     fireEvent.change(screen.getByRole('textbox', { name: 'Spendable JP' }), {
       target: { value: '99' },
@@ -2024,7 +2107,7 @@ describe('verified save inspection', () => {
       backupCreated: true,
     });
     render(<App />);
-    await chooseSlot(9);
+    await chooseUnits(9);
     fireEvent.click(await screen.findByRole('button', { name: 'Jobs' }));
     fireEvent.change(screen.getByRole('textbox', { name: 'Job level' }), {
       target: { value: '8' },
@@ -2196,7 +2279,7 @@ describe('verified save inspection', () => {
       backupCreated: true,
     });
     render(<App />);
-    await chooseSlot(34);
+    await chooseUnits(34);
     fireEvent.click(await screen.findByRole('button', { name: 'Jobs' }));
     fireEvent.click(screen.getByRole('button', { name: 'reaction' }));
     fireEvent.click(screen.getByRole('checkbox', { name: /Dragonheart/ }));
@@ -2276,7 +2359,7 @@ describe('verified save inspection', () => {
       backupCreated: true,
     });
     render(<App />);
-    await chooseSlot(1);
+    await chooseUnits(1);
     fireEvent.change(await screen.findByRole('textbox', { name: 'Bravery' }), {
       target: { value: '60' },
     });
@@ -2383,7 +2466,7 @@ describe('verified save inspection', () => {
       });
     });
     render(<App />);
-    await chooseSlot(27);
+    await chooseUnits(27);
     expect(
       (await screen.findAllByText('First slot unit')).length,
     ).toBeGreaterThan(0);
@@ -2740,7 +2823,9 @@ describe('named reader roster', () => {
     render(<App />);
     await openRoster();
     fireEvent.click(screen.getByRole('button', { name: 'Equipment' }));
-    const hatHint = screen.getByText('Hat').closest('.workspace-hint');
+    const hatHint = screen
+      .getByRole('img', { name: /^Hat icon/ })
+      .closest('.workspace-hint');
     if (!hatHint) throw new Error('Missing equipment tooltip');
     fireEvent.focus(hatHint);
     expect(screen.getByRole('tooltip').textContent).toContain(

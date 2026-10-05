@@ -45,6 +45,10 @@ export interface EditorDraft {
   creature?: { formKey: string; name: string } | null;
   additions?: PendingAddition[];
   gil: string;
+  storyStep?: string;
+  calendar?: { month: number; day: number };
+  /** Unlocked state by achievement save index. */
+  achievements?: Record<number, boolean>;
   inventory: Record<number, string>;
   units: Record<number, UnitDraft>;
   generic: { sourceSlot: number; sourcePosition: number; name: string } | null;
@@ -119,6 +123,90 @@ function add(
   });
 }
 
+export function storyStepLabel(context: EditContext, progress: number): string {
+  const choice = context.storyChoices?.find(
+    (option) => option.progress === progress,
+  );
+  return [String(progress), choice?.chapter, choice?.objective]
+    .filter((part) => part)
+    .join(' · ');
+}
+
+/** Guests the story step edit rebuilds from the game's battle data. */
+export function storyGuestsLabel(
+  context: EditContext,
+  progress: number,
+): string {
+  const guests =
+    context.storyChoices?.find((option) => option.progress === progress)
+      ?.guests ?? [];
+  return guests.length > 0 ? guests.join(', ') : 'No guests';
+}
+
+/** Story members the step edit adds to or removes from the saved party. */
+export function storyPartyLabel(
+  context: EditContext,
+  progress: number,
+): string | null {
+  const choice = context.storyChoices?.find(
+    (option) => option.progress === progress,
+  );
+  const parts = [
+    choice?.joins?.length ? `Joins: ${choice.joins.join(', ')}` : null,
+    choice?.leaves?.length ? `Leaves: ${choice.leaves.join(', ')}` : null,
+  ].filter((part) => part !== null);
+  return parts.length > 0 ? parts.join(' · ') : null;
+}
+
+export function calendarLabel(date: { month: number; day: number }): string {
+  return `Month ${String(date.month)}, day ${String(date.day)}`;
+}
+
+/** The game's "Awarded for …" description as a short sentence. */
+export function achievementLabel(description: string): string {
+  const text = description.replace(/^Awarded for /, '');
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function collectExtras(
+  context: EditContext,
+  draft: EditorDraft,
+  review: DraftReview,
+) {
+  const saved = context.calendar;
+  const date = draft.calendar;
+  if (saved && date && (date.month !== saved.month || date.day !== saved.day)) {
+    const length = saved.monthLengths[date.month - 1];
+    if (length === undefined || date.day < 1 || date.day > length) {
+      review.errors.push('Choose a valid in-game date.');
+    } else {
+      review.operations.push({
+        kind: 'calendar_date',
+        month: date.month,
+        day: date.day,
+      });
+      add(review, 'Game', 'Date', calendarLabel(saved), calendarLabel(date));
+    }
+  }
+  for (const achievement of context.achievements ?? []) {
+    const unlocked = draft.achievements?.[achievement.index];
+    if (unlocked !== undefined && unlocked !== achievement.unlocked) {
+      review.operations.push({
+        kind: 'achievement',
+        index: achievement.index,
+        unlocked,
+      });
+      add(
+        review,
+        'Achievements',
+        achievementLabel(achievement.description),
+        achievement.unlocked ? 'Unlocked' : 'Locked',
+        unlocked ? 'Unlocked' : 'Locked',
+      );
+    }
+  }
+}
+
 export function collectDraft(
   reader: ReaderDocument | null,
   context: EditContext,
@@ -139,6 +227,39 @@ export function collectDraft(
       add(review, 'Game', 'Gil', context.gil, draft.gil);
     }
   }
+  if (
+    draft.storyStep !== undefined &&
+    context.storyStep !== undefined &&
+    draft.storyStep !== String(context.storyStep)
+  ) {
+    const choice = context.storyChoices?.find(
+      (option) => String(option.progress) === draft.storyStep,
+    );
+    if (!choice) {
+      review.errors.push('Choose a story step from the list.');
+    } else {
+      review.operations.push({ kind: 'story_step', progress: draft.storyStep });
+      add(
+        review,
+        'Game',
+        'Story step',
+        storyStepLabel(context, context.storyStep),
+        storyStepLabel(context, choice.progress),
+      );
+      add(
+        review,
+        'Game',
+        'Guests',
+        'Current guests',
+        storyGuestsLabel(context, choice.progress),
+      );
+      const party = storyPartyLabel(context, choice.progress);
+      if (party) {
+        add(review, 'Game', 'Party', 'Current party', party);
+      }
+    }
+  }
+  collectExtras(context, draft, review);
 
   const holdings = reader?.inventory.value;
   const originalHeld = new Map<number, { quantity: number; label: string }>();

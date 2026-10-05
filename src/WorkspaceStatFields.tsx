@@ -35,11 +35,10 @@ export function WorkspaceStatFields({
     <section className="workspace-paper">
       <h3>Base stats</h3>
       <p className="workspace-stat-help">
-        Equipment bonuses are added to these values. Press Enter or leave a
-        field to apply it.
+        Base values before equipment. Press Enter or leave a field to apply.
       </p>
       {busy && <p role="status">Calculating stats…</p>}
-      <div className="workspace-field-grid" aria-busy={busy}>
+      <div className="workspace-stat-table" aria-busy={busy}>
         {statFields.map(([stat, label]) => {
           const detail = projected.effective.breakdown?.[stat];
           const fact = detail?.base.value ?? projected.effective[stat].value;
@@ -49,7 +48,7 @@ export function WorkspaceStatFields({
           const input = inputs.find((entry) => entry.stat === stat);
           const changed = draft.statBases?.[stat] !== undefined || !!input;
           return (
-            <div key={stat}>
+            <div key={stat} className="workspace-stat-row">
               {editable && fact.state === 'known' ? (
                 <>
                   <NumericField

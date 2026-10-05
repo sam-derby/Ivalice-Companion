@@ -1,4 +1,5 @@
-export type WorkspaceSection = 'game' | 'units' | 'inventory';
+export type WorkspaceSection =
+  'game' | 'quests' | 'units' | 'inventory' | 'utilities';
 export type UnitPanel = 'status' | 'equipment' | 'jobs';
 export type AbilityKind = 'action' | 'reaction' | 'support' | 'movement';
 

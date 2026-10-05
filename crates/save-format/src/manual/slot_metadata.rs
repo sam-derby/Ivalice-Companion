@@ -19,6 +19,27 @@ const EVENT_COUNT: usize = 256;
 const EVENT_BYTES: usize = EVENT_COUNT * 4;
 const BATTLE_SORT_OFFSET: usize = EVENT_OFFSET + EVENT_BYTES;
 const BATTLE_END: usize = USER;
+// Upstream's window starts two bytes early: the 4-aligned array puts variable 0x2C on gil.
+const EVENT_VARIABLES_OFFSET: usize = EVENT_OFFSET + 2;
+const STORY_TRACKS: usize = 12;
+// Story replay (2026-10-05): ids 0x00-0x7F are i32; ids 0x80-0x3FF are bits from here.
+pub(crate) const EVENT_FLAGS_OFFSET: usize = EVENT_VARIABLES_OFFSET + 0x1f0;
+pub(crate) const EVENT_VARIABLE_COUNT: u16 = 0x80;
+pub(crate) const EVENT_FLAG_LIMIT: u16 = 0x400;
+pub(crate) const STORY_PROGRESS_OFFSETS: [usize; 2] = [USER, INFO + 0x20];
+// TICSaveEditor.Core/Sections/UserSection.cs at 07ea857: GameProgressRaw then GameFlagRaw.
+pub(crate) const GAME_FLAGS_OFFSET: usize = USER + 0x30;
+pub(crate) fn story_track_offset(track: u8) -> usize {
+    USER + 4 * usize::from(track)
+}
+pub(crate) fn event_variable_offset(id: u16) -> usize {
+    EVENT_VARIABLES_OFFSET + 4 * usize::from(id)
+}
+// Owner game check of example slots 15, 17 and 28 (2026-10-05) matched this as the world-map area.
+const CURRENT_AREA_VARIABLE: usize = 0x31;
+// Example slots run from month 3 day 21 at step 40 to month 10 day 21 at 940.
+const CALENDAR_VARIABLES: [usize; 2] = [0x2e, 0x2f];
+pub(crate) const ACHIEVEMENTS_OFFSET: usize = FFTO_ACHIEVEMENT;
 // Owner-controlled slot-32 before/after gil saves (2026-09-29); no upstream accessor.
 pub(super) const GIL_OFFSET: usize = 0x86e4;
 
@@ -44,6 +65,9 @@ pub struct SlotMetadata {
     pub job_new_flags: Vec<u8>,
     pub job_disable_flags: Vec<u8>,
     pub event_work: Vec<i32>,
+    pub event_variables: Vec<i32>,
+    /// User GameProgressRaw as i32 tracks; track 0 is the main story.
+    pub story_progress: [i32; STORY_TRACKS],
     pub raw_fields: Vec<RawSlotField>,
 }
 
@@ -140,7 +164,7 @@ const RAW_FIELDS: &[(&str, &str, usize, usize, usize)] = &[
 ];
 
 impl SlotMetadata {
-    pub(super) fn parse(slot: &[u8]) -> Result<Self, ManualParseError> {
+    pub(crate) fn parse(slot: &[u8]) -> Result<Self, ManualParseError> {
         if slot.len() < UPSTREAM_END {
             return Err(ManualParseError::SlotBounds);
         }
@@ -154,12 +178,11 @@ impl SlotMetadata {
                 })
             })
             .collect::<Result<Vec<_>, ManualParseError>>()?;
-        let event_work = field(slot, EVENT_OFFSET, 0, EVENT_BYTES)?
-            .as_chunks::<4>()
-            .0
-            .iter()
-            .map(|bytes| i32::from_le_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]))
-            .collect();
+        let event_work = i32_array(field(slot, EVENT_OFFSET, 0, EVENT_BYTES)?);
+        let event_variables = i32_array(field(slot, EVENT_VARIABLES_OFFSET, 0, EVENT_BYTES)?);
+        let story_progress = i32_array(field(slot, USER, 0, STORY_TRACKS * 4)?)
+            .try_into()
+            .map_err(|_| ManualParseError::SlotBounds)?;
         // TICSaveEditor.Core/Sections/CardSection.cs at 07ea857.
         let card_magic = u16::from_le_bytes(
             field(slot, CARD, 0, 2)?
@@ -200,6 +223,8 @@ impl SlotMetadata {
             job_new_flags,
             job_disable_flags,
             event_work,
+            event_variables,
+            story_progress,
             raw_fields,
         })
     }
@@ -221,8 +246,61 @@ impl SlotMetadata {
 
     #[must_use]
     pub fn unnamed_event_values(&self) -> usize {
-        self.event_work.iter().filter(|value| **value != 0).count()
+        self.event_variables
+            .iter()
+            .filter(|value| **value != 0)
+            .count()
     }
+
+    #[must_use]
+    pub fn current_area_index(&self) -> Option<u8> {
+        self.event_variables
+            .get(CURRENT_AREA_VARIABLE)
+            .and_then(|value| u8::try_from(*value).ok())
+    }
+
+    /// Month and day from event variables 0x2E and 0x2F.
+    #[must_use]
+    pub fn calendar(&self) -> Option<(u8, u8)> {
+        let value = |id: usize| {
+            self.event_variables
+                .get(id)
+                .and_then(|value| u8::try_from(*value).ok())
+        };
+        Some((value(CALENDAR_VARIABLES[0])?, value(CALENDAR_VARIABLES[1])?))
+    }
+
+    /// FftoAchievement unlocked bytes and progress counters, by save index.
+    #[must_use]
+    pub fn achievements(&self) -> Option<(&[u8], &[u8])> {
+        let raw = |name: &str| {
+            self.raw_fields
+                .iter()
+                .find(|field| field.section == "FftoAchievement" && field.name == name)
+                .map(|field| field.bytes.as_slice())
+        };
+        Some((raw("UnlockedRaw")?, raw("ProgressRaw")?))
+    }
+
+    /// Event flag 0x80-0x3FF, read from the bit array after the variables.
+    #[must_use]
+    pub fn event_flag(&self, id: u16) -> Option<bool> {
+        if !(EVENT_VARIABLE_COUNT..EVENT_FLAG_LIMIT).contains(&id) {
+            return None;
+        }
+        let byte = EVENT_FLAGS_OFFSET - EVENT_VARIABLES_OFFSET + usize::from(id / 8);
+        let word = self.event_variables.get(byte / 4)?.to_le_bytes();
+        Some(word[byte % 4] >> (id % 8) & 1 == 1)
+    }
+}
+
+fn i32_array(bytes: &[u8]) -> Vec<i32> {
+    bytes
+        .as_chunks::<4>()
+        .0
+        .iter()
+        .map(|bytes| i32::from_le_bytes(*bytes))
+        .collect()
 }
 
 fn field(slot: &[u8], base: usize, offset: usize, len: usize) -> Result<&[u8], ManualParseError> {
@@ -296,6 +374,7 @@ mod tests {
         assert_eq!(parsed.playtime_minutes, 123);
         assert_eq!(parsed.event_work.len(), 256);
         assert_eq!((parsed.event_work[0], parsed.event_work[255]), (-7, 9));
+        // Both misaligned upstream values straddle aligned variables 0 and 254.
         assert_eq!(parsed.unnamed_event_values(), 2);
         assert_eq!(parsed.difficulty_level, 3);
         assert_eq!(
@@ -314,6 +393,54 @@ mod tests {
         slot[4] = 0x81;
         let invalid = SlotMetadata::parse(&slot).unwrap_or_else(|error| panic!("{error}"));
         assert_eq!(invalid.readable_title(), None);
+    }
+
+    #[test]
+    fn event_flags_are_bits_after_the_variables() {
+        let mut slot = vec![0; UPSTREAM_END];
+        slot[EVENT_FLAGS_OFFSET + 0xa9 / 8] = 1 << (0xa9 % 8);
+        slot[EVENT_FLAGS_OFFSET + 0x3ee / 8] = 1 << (0x3ee % 8);
+        let parsed = SlotMetadata::parse(&slot).unwrap_or_else(|error| panic!("{error}"));
+        assert_eq!(parsed.event_flag(0xa9), Some(true));
+        assert_eq!(parsed.event_flag(0xa8), Some(false));
+        assert_eq!(parsed.event_flag(0xaa), Some(false));
+        assert_eq!(parsed.event_flag(0x3ee), Some(true));
+        assert_eq!(parsed.event_flag(0x7f), None);
+        assert_eq!(parsed.event_flag(0x400), None);
+    }
+
+    #[test]
+    fn aligned_event_variables_and_story_tracks_are_independent() {
+        assert_eq!(EVENT_VARIABLES_OFFSET + 0x2c * 4, GIL_OFFSET);
+        let mut slot = vec![0; UPSTREAM_END];
+        slot[EVENT_VARIABLES_OFFSET - 1] = 0x5a;
+        slot[EVENT_VARIABLES_OFFSET..EVENT_VARIABLES_OFFSET + 4]
+            .copy_from_slice(&(-3_i32).to_le_bytes());
+        slot[EVENT_VARIABLES_OFFSET + EVENT_BYTES - 4..EVENT_VARIABLES_OFFSET + EVENT_BYTES]
+            .copy_from_slice(&i32::MAX.to_le_bytes());
+        slot[EVENT_VARIABLES_OFFSET + EVENT_BYTES] = 0xa5;
+        let area = EVENT_VARIABLES_OFFSET + CURRENT_AREA_VARIABLE * 4;
+        slot[area..area + 4].copy_from_slice(&24_i32.to_le_bytes());
+        slot[USER - 1] = 0x5a;
+        slot[USER..USER + 4].copy_from_slice(&940_i32.to_le_bytes());
+        slot[USER + 44..USER + 48].copy_from_slice(&(-1_i32).to_le_bytes());
+        slot[USER + 48] = 0xa5;
+        let parsed = SlotMetadata::parse(&slot).unwrap_or_else(|error| panic!("{error}"));
+        assert_eq!(parsed.event_variables.len(), 256);
+        assert_eq!(
+            (parsed.event_variables[0], parsed.event_variables[255]),
+            (-3, i32::MAX)
+        );
+        assert_eq!(parsed.unnamed_event_values(), 3);
+        assert_eq!(parsed.current_area_index(), Some(24));
+        assert_eq!(parsed.story_progress[0], 940);
+        assert_eq!(parsed.story_progress[11], -1);
+        assert!(parsed.story_progress[1..11].iter().all(|value| *value == 0));
+        for outside in [-1_i32, 256] {
+            slot[area..area + 4].copy_from_slice(&outside.to_le_bytes());
+            let parsed = SlotMetadata::parse(&slot).unwrap_or_else(|error| panic!("{error}"));
+            assert_eq!(parsed.current_area_index(), None);
+        }
     }
 
     #[test]

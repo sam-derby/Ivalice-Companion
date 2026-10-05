@@ -1,8 +1,9 @@
 # Third-party notices
 
 Ivalice Companion's application code is [GPL-3.0-only](LICENSE). The Rust
-adaptation adds bounds checks, scoped save edits, snapshots and backup handling;
-last modified 2026-10-04. These terms do not relicense third-party assets.
+adaptation adds bounds checks, scoped save edits, slot operations, snapshots and
+backup handling; last modified 2026-10-05. These terms do not relicense
+third-party assets.
 
 ## Save code and data sources
 
@@ -43,7 +44,12 @@ The icon is a colour-reversed derivative of the game's executable icon. The
 reader catalogue includes English game names and descriptions from
 TICSaveEditor, plus mechanical table data. The job-requirements resource
 contains extracted game table facts; the ability map combines upstream tables
-and verified bit mappings.
+and verified bit mappings. The story-progress, story-roster, achievements and
+errands resources contain English labels and table, battle-entry and
+event-script facts extracted from the game's NXD tables and PAC files with
+FF16Tools, the Nex layouts above and the event disassembler from
+[skeewirt's TIC research](https://github.com/skeewirt/TIC/tree/c2dae2a4be46f69e5a27008449d2299eff34ed0d);
+none of those tools is included.
 
 FINAL FANTASY TACTICS and its game content belong to their respective rights
 holders. This unofficial project is not affiliated with Square Enix.

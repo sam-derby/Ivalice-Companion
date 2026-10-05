@@ -462,6 +462,21 @@
         "state": "unknown"
       }
     },
+    "story_progress": {
+      "value": {
+        "state": "unknown"
+      }
+    },
+    "objective": {
+      "value": {
+        "state": "unknown"
+      }
+    },
+    "area_index": {
+      "value": {
+        "state": "unknown"
+      }
+    },
     "ramza_level": {
       "value": {
         "state": "unknown"

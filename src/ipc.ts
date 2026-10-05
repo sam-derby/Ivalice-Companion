@@ -1,5 +1,5 @@
 import { invoke } from '@tauri-apps/api/core';
-import { open } from '@tauri-apps/plugin-dialog';
+import { open, save } from '@tauri-apps/plugin-dialog';
 
 export type ValueState<T> =
   | { state: 'known'; value: T }
@@ -106,4 +106,23 @@ export async function chooseSave(): Promise<SaveSelectionStatus | null> {
     return null;
   }
   return invoke<SaveSelectionStatus>('set_save_selection', { path });
+}
+
+/** A save file to import a slot from; the selected save is unaffected. */
+export async function chooseImportFile(): Promise<string | null> {
+  return open({
+    title: 'Choose a save to import from',
+    directory: false,
+    multiple: false,
+    filters: [{ name: 'Enhanced save', extensions: ['png'] }],
+  });
+}
+
+/** Where to write an exported slot; the system dialog confirms any replacement. */
+export async function chooseExportFile(slot: number): Promise<string | null> {
+  return save({
+    title: `Export slot ${String(slot + 1)}`,
+    defaultPath: `slot-${String(slot + 1)}-enhanced.png`,
+    filters: [{ name: 'Enhanced save', extensions: ['png'] }],
+  });
 }

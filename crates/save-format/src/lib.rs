@@ -10,6 +10,7 @@ mod error;
 mod manual;
 mod png;
 mod resource;
+mod slots;
 mod umif;
 
 pub use creature::{creature_form, creature_forms, CreatureCategory, CreatureForm};
@@ -30,6 +31,7 @@ pub use manual::ManualParseError;
 pub use resource::{
     PINNED_DICTIONARY_LENGTH, PINNED_DICTIONARY_SHA256, PINNED_DICTIONARY_SHA256_HEX,
 };
+pub use slots::{apply_slot_operation, export_slot, validate_slot_record, SlotOperation};
 
 /// Maximum accepted PNG/container input size.
 pub const MAX_CONTAINER_BYTES: usize = 64 * 1024 * 1024;

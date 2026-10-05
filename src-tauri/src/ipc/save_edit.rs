@@ -4,10 +4,13 @@ use super::*;
 use ivalice_domain::equipment_rules::GearError;
 use ivalice_domain::identity::{UnitSex, ZodiacSign};
 use ivalice_domain::job_eligibility::level_from_total_jp;
+use ivalice_domain::story_progress::CURRENT_AREA_VARIABLE;
+use ivalice_domain::story_roster::{plan_unit, RosterRole, RosterUnit, GUEST_POSITIONS};
 use ivalice_domain::{game_data::SpoilerLevel, ValueState};
 use ivalice_infrastructure::{
     replace_save_with_backup_if_unchanged, restore_save_from_backup_if_unchanged,
-    AbilityFlagsLoader, JobRequirementsLoader, SaveEditError,
+    AbilityFlagsLoader, JobRequirementsLoader, SaveEditError, StoryProgressLoader,
+    StoryRosterLoader,
 };
 use ivalice_save_format::{
     edit_enhanced_png, edit_enhanced_png_with_abilities, edit_enhanced_png_with_jobs, BaseStatKind,
@@ -37,6 +40,17 @@ enum RequestedOperation {
     },
     Gil {
         value: String,
+    },
+    StoryStep {
+        progress: String,
+    },
+    CalendarDate {
+        month: u8,
+        day: u8,
+    },
+    Achievement {
+        index: u8,
+        unlocked: bool,
     },
     InventoryQuantity {
         item_position: u16,
@@ -253,6 +267,47 @@ pub(super) fn parse_transaction_request(
         .map(|operation| match operation {
             RequestedOperation::Gil { value } => {
                 parse_gil(value).map(|value| EditOperation::Gil { value })
+            }
+            RequestedOperation::StoryStep { progress } => {
+                if progress.is_empty()
+                    || progress.len() > 4
+                    || !progress.bytes().all(|byte| byte.is_ascii_digit())
+                {
+                    return Err(IpcError::simple(
+                        IpcErrorCategory::Input,
+                        "invalid_story_step",
+                        false,
+                    ));
+                }
+                progress
+                    .parse::<i32>()
+                    .map(|value| EditOperation::StoryProgress { value })
+                    .map_err(|_| {
+                        IpcError::simple(IpcErrorCategory::Input, "invalid_story_step", false)
+                    })
+            }
+            RequestedOperation::CalendarDate { month, day } => {
+                ivalice_domain::calendar::day_of_year(*month, *day)
+                    .map(|_| EditOperation::CalendarDate {
+                        month: *month,
+                        day: *day,
+                    })
+                    .ok_or_else(|| {
+                        IpcError::simple(IpcErrorCategory::Input, "invalid_calendar_date", false)
+                    })
+            }
+            RequestedOperation::Achievement { index, unlocked } => {
+                if *index >= ivalice_domain::achievements::ACHIEVEMENT_COUNT {
+                    return Err(IpcError::simple(
+                        IpcErrorCategory::Input,
+                        "invalid_achievement",
+                        false,
+                    ));
+                }
+                Ok(EditOperation::Achievement {
+                    index: *index,
+                    unlocked: *unlocked,
+                })
             }
             RequestedOperation::InventoryQuantity {
                 item_position,
@@ -675,13 +730,23 @@ pub(super) fn parse_transaction_request(
     let mut fields = std::collections::BTreeSet::new();
     for operation in &operations {
         let field = match operation {
-            EditOperation::CopyUnitFromSlot { .. } | EditOperation::RebindUnitFromSlot { .. } => {
+            EditOperation::CopyUnitFromSlot { .. }
+            | EditOperation::RebindUnitFromSlot { .. }
+            | EditOperation::EventVariable { .. }
+            | EditOperation::GameFlag { .. }
+            | EditOperation::SideProgress { .. }
+            | EditOperation::StoryGuest { .. }
+            | EditOperation::StoryMember { .. }
+            | EditOperation::RamzaForm { .. } => {
                 return Err(IpcError::simple(
                     IpcErrorCategory::Input,
                     "invalid_edit_request",
                     false,
                 ));
             }
+            EditOperation::StoryProgress { .. } => 1_100_000,
+            EditOperation::CalendarDate { .. } => 1_200_000,
+            EditOperation::Achievement { index, .. } => 1_300_000 + u32::from(*index),
             EditOperation::CreateCreature { unit_position, .. }
             | EditOperation::CreateGenericFromSlot { unit_position, .. } => {
                 700_000 + u32::from(*unit_position)
@@ -863,7 +928,16 @@ pub(super) fn save_selected_operations(
         .iter()
         .find_map(|operation| match operation {
             EditOperation::Gil { value } => Some(*value),
-            EditOperation::InventoryQuantity { .. }
+            EditOperation::StoryProgress { .. }
+            | EditOperation::CalendarDate { .. }
+            | EditOperation::Achievement { .. }
+            | EditOperation::EventVariable { .. }
+            | EditOperation::GameFlag { .. }
+            | EditOperation::SideProgress { .. }
+            | EditOperation::StoryGuest { .. }
+            | EditOperation::StoryMember { .. }
+            | EditOperation::RamzaForm { .. }
+            | EditOperation::InventoryQuantity { .. }
             | EditOperation::Gear { .. }
             | EditOperation::CharacterLevel { .. }
             | EditOperation::Experience { .. }
@@ -924,6 +998,7 @@ pub(super) fn prepare_replacement(
     input: &[u8],
     operations: &[EditOperation],
 ) -> Result<Vec<u8>, IpcError> {
+    let operations = &expand_story_step(state, input, loaded.slot, operations)?;
     with_edit_resources(
         state,
         loaded,
@@ -952,6 +1027,7 @@ pub(super) fn prepare_preview(
     input: &[u8],
     operations: &[EditOperation],
 ) -> Result<ivalice_save_format::DecodedContainer, IpcError> {
+    let operations = &expand_story_step(state, input, loaded.slot, operations)?;
     with_edit_resources(state, loaded, operations, |dictionary, jobs, abilities| {
         ivalice_save_format::preview_enhanced_png(
             input,
@@ -962,6 +1038,119 @@ pub(super) fn prepare_preview(
             abilities,
         )
     })
+}
+
+/// A story step also writes the replayed event work, Ramza's chapter form, the
+/// story members and the guests rebuilt from battle entries for that step.
+fn expand_story_step(
+    state: &DesktopState,
+    input: &[u8],
+    slot: u8,
+    operations: &[EditOperation],
+) -> Result<Vec<EditOperation>, IpcError> {
+    let mut expanded = operations.to_vec();
+    let Some(progress) = operations.iter().find_map(|operation| match operation {
+        EditOperation::StoryProgress { value } => Some(*value),
+        _ => None,
+    }) else {
+        return Ok(expanded);
+    };
+    let story = StoryProgressLoader::load(&state.resource_root).map_err(|_| {
+        IpcError::simple(
+            IpcErrorCategory::Resource,
+            "story_progress_unavailable",
+            false,
+        )
+    })?;
+    let plan = story
+        .variable_plan(progress)
+        .ok_or_else(|| IpcError::simple(IpcErrorCategory::Input, "invalid_story_step", false))?;
+    expanded.extend(
+        plan.into_iter()
+            .map(|(id, value)| EditOperation::EventVariable { id, value }),
+    );
+    let invalid = || IpcError::simple(IpcErrorCategory::Input, "invalid_story_step", false);
+    let dictionary = read_dictionary(&state.dictionary_path())?;
+    let decoded = ivalice_save_format::decode_enhanced_png(input, Some(&dictionary))
+        .map_err(|_| invalid())?;
+    let metadata = decoded
+        .slot_metadata(slot)
+        .ok()
+        .flatten()
+        .ok_or_else(invalid)?;
+    let game_flags = story.game_flag_plan(progress).ok_or_else(invalid)?;
+    expanded.extend(
+        game_flags
+            .into_iter()
+            .map(|(id, value)| EditOperation::GameFlag { id, value }),
+    );
+    expanded.extend(
+        story
+            .side_track_plan(progress, &metadata.story_progress)
+            .into_iter()
+            .map(|(track, value)| EditOperation::SideProgress { track, value }),
+    );
+    if let Some(area) = metadata
+        .current_area_index()
+        .and_then(|saved| story.area_plan(progress, saved))
+    {
+        expanded.push(EditOperation::EventVariable {
+            id: CURRENT_AREA_VARIABLE,
+            value: i32::from(area),
+        });
+    }
+    let unavailable = || {
+        IpcError::simple(
+            IpcErrorCategory::Resource,
+            "story_roster_unavailable",
+            false,
+        )
+    };
+    let roster = StoryRosterLoader::load(&state.resource_root).map_err(|_| unavailable())?;
+    let catalogue = state
+        .catalogue
+        .as_ref()
+        .map_err(|error| reader::map_catalogue_error(*error))?
+        .load(&CancellationToken::default())
+        .map_err(reader::map_catalogue_error)?;
+    let jobs = &catalogue.mechanics().ok_or_else(unavailable)?.jobs;
+    // Members whose battle entry asks for the party level take Ramza's level.
+    let party_level = decoded
+        .unit_records(slot)
+        .ok()
+        .flatten()
+        .and_then(|records| records.first().map(|ramza| ramza.level))
+        .ok_or_else(invalid)?;
+    let plan = |unit: &RosterUnit, role| {
+        let id = format!("job:{}", unit.job);
+        let growth = jobs
+            .iter()
+            .find(|job| job.id == id)
+            .and_then(|job| job.growth)
+            .ok_or_else(unavailable)?;
+        plan_unit(unit, role, growth, party_level).map_err(|_| unavailable())
+    };
+    expanded.push(EditOperation::RamzaForm {
+        character: roster.ramza_form_at(progress).character,
+    });
+    for (unit, present) in roster.members_at(progress) {
+        expanded.push(EditOperation::StoryMember {
+            plan: plan(unit, RosterRole::Member)?,
+            present,
+        });
+    }
+    let mut guests = roster.guests_at(progress);
+    for unit_position in 50..50 + GUEST_POSITIONS {
+        let guest = guests
+            .next()
+            .map(|unit| plan(unit, RosterRole::Guest))
+            .transpose()?;
+        expanded.push(EditOperation::StoryGuest {
+            unit_position,
+            guest,
+        });
+    }
+    Ok(expanded)
 }
 
 fn with_edit_resources<T>(
@@ -1152,7 +1341,7 @@ pub(super) fn map_gil_edit_error(error: GilEditError) -> IpcError {
     }
 }
 
-fn map_save_edit_error(error: SaveEditError) -> IpcError {
+pub(super) fn map_save_edit_error(error: SaveEditError) -> IpcError {
     match error {
         SaveEditError::UnsafePath => {
             IpcError::simple(IpcErrorCategory::Selection, "unsafe_save_path", false)
@@ -1171,6 +1360,9 @@ fn map_save_edit_error(error: SaveEditError) -> IpcError {
         }
         SaveEditError::Io => {
             IpcError::simple(IpcErrorCategory::Snapshot, "save_write_failed", true)
+        }
+        SaveEditError::Exists => {
+            IpcError::simple(IpcErrorCategory::Input, "export_target_exists", false)
         }
     }
 }
@@ -1389,6 +1581,72 @@ mod tests {
         for character in [60, 62, 64, 65, 67, 69, 72, 73, 115, 116, 117, 118, 119] {
             assert!(parse_transaction_request(json!({"snapshotGeneration":1,"manualSlotId":31,
                 "operations":[{"kind":"add_named_from_unit","sourceSlot":31,"sourcePosition":0,"unitPosition":13,"characterKey":format!("character_name:{character}")}] })).is_err());
+        }
+    }
+
+    #[test]
+    fn story_step_requests_parse_only_whole_steps_once() {
+        let request = |operations: serde_json::Value| json!({"snapshotGeneration": 1, "manualSlotId": 3, "operations": operations});
+        let (_, parsed) =
+            parse_transaction_request(request(json!([{"kind": "story_step", "progress": "940"}])))
+                .unwrap_or_else(|error| panic!("{error:?}"));
+        assert_eq!(parsed, [EditOperation::StoryProgress { value: 940 }]);
+        for progress in ["", "-1", "12345", "9a", " 10"] {
+            assert!(parse_transaction_request(request(
+                json!([{"kind": "story_step", "progress": progress}])
+            ))
+            .is_err());
+        }
+        assert!(parse_transaction_request(request(json!([
+            {"kind": "story_step", "progress": "10"},
+            {"kind": "story_step", "progress": "20"}
+        ])))
+        .is_err());
+        assert!(parse_transaction_request(request(
+            json!([{"kind": "event_variable", "id": 110, "value": 1}])
+        ))
+        .is_err());
+    }
+
+    #[test]
+    fn calendar_and_achievement_requests_parse_valid_values_once() {
+        let request = |operations: serde_json::Value| json!({"snapshotGeneration": 1, "manualSlotId": 3, "operations": operations});
+        let (_, parsed) = parse_transaction_request(request(json!([
+            {"kind": "calendar_date", "month": 2, "day": 28},
+            {"kind": "achievement", "index": 49, "unlocked": true},
+            {"kind": "achievement", "index": 0, "unlocked": false}
+        ])))
+        .unwrap_or_else(|error| panic!("{error:?}"));
+        assert_eq!(
+            parsed,
+            [
+                EditOperation::CalendarDate { month: 2, day: 28 },
+                EditOperation::Achievement {
+                    index: 49,
+                    unlocked: true
+                },
+                EditOperation::Achievement {
+                    index: 0,
+                    unlocked: false
+                },
+            ]
+        );
+        for operations in [
+            json!([{"kind": "calendar_date", "month": 2, "day": 29}]),
+            json!([{"kind": "calendar_date", "month": 0, "day": 1}]),
+            json!([{"kind": "calendar_date", "month": 12, "day": 32}]),
+            json!([{"kind": "achievement", "index": 50, "unlocked": true}]),
+            json!([{"kind": "achievement", "index": 1, "unlocked": 1}]),
+            json!([
+                {"kind": "achievement", "index": 1, "unlocked": true},
+                {"kind": "achievement", "index": 1, "unlocked": false}
+            ]),
+            json!([
+                {"kind": "calendar_date", "month": 1, "day": 1},
+                {"kind": "calendar_date", "month": 1, "day": 2}
+            ]),
+        ] {
+            assert!(parse_transaction_request(request(operations)).is_err());
         }
     }
 

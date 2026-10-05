@@ -3,6 +3,8 @@
 //! owner-verified fields are changed in the decoded payload.
 
 mod progression;
+mod roster;
+mod story;
 pub use progression::BaseStatKind;
 
 use flate2::{Compress, Compression, FlushCompress, Status};
@@ -13,6 +15,7 @@ use ivalice_domain::equipment_rules::{project_held_counts, GearError, GearPlan, 
 pub use ivalice_domain::equipment_rules::{GearSlot, GearSource};
 use ivalice_domain::identity::{UnitSex, ZodiacSign};
 use ivalice_domain::job_eligibility::{level_from_total_jp, ValidatedJobRequirements};
+use ivalice_domain::story_roster::UnitRecordPlan;
 
 use crate::{
     manual, png, umif, ContainerError, ManualParseError, StoredAdlerStatus, MAX_CONTAINER_BYTES,
@@ -42,6 +45,51 @@ pub enum EditOperation {
     },
     Gil {
         value: u32,
+    },
+    /// Main story step; both saved copies change together.
+    StoryProgress {
+        value: i32,
+    },
+    /// Event work id 0x00-0x7F (i32) or 0x80-0x3FF (bit flag, value 0 or 1).
+    EventVariable {
+        id: u16,
+        value: i32,
+    },
+    /// User GameFlag byte 0-31, stored as 0 or 1.
+    GameFlag {
+        id: u8,
+        value: bool,
+    },
+    /// Side-quest GameProgress track 1-11.
+    SideProgress {
+        track: u8,
+        value: i32,
+    },
+    /// In-game month (1-12) and day.
+    CalendarDate {
+        month: u8,
+        day: u8,
+    },
+    /// FftoAchievement unlocked byte by save index (0-49).
+    Achievement {
+        index: u8,
+        unlocked: bool,
+    },
+    /// One guest position (50-53) built from story data; `None` leaves it empty.
+    /// All four positions must be given together.
+    StoryGuest {
+        unit_position: u8,
+        guest: Option<UnitRecordPlan>,
+    },
+    /// A permanent story member: kept, reactivated or built when present,
+    /// deactivated when absent.
+    StoryMember {
+        plan: UnitRecordPlan,
+        present: bool,
+    },
+    /// Ramza's chapter form (character 1-3) at position 0.
+    RamzaForm {
+        character: u8,
     },
     InventoryQuantity {
         item_position: u16,
@@ -631,8 +679,55 @@ fn edit_enhanced_png_inner(
     let mut staged_gear_bytes = Vec::<(usize, u16)>::new();
     let mut staged_gear_expected = Vec::<(u8, [Option<u16>; 7])>::new();
     let mut staged_unit_copy = None;
+    let mut staged_story = story::StoryStaging::default();
+    let mut staged_roster: Option<Vec<(std::ops::Range<usize>, Vec<u8>)>> = None;
     for operation in operations {
         match operation {
+            EditOperation::StoryGuest { .. }
+            | EditOperation::StoryMember { .. }
+            | EditOperation::RamzaForm { .. } => {
+                if staged_roster.is_some() {
+                    continue;
+                }
+                let block = manual::unit_block_payload_range(&payload, slot)?;
+                let current = payload
+                    .get(block.clone())
+                    .ok_or(GilEditError::Encoding)?
+                    .chunks(manual::unit_record::SIZE)
+                    .map(|chunk| {
+                        roster::Record::try_from(chunk).map_err(|_| GilEditError::Encoding)
+                    })
+                    .collect::<Result<Vec<_>, _>>()?;
+                let changes = roster::changes(operations, &current)?;
+                if operations.iter().any(|other| {
+                    unit_position(other).is_some_and(|position| {
+                        changes
+                            .iter()
+                            .any(|(changed, _)| *changed == usize::from(position))
+                    })
+                }) {
+                    return Err(GilEditError::InvalidField);
+                }
+                let mut staged = Vec::new();
+                for (position, bytes) in changes {
+                    let start = block.start + position * manual::unit_record::SIZE;
+                    let range = start..start + manual::unit_record::SIZE;
+                    payload
+                        .get_mut(range.clone())
+                        .ok_or(GilEditError::Encoding)?
+                        .copy_from_slice(&bytes);
+                    staged.push((range, bytes.to_vec()));
+                }
+                staged_roster = Some(staged);
+            }
+            EditOperation::StoryProgress { .. }
+            | EditOperation::EventVariable { .. }
+            | EditOperation::GameFlag { .. }
+            | EditOperation::SideProgress { .. }
+            | EditOperation::CalendarDate { .. }
+            | EditOperation::Achievement { .. } => {
+                story::apply(&mut payload, slot, operation, &mut staged_story)?;
+            }
             EditOperation::Gil { value } => {
                 if expected_gil.replace(*value).is_some() {
                     return Err(GilEditError::DuplicateField);
@@ -1218,42 +1313,7 @@ fn edit_enhanced_png_inner(
             },
         )
     } else {
-        let ffto_range = png::single_ffto_range(input)?;
-        let original_umif = input
-            .get(ffto_range.clone())
-            .ok_or(GilEditError::Encoding)?;
-        let umif = pack_umif(original_umif, &payload, dictionary)?;
-        let chunk_start = ffto_range
-            .start
-            .checked_sub(8)
-            .ok_or(GilEditError::Encoding)?;
-        let chunk_end = ffto_range
-            .end
-            .checked_add(4)
-            .ok_or(GilEditError::Encoding)?;
-        let mut output = Vec::with_capacity(
-            input
-                .len()
-                .saturating_sub(original_umif.len())
-                .saturating_add(umif.len()),
-        );
-        output.extend_from_slice(input.get(..chunk_start).ok_or(GilEditError::Encoding)?);
-        output.extend_from_slice(
-            &u32::try_from(umif.len())
-                .map_err(|_| GilEditError::Encoding)?
-                .to_be_bytes(),
-        );
-        output.extend_from_slice(b"ffTo");
-        output.extend_from_slice(&umif);
-        output.extend_from_slice(&png::crc32_parts(b"ffTo", &umif).to_be_bytes());
-        output.extend_from_slice(input.get(chunk_end..).ok_or(GilEditError::Encoding)?);
-        if output.len() > MAX_CONTAINER_BYTES {
-            return Err(GilEditError::Encoding);
-        }
-        let check = crate::decode_enhanced_png(&output, Some(dictionary))?;
-        if check.stored_adler_status() != StoredAdlerStatus::Matched || check.payload() != payload {
-            return Err(GilEditError::Encoding);
-        }
+        let (output, check) = encode_payload(input, dictionary, &payload)?;
         (Some(output), check)
     };
     if expected_gil.is_some_and(|gil| {
@@ -1263,6 +1323,16 @@ fn edit_enhanced_png_inner(
             .flatten()
             .is_none_or(|metadata| metadata.gil != gil)
     }) {
+        return Err(GilEditError::Encoding);
+    }
+    if !staged_story.is_empty() && !staged_story.verify(check.payload()) {
+        return Err(GilEditError::Encoding);
+    }
+    if staged_roster
+        .iter()
+        .flatten()
+        .any(|(range, bytes)| check.payload().get(range.clone()) != Some(bytes.as_slice()))
+    {
         return Err(GilEditError::Encoding);
     }
     if staged_counts.iter().enumerate().any(|(position, staged)| {
@@ -1393,6 +1463,11 @@ fn edit_enhanced_png_inner(
             before != after
                 && !(4..8).contains(&index)
                 && !(expected_gil.is_some() && (gil_start..gil_end).contains(&index))
+                && !staged_story.allows(index, *before, *after)
+                && !staged_roster
+                    .iter()
+                    .flatten()
+                    .any(|(range, _)| range.contains(&index))
                 && !staged_counts
                     .iter()
                     .flatten()
@@ -1428,6 +1503,40 @@ fn edit_enhanced_png_inner(
         encoded: output,
         decoded: check,
     })
+}
+
+fn unit_position(operation: &EditOperation) -> Option<u8> {
+    match operation {
+        EditOperation::CreateCreature { unit_position, .. }
+        | EditOperation::Gear { unit_position, .. }
+        | EditOperation::CharacterLevel { unit_position, .. }
+        | EditOperation::Experience { unit_position, .. }
+        | EditOperation::BaseStat { unit_position, .. }
+        | EditOperation::Bravery { unit_position, .. }
+        | EditOperation::Faith { unit_position, .. }
+        | EditOperation::Zodiac { unit_position, .. }
+        | EditOperation::Sex { unit_position, .. }
+        | EditOperation::JobProgress { unit_position, .. }
+        | EditOperation::LearnedAbility { unit_position, .. }
+        | EditOperation::EquippedSlot { unit_position, .. }
+        | EditOperation::CopyUnitFromSlot { unit_position, .. }
+        | EditOperation::RebindUnitFromSlot { unit_position, .. }
+        | EditOperation::CreateGenericFromSlot { unit_position, .. }
+        | EditOperation::AddStoryFromSlot { unit_position, .. }
+        | EditOperation::AddGuestFromSlot { unit_position, .. }
+        | EditOperation::AddNamedFromUnit { unit_position, .. } => Some(*unit_position),
+        EditOperation::Gil { .. }
+        | EditOperation::StoryProgress { .. }
+        | EditOperation::EventVariable { .. }
+        | EditOperation::GameFlag { .. }
+        | EditOperation::SideProgress { .. }
+        | EditOperation::CalendarDate { .. }
+        | EditOperation::Achievement { .. }
+        | EditOperation::StoryGuest { .. }
+        | EditOperation::StoryMember { .. }
+        | EditOperation::RamzaForm { .. }
+        | EditOperation::InventoryQuantity { .. } => None,
+    }
 }
 
 fn normalized_gear(equipment: &[u16; 7]) -> [Option<u16>; 7] {
@@ -1888,6 +1997,51 @@ fn equipped_choice_allowed(
         slot,
         value,
     )
+}
+
+/// Repack a checksummed payload into `input`'s PNG and verify it decodes back exactly.
+pub(crate) fn encode_payload(
+    input: &[u8],
+    dictionary: &[u8],
+    payload: &[u8],
+) -> Result<(Vec<u8>, crate::DecodedContainer), GilEditError> {
+    let ffto_range = png::single_ffto_range(input)?;
+    let original_umif = input
+        .get(ffto_range.clone())
+        .ok_or(GilEditError::Encoding)?;
+    let umif = pack_umif(original_umif, payload, dictionary)?;
+    let chunk_start = ffto_range
+        .start
+        .checked_sub(8)
+        .ok_or(GilEditError::Encoding)?;
+    let chunk_end = ffto_range
+        .end
+        .checked_add(4)
+        .ok_or(GilEditError::Encoding)?;
+    let mut output = Vec::with_capacity(
+        input
+            .len()
+            .saturating_sub(original_umif.len())
+            .saturating_add(umif.len()),
+    );
+    output.extend_from_slice(input.get(..chunk_start).ok_or(GilEditError::Encoding)?);
+    output.extend_from_slice(
+        &u32::try_from(umif.len())
+            .map_err(|_| GilEditError::Encoding)?
+            .to_be_bytes(),
+    );
+    output.extend_from_slice(b"ffTo");
+    output.extend_from_slice(&umif);
+    output.extend_from_slice(&png::crc32_parts(b"ffTo", &umif).to_be_bytes());
+    output.extend_from_slice(input.get(chunk_end..).ok_or(GilEditError::Encoding)?);
+    if output.len() > MAX_CONTAINER_BYTES {
+        return Err(GilEditError::Encoding);
+    }
+    let check = crate::decode_enhanced_png(&output, Some(dictionary))?;
+    if check.stored_adler_status() != StoredAdlerStatus::Matched || check.payload() != payload {
+        return Err(GilEditError::Encoding);
+    }
+    Ok((output, check))
 }
 
 fn pack_umif(original: &[u8], payload: &[u8], dictionary: &[u8]) -> Result<Vec<u8>, GilEditError> {

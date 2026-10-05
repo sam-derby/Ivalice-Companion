@@ -1,6 +1,5 @@
 import type { BaseStatKind, EditContext, ReaderUnit } from './reader-ipc';
 import type { UnitDraft } from './editor-draft';
-import { jobName } from './ReaderRoster';
 import { NumericField, valueText } from './workspace-fields';
 import { WorkspaceStatFields } from './WorkspaceStatFields';
 
@@ -45,9 +44,9 @@ export function WorkspaceStatus({
 }) {
   return (
     <div className="workspace-status-grid">
-      <section className="workspace-paper">
-        <h3>Level &amp; EXP</h3>
-        <div className="workspace-field-grid">
+      <section className="workspace-paper workspace-character">
+        <h3>Character details</h3>
+        <div className="workspace-field-grid workspace-compact-fields">
           {(
             [
               ['level', 'Level', unit.saved.level],
@@ -78,16 +77,13 @@ export function WorkspaceStatus({
               </dl>
             ),
           )}
-        </div>
-        <h3>Bravery &amp; Faith</h3>
-        {editable ? (
-          <div className="workspace-field-grid">
-            {(
-              [
-                ['bravery', 'Bravery', unit.saved.start_bcp],
-                ['faith', 'Faith', unit.saved.start_faith],
-              ] as const
-            ).map(([key, label, original]) => (
+          {(
+            [
+              ['bravery', 'Bravery', unit.saved.start_bcp, 'brave'],
+              ['faith', 'Faith', unit.saved.start_faith, 'faith'],
+            ] as const
+          ).map(([key, label, original, stored]) =>
+            editable ? (
               <NumericField
                 key={key}
                 label={label}
@@ -97,36 +93,17 @@ export function WorkspaceStatus({
                   onChange(key, value);
                 }}
               />
-            ))}
-          </div>
-        ) : (
-          <dl className="workspace-facts">
-            <div>
-              <dt>Bravery</dt>
-              <dd>{valueText(projected.stored.brave.value)}</dd>
-            </div>
-            <div>
-              <dt>Faith</dt>
-              <dd>{valueText(projected.stored.faith.value)}</dd>
-            </div>
-          </dl>
-        )}
-      </section>
-      <WorkspaceStatFields
-        unit={unit}
-        projected={projected}
-        draft={draft}
-        editable={progressionEditable}
-        inputs={statInputs}
-        onChange={onStatChange}
-        onCommit={onStatCommit}
-        onReset={onStatReset}
-        error={projectionError}
-        busy={projecting}
-      />
-      <section className="workspace-paper">
-        <h3>Character details</h3>
-        <dl className="workspace-facts">
+            ) : (
+              <dl className="workspace-facts" key={key}>
+                <div>
+                  <dt>{label}</dt>
+                  <dd>{valueText(projected.stored[stored].value)}</dd>
+                </div>
+              </dl>
+            ),
+          )}
+        </div>
+        <dl className="workspace-facts workspace-identity">
           <div className="workspace-identity-sex">
             <dt>Sex</dt>
             <dd>
@@ -178,32 +155,18 @@ export function WorkspaceStatus({
           </div>
         </dl>
       </section>
-      <section
-        className="workspace-paper workspace-growth"
-        aria-label={`${jobName(unit)} Growth`}
-      >
-        <h3>{jobName(unit)} Growth</h3>
-        <dl className="workspace-facts">
-          {(
-            [
-              ['HP', 'hp'],
-              ['MP', 'mp'],
-              ['Speed', 'speed'],
-              ['PA', 'physical_attack'],
-              ['MA', 'magical_attack'],
-            ] as const
-          ).map(([label, key]) => (
-            <div key={key}>
-              <dt>{label}</dt>
-              <dd>
-                {projected.growth.value.state === 'known'
-                  ? projected.growth.value.value[key]
-                  : valueText(projected.growth.value)}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      </section>
+      <WorkspaceStatFields
+        unit={unit}
+        projected={projected}
+        draft={draft}
+        editable={progressionEditable}
+        inputs={statInputs}
+        onChange={onStatChange}
+        onCommit={onStatCommit}
+        onReset={onStatReset}
+        error={projectionError}
+        busy={projecting}
+      />
     </div>
   );
 }

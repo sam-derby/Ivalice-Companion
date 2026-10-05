@@ -93,10 +93,14 @@ export function App() {
   const selectionSequence = useRef(0);
   const lastReaderIdentity = useRef<ReaderIdentity | null>(null);
   const workspaceViews = useRef(new Map<number, WorkspaceView>());
+  const lastSection = useRef<WorkspaceView['section']>('game');
   const [initialWorkspaceView, setInitialWorkspaceView] =
     useState<WorkspaceView>();
+  const [defaultSection, setDefaultSection] =
+    useState<WorkspaceView['section']>('game');
   const onViewChange = useCallback((slot: number, view: WorkspaceView) => {
     workspaceViews.current.set(slot, view);
+    lastSection.current = view.section;
   }, []);
 
   useEffect(() => {
@@ -136,6 +140,7 @@ export function App() {
     setNotice(null);
     lastReaderIdentity.current = null;
     workspaceViews.current.clear();
+    lastSection.current = 'game';
     setInitialWorkspaceView(undefined);
   }, []);
 
@@ -190,6 +195,7 @@ export function App() {
           ? undefined
           : workspaceViews.current.get(manualSlotId),
       );
+      setDefaultSection(lastSection.current);
       if (nextIdentity) lastReaderIdentity.current = nextIdentity;
       setLoad({ state: 'loaded' });
       return true;
@@ -404,7 +410,10 @@ export function App() {
           onDirtyChange={onDirtyChange}
           onReload={onReload}
           manualSlotId={selectedSlot}
+          occupiedSlots={slots}
+          slotSummaries={slotSummaries}
           initialView={initialWorkspaceView}
+          defaultSection={defaultSection}
           onViewChange={onViewChange}
         />
       )}

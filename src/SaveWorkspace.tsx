@@ -11,6 +11,7 @@ import {
   type ReaderUnit,
   type GearSlot,
   type GearSource,
+  type SlotSummary,
 } from './reader-ipc';
 import {
   abilityArt,
@@ -44,7 +45,9 @@ import { WorkspaceGame } from './WorkspaceGame';
 import { WorkspaceStatus } from './WorkspaceStatus';
 import { useDraftProjection } from './use-draft-projection';
 import { EquippedGear, description } from './WorkspaceEquipment';
-import { Tooltip } from './Tooltip';
+import { InfoHint, Tooltip } from './Tooltip';
+import { WorkspaceQuests } from './WorkspaceQuests';
+import { WorkspaceUtilities } from './WorkspaceUtilities';
 import { NumericField, stagedNumber, valueText } from './workspace-fields';
 import type {
   WorkspaceSection,
@@ -59,7 +62,11 @@ interface Props {
   onDirtyChange: (dirty: boolean) => void;
   onReload: (slot: number, message: string) => Promise<void>;
   manualSlotId: number;
+  occupiedSlots?: number[];
+  slotSummaries?: SlotSummary[];
   initialView: WorkspaceView | undefined;
+  /** Section shown when this slot has no remembered view. */
+  defaultSection?: WorkspaceSection;
   onViewChange: (slot: number, view: WorkspaceView) => void;
 }
 
@@ -172,7 +179,10 @@ export function SaveWorkspace({
   onDirtyChange,
   onReload,
   manualSlotId,
+  occupiedSlots = [],
+  slotSummaries = [],
   initialView,
+  defaultSection = 'game',
   onViewChange,
 }: Props) {
   const [additionPreview, setAdditionPreview] = useState<{
@@ -219,7 +229,7 @@ export function SaveWorkspace({
   );
   const art = useReaderArt();
   const [section, setSection] = useState<WorkspaceSection>(
-    initialView?.section ?? (reader ? 'units' : 'game'),
+    initialView?.section ?? defaultSection,
   );
   const [panel, setPanel] = useState<UnitPanel>(initialView?.panel ?? 'status');
   const roster = reader?.roster.value;
@@ -862,6 +872,7 @@ export function SaveWorkspace({
           const currentMissing =
             slot.currentKey !== '' &&
             !choices.some((row) => row.key === slot.currentKey);
+          const fieldLabel = `${combatSet === null ? 'Active' : `Combat set ${String(combatSet + 1)}`} ${slot.slot === 'secondary_command' ? 'secondary command' : slot.slot}`;
           return (
             <div
               key={key}
@@ -872,48 +883,49 @@ export function SaveWorkspace({
                 undefined
               }
             >
-              <label htmlFor={`loadout-${String(unit.key)}-${key}`}>
-                {slot.slot === 'secondary_command'
-                  ? 'Secondary command'
-                  : slot.slot.charAt(0).toUpperCase() + slot.slot.slice(1)}
-              </label>
-              <Tooltip
-                focusable={false}
-                text={
-                  context?.abilityDescriptions?.[
-                    unitDraft.loadout[key] ?? slot.currentKey
-                  ] ??
-                  ((unitDraft.loadout[key] ?? slot.currentKey) ===
-                  slot.currentKey
-                    ? description(unit.abilities[slot.slot])
-                    : undefined)
-                }
+              <div className="workspace-field-label">
+                <label htmlFor={`loadout-${String(unit.key)}-${key}`}>
+                  {slot.slot === 'secondary_command'
+                    ? 'Secondary command'
+                    : slot.slot.charAt(0).toUpperCase() + slot.slot.slice(1)}
+                </label>
+                <InfoHint
+                  label={fieldLabel}
+                  text={
+                    context?.abilityDescriptions?.[
+                      unitDraft.loadout[key] ?? slot.currentKey
+                    ] ??
+                    ((unitDraft.loadout[key] ?? slot.currentKey) ===
+                    slot.currentKey
+                      ? description(unit.abilities[slot.slot])
+                      : undefined)
+                  }
+                />
+              </div>
+              <select
+                id={`loadout-${String(unit.key)}-${key}`}
+                aria-label={fieldLabel}
+                value={unitDraft.loadout[key] ?? slot.currentKey}
+                onChange={(event) => {
+                  changeUnit(unit.key, (current) => ({
+                    ...current,
+                    loadout: {
+                      ...current.loadout,
+                      [key]: event.target.value,
+                    },
+                  }));
+                }}
               >
-                <select
-                  id={`loadout-${String(unit.key)}-${key}`}
-                  aria-label={`${combatSet === null ? 'Active' : `Combat set ${String(combatSet + 1)}`} ${slot.slot === 'secondary_command' ? 'secondary command' : slot.slot}`}
-                  value={unitDraft.loadout[key] ?? slot.currentKey}
-                  onChange={(event) => {
-                    changeUnit(unit.key, (current) => ({
-                      ...current,
-                      loadout: {
-                        ...current.loadout,
-                        [key]: event.target.value,
-                      },
-                    }));
-                  }}
-                >
-                  <option value="">None</option>
-                  {currentMissing && (
-                    <option value={slot.currentKey}>Unknown selection</option>
-                  )}
-                  {choices.map((choice) => (
-                    <option key={choice.key} value={choice.key}>
-                      {choice.label}
-                    </option>
-                  ))}
-                </select>
-              </Tooltip>
+                <option value="">None</option>
+                {currentMissing && (
+                  <option value={slot.currentKey}>Unknown selection</option>
+                )}
+                {choices.map((choice) => (
+                  <option key={choice.key} value={choice.key}>
+                    {choice.label}
+                  </option>
+                ))}
+              </select>
               {unitDraft.loadout[key] !== undefined &&
                 unitDraft.loadout[key] !== slot.currentKey && (
                   <div className="workspace-saved-selection">
@@ -968,8 +980,10 @@ export function SaveWorkspace({
         {(
           [
             ['game', 'Game'],
+            ['quests', 'Quests'],
             ['units', 'Units'],
             ['inventory', 'Inventory'],
+            ['utilities', 'Utilities'],
           ] as const
         ).map(([key, label]) => (
           <button
@@ -1000,13 +1014,45 @@ export function SaveWorkspace({
       <div className="workspace-content">
         {section === 'game' && (
           <WorkspaceGame
-            reader={reader}
+            reader={statsPreview.reader ?? reader}
             gil={draft.gil}
             savedGil={context?.gil ?? null}
             onGilChange={(gil) => {
               setDraft((current) => ({ ...current, gil }));
               setSaveError(null);
             }}
+            context={context}
+            storyStep={draft.storyStep}
+            onStoryStepChange={(storyStep) => {
+              setDraft((current) => ({ ...current, storyStep }));
+              setSaveError(null);
+            }}
+            calendar={draft.calendar}
+            onCalendarChange={(calendar) => {
+              setDraft((current) => ({ ...current, calendar }));
+              setSaveError(null);
+            }}
+            achievements={draft.achievements}
+            onAchievementChange={(index, unlocked) => {
+              setDraft((current) => ({
+                ...current,
+                achievements: { ...current.achievements, [index]: unlocked },
+              }));
+              setSaveError(null);
+            }}
+          />
+        )}
+
+        {section === 'quests' && <WorkspaceQuests context={context} />}
+
+        {section === 'utilities' && (
+          <WorkspaceUtilities
+            context={loadedContext}
+            occupied={occupiedSlots}
+            summaries={slotSummaries}
+            loadedSlot={manualSlotId}
+            pendingChanges={dirty}
+            onReload={onReload}
           />
         )}
 
@@ -1351,6 +1397,11 @@ export function SaveWorkspace({
                           row.membership.value.value === 'guest' && (
                             <span className="workspace-membership">Guest</span>
                           )}
+                        {context?.unitsOnErrands?.includes(row.key) && (
+                          <span className="workspace-membership">
+                            On an errand
+                          </span>
+                        )}
                       </button>
                     );
                   })}
@@ -1530,12 +1581,7 @@ export function SaveWorkspace({
                             </div>
                             <div className="workspace-paper">
                               <h3>Equipped abilities</h3>
-                              <Tooltip
-                                text={description(
-                                  unit.abilities.primary_command,
-                                )}
-                                focusable={false}
-                              >
+                              <div className="workspace-primary-command">
                                 <button
                                   type="button"
                                   onClick={() => {
@@ -1555,7 +1601,13 @@ export function SaveWorkspace({
                                         unit.abilities.primary_command.value,
                                       )}
                                 </button>
-                              </Tooltip>
+                                <InfoHint
+                                  label="Primary command"
+                                  text={description(
+                                    unit.abilities.primary_command,
+                                  )}
+                                />
+                              </div>
                               {loadout ? (
                                 loadoutFields(null)
                               ) : (
@@ -1563,29 +1615,27 @@ export function SaveWorkspace({
                                   <div>
                                     <dt>Secondary command</dt>
                                     <dd>
-                                      <Tooltip
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          showCommand(
+                                            unit.abilities.secondary_command
+                                              .value,
+                                          );
+                                        }}
+                                      >
+                                        {valueText(
+                                          unit.abilities.secondary_command
+                                            .value,
+                                          (ability) => valueText(ability.label),
+                                        )}
+                                      </button>
+                                      <InfoHint
+                                        label="Secondary command"
                                         text={description(
                                           unit.abilities.secondary_command,
                                         )}
-                                        focusable={false}
-                                      >
-                                        <button
-                                          type="button"
-                                          onClick={() => {
-                                            showCommand(
-                                              unit.abilities.secondary_command
-                                                .value,
-                                            );
-                                          }}
-                                        >
-                                          {valueText(
-                                            unit.abilities.secondary_command
-                                              .value,
-                                            (ability) =>
-                                              valueText(ability.label),
-                                          )}
-                                        </button>
-                                      </Tooltip>
+                                      />
                                     </dd>
                                   </div>
                                   {(
@@ -1598,17 +1648,16 @@ export function SaveWorkspace({
                                     <div key={key}>
                                       <dt>{label}</dt>
                                       <dd>
-                                        <Tooltip
+                                        {valueText(
+                                          unit.abilities[key].value,
+                                          (ability) => valueText(ability.label),
+                                        )}
+                                        <InfoHint
+                                          label={label}
                                           text={description(
                                             unit.abilities[key],
                                           )}
-                                        >
-                                          {valueText(
-                                            unit.abilities[key].value,
-                                            (ability) =>
-                                              valueText(ability.label),
-                                          )}
-                                        </Tooltip>
+                                        />
                                       </dd>
                                     </div>
                                   ))}
@@ -1946,14 +1995,6 @@ export function SaveWorkspace({
                                                     );
                                                   }}
                                                 />
-                                                <ArtImage
-                                                  src={abilityArt(
-                                                    art,
-                                                    ability.key,
-                                                  )}
-                                                  label={`${ability.label} icon`}
-                                                  variant="item"
-                                                />
                                                 <Tooltip
                                                   text={
                                                     context
@@ -1962,8 +2003,18 @@ export function SaveWorkspace({
                                                     ]
                                                   }
                                                 >
-                                                  {ability.label}
+                                                  <ArtImage
+                                                    src={abilityArt(
+                                                      art,
+                                                      ability.key,
+                                                    )}
+                                                    label={`${ability.label} icon`}
+                                                    variant="item"
+                                                  />
                                                 </Tooltip>
+                                                <span className="workspace-ability-name">
+                                                  {ability.label}
+                                                </span>
                                               </label>
                                               {(loadout
                                                 ? loadout.slots.some(
@@ -2083,7 +2134,10 @@ export function SaveWorkspace({
             <ul className="workspace-ability-list">
               {commandInfo.members.map((row) => (
                 <li key={row.label}>
-                  <Tooltip text={row.description}>{row.label}</Tooltip>
+                  <span>
+                    {row.label}{' '}
+                    <InfoHint label={row.label} text={row.description} />
+                  </span>
                   <small>{row.learned ? 'Learned' : 'Unlearned'}</small>
                 </li>
               ))}
