@@ -15,19 +15,18 @@ SHA-256 checksums are listed in the
 
 - **Units:** party roster with sprites, jobs, abilities, equipment and displayed
   stats. Edit levels, experience, base stats, job progress, learned and equipped
-  abilities, and equipment; add recruits and creatures.
+  abilities, and equipment; add recruits and creatures. Units away on an errand
+  are marked in the roster.
 - **Game:** saved chapter, objective and world-map area; edit gil, the in-game
-  date and achievement unlocks. Story-step editing is experimental: it rebuilds
-  story members, guests, Ramza's form, the world map and side-quest progress for
-  the chosen step.
-- **Quests:** Chapter 4 side-quest scenes seen, every errand posting, and the
-  artefacts and wonders. Units away on an errand are marked in the roster.
+  date, achievement unlocks and the story step, which rebuilds story members,
+  guests, Ramza's form, the world map and side-quest progress for the chosen
+  step.
 - **Utilities:** copy, move, swap, delete or import whole save slots, or save
   one slot as a separate save file.
 
-Version 0.1.5 adds the Game story view and editing, the Quests and Utilities
-tabs, and opens on the Game tab. Version 0.1.4 added level, experience and
-base-stat editing with live previews.
+Version 0.1.5 adds the Game story view and editing and the Utilities tab, and
+opens on the Game tab. Version 0.1.4 added level, experience and base-stat
+editing with live previews.
 
 For the portable ZIP, extract the whole folder and run `ivalice-companion.exe`.
 Keep `resources/` and `licenses/` beside it. Windows 10/11 and WebView2 are
@@ -35,8 +34,7 @@ required; the ZIP does not install WebView2. Settings remain in LocalAppData.
 
 Edits are staged until Save. Every write checks that the loaded file is
 unchanged and creates a recoverable backup first. Try changes on a copy of your
-save. Creature additions, story-step edits and copied, moved or imported slots
-have not all been confirmed in the game.
+save.
 
 ## Build from source
 

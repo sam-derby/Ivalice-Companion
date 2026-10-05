@@ -79,7 +79,7 @@ test('offers listed story steps and reports the chosen one', () => {
   ).toEqual(['465 · Chapter 2 · Free them.', '940 · Chapter 3']);
   fireEvent.change(select, { target: { value: '465' } });
   expect(onStoryStepChange).toHaveBeenCalledWith('465');
-  expect(screen.getByText(/may soft-lock/)).toBeTruthy();
+  expect(screen.getByText('Other changes')).toBeTruthy();
 });
 
 test('edits the in-game date and achievement unlocks', () => {
@@ -126,5 +126,5 @@ test('edits the in-game date and achievement unlocks', () => {
   expect(screen.getByText('0 of 1 unlocked')).toBeTruthy();
   fireEvent.click(screen.getByRole('checkbox', { name: 'Reach level 50.' }));
   expect(onAchievementChange).toHaveBeenCalledWith(8, true);
-  expect(screen.getByText(/Steam/)).toBeTruthy();
+  expect(screen.getByText('Changes edit only this save.')).toBeTruthy();
 });

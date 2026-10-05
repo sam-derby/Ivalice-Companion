@@ -275,8 +275,7 @@ export function WorkspaceUtilities({
           <p>{describe(selected)}</p>
           <p className="workspace-utilities-note">
             Every change first copies the save to the file with &quot; -
-            backup&quot; in its name. Copied, moved and imported slots have not
-            yet been loaded in the game, so check one before relying on it.
+            backup&quot; in its name.
           </p>
           {pendingChanges && (
             <p role="status">

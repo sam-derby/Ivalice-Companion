@@ -605,7 +605,7 @@ describe('workspace cleanup', () => {
     expect(choice).toHaveProperty('value', 'ability:2');
     expect(mocks.saveTransaction).not.toHaveBeenCalled();
   });
-  test('marks units away on an errand and opens the Quests section', async () => {
+  test('marks units away on an errand and hides the work-in-progress Quests section', async () => {
     mocks.getSaveSelection.mockResolvedValue({ state: 'selected' });
     mocks.loadReader.mockImplementation((request) =>
       Promise.resolve({
@@ -646,10 +646,7 @@ describe('workspace cleanup', () => {
     expect(
       screen.getByRole('button', { name: /Ramza/ }).textContent,
     ).not.toContain('On an errand');
-    fireEvent.click(screen.getByRole('button', { name: 'Quests' }));
-    expect(
-      screen.getByRole('article', { name: 'Errands' }).textContent,
-    ).toContain('The Fate of Our Company');
+    expect(screen.queryByRole('button', { name: 'Quests' })).toBeNull();
     expect(mocks.saveTransaction).not.toHaveBeenCalled();
   });
 

@@ -163,7 +163,7 @@ export function WorkspaceGame({
                     </ul>
                   )}
                   <details className="workspace-story-note">
-                    <summary>Experimental: the game may soft-lock</summary>
+                    <summary>Other changes</summary>
                     <p>
                       Also sets the replayed story variables, flags, game flags
                       and world map, clears Chapter 4 side quests before Chapter
