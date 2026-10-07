@@ -180,11 +180,13 @@ fn no_replace_rename_preserves_concurrent_file() -> Result<(), Box<dyn Error>> {
 
 #[test]
 fn edit_restore_preserves_permissions_and_exact_backup() -> Result<(), Box<dyn Error>> {
+    use std::io::Write;
     let scratch = Scratch::new()?;
     let path = scratch.0.join("enhanced.png");
     fs::write(&path, b"original")?;
     fs::set_permissions(&path, fs::Permissions::from_mode(0o640))?;
     let original_inode = fs::metadata(&path)?.ino();
+    let mut old_writer = fs::OpenOptions::new().write(true).open(&path)?;
     let backup = replace_save_with_backup_if_unchanged(
         &path,
         Sha256::digest(b"original").into(),
@@ -193,7 +195,11 @@ fn edit_restore_preserves_permissions_and_exact_backup() -> Result<(), Box<dyn E
     )
     .map_err(|_| "save failed")?;
     assert_eq!(fs::read(backup.path())?, b"original");
-    assert_eq!(fs::metadata(backup.path())?.ino(), original_inode);
+    assert_ne!(fs::metadata(backup.path())?.ino(), original_inode);
+    old_writer.write_all(b"external")?;
+    old_writer.sync_all()?;
+    assert_eq!(fs::read(backup.path())?, b"original");
+    assert_eq!(fs::read(&path)?, b"edited");
     assert_eq!(fs::metadata(&path)?.mode() & 0o777, 0o640);
     restore_save_from_backup_if_unchanged(&path, Sha256::digest(b"edited").into(), &backup)
         .map_err(|_| "restore failed")?;
