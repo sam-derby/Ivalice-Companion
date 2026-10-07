@@ -52,7 +52,7 @@ async function findBuild() {
   };
   for (let attempt = 0; attempt < 120; attempt++) {
     const runs = await request(
-      `workflows/validate.yml/runs?head_sha=${sha}&event=push&per_page=100`,
+      `workflows/validate.yml/runs?head_sha=${sha}&per_page=100`,
     );
     const id = latestBuild(runs.workflow_runs, sha);
     if (id !== null) {
