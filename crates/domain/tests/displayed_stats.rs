@@ -58,10 +58,9 @@ fn mechanics() -> ReaderMechanics {
     }
 }
 fn document() -> ReaderDocument {
-    let mut document: ReaderDocument = serde_json::from_slice(include_bytes!(
-        "../../../tests/fixtures/reader-v2.json"
-    ))
-    .unwrap_or_else(|error| panic!("{error}"));
+    let mut document: ReaderDocument =
+        serde_json::from_slice(include_bytes!("../../../tests/fixtures/reader-v2.json"))
+            .unwrap_or_else(|error| panic!("{error}"));
     let ValueState::Known(units) = &mut document.roster.value else {
         panic!("fixture roster")
     };
