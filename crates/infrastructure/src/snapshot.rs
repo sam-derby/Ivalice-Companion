@@ -1203,7 +1203,14 @@ $fault = $env:IVALICE_D002_FAULT
 $stage = 'read-acl'
 try {
 $sections = [Security.AccessControl.AccessControlSections]::Access
-$original = (Get-Acl -LiteralPath $path).GetSecurityDescriptorSddlForm($sections)
+$originalSecurity = Get-Acl -LiteralPath $path
+$original = $originalSecurity.GetSecurityDescriptorSddlForm($sections)
+function AccessKeys($security) {
+  $security.GetAccessRules($true, $true, [Security.Principal.SecurityIdentifier]) | ForEach-Object {
+    $_.IdentityReference.Value + ':' + [int]$_.FileSystemRights + ':' + [int]$_.AccessControlType + ':' + $_.IsInherited + ':' + [int]$_.InheritanceFlags + ':' + [int]$_.PropagationFlags
+  } | Sort-Object
+}
+$originalKeys = (AccessKeys $originalSecurity) -join ';'
 $acl = [Security.AccessControl.FileSecurity]::new()
 $acl.SetSecurityDescriptorSddlForm($original, $sections)
 $changed = [Security.AccessControl.FileSecurity]::new()
@@ -1222,7 +1229,9 @@ try {
     $stage = 'restore-acl'
     Set-Acl -LiteralPath $path -AclObject $acl
     $stage = 'verify-restored-acl'
-    if ((Get-Acl -LiteralPath $path).GetSecurityDescriptorSddlForm($sections) -ne $original) {
+    $restored = Get-Acl -LiteralPath $path
+    # Windows can normalize SDDL control flags while preserving the exact rules.
+    if (((AccessKeys $restored) -join ';') -ne $originalKeys -or $restored.AreAccessRulesProtected -ne $originalSecurity.AreAccessRulesProtected) {
       throw 'ACL restoration differed'
     }
   } finally { $identity.Dispose() }
