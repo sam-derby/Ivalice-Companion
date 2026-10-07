@@ -17,6 +17,20 @@ import {
   requireDraft,
 } from './release-publish.mjs';
 import { runtimePackages } from './linux-notices.mjs';
+import { inspectReaderArt, verifyReaderArt } from './reader-art-input.mjs';
+
+test('reader artwork integrity rejects missing or changed images', () =>
+  temporary((root) => {
+    write(root, 'manifest.json', '{"schema":"reader_art_v1"}');
+    write(root, 'images/item-1.png', Buffer.from('89504e470d0a1a0a00', 'hex'));
+    const expected = inspectReaderArt(root);
+    assert.equal(expected.files, 2);
+    verifyReaderArt(root, expected);
+    write(root, 'images/item-1.png', Buffer.from('89504e470d0a1a0a01', 'hex'));
+    assert.throws(() => verifyReaderArt(root, expected), /differs/);
+    fs.unlinkSync(path.join(root, 'images/item-1.png'));
+    assert.throws(() => verifyReaderArt(root, expected), /differs/);
+  }));
 
 test('Linux notices include the selected runtime tree and exclude unused optional crates', () => {
   const metadata = {

@@ -52,6 +52,11 @@ WebView2. Run `npm ci`, then `npm run build`. The installer is written to
 `target/release/bundle/nsis/`; required runtime resources are included in
 source.
 
+Fresh builds recover reader artwork from the pinned published v0.1.5 portable
+using a pinned, development-only Tauri Dumper build. The manifest and all 481
+images are checked against the recorded SHA-256 tree before embedding. Raw
+artwork remains ignored; no private game installation or save is needed.
+
 On Linux, install the same Node and pinned Rust toolchain, plus
 [Tauri's Linux prerequisites](https://v2.tauri.app/start/prerequisites/#linux).
 Run `npm ci`, then `npm run build` for the `.deb` and AppImage under

@@ -37,6 +37,12 @@ and `create_draft` disabled. Download the `packages-windows` and
 | Linux x86_64 | `Ivalice.Companion_X.Y.Z_amd64.deb`     | `Ivalice.Companion_X.Y.Z_x86_64.AppImage`  |
 
 Each package includes the eight runtime resources and five licence notices.
+Fresh builds recover the 481 reader images from the SHA-256-pinned published
+v0.1.5 portable using Tauri Dumper at a fixed source revision. The recovered
+manifest and every image must match the recorded artwork tree hash. Artwork and
+the extraction tool stay in ignored build directories; raw images are not
+committed. The frontend is rebuilt from current source, and packaging verifies
+the artwork copied into `dist/` before accepting either platform's downloads.
 Linux builds extend the existing dependency notice with the selected locked Rust
 runtime tree and the linked distribution libraries' copyright files before
 bundling. Missing licence texts fail the build; upstream workspace licences are

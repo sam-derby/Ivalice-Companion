@@ -1,6 +1,7 @@
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { stageRustNotices, appendNativeNotices } from './linux-notices.mjs';
+import { stageReaderArt } from './reader-art-input.mjs';
 
 // Keep packaging configuration out of Tauri's automatically merged platform
 // files: ordinary cargo checks run before generated notices are staged.
@@ -10,6 +11,7 @@ const configs = {
 };
 const config = configs[process.platform];
 if (!config) throw new Error('Desktop builds support Windows and Linux only');
+await stageReaderArt(process.cwd());
 function tauri(args) {
   const result = spawnSync(
     process.execPath,
