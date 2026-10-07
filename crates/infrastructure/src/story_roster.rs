@@ -4,7 +4,7 @@ use std::{fs, path::Path};
 
 use ivalice_domain::story_roster::ValidatedStoryRoster;
 
-use crate::windows_fs;
+use crate::platform_fs;
 
 pub struct StoryRosterLoader;
 
@@ -16,7 +16,7 @@ pub enum StoryRosterLoadError {
 impl StoryRosterLoader {
     pub fn load(resource_root: &Path) -> Result<ValidatedStoryRoster, StoryRosterLoadError> {
         let path = resource_root.join("resources").join("story-roster-v1.json");
-        windows_fs::validate_regular_file(&path).map_err(|_| StoryRosterLoadError::Unavailable)?;
+        platform_fs::validate_regular_file(&path).map_err(|_| StoryRosterLoadError::Unavailable)?;
         let size = fs::metadata(&path)
             .map_err(|_| StoryRosterLoadError::Unavailable)?
             .len();

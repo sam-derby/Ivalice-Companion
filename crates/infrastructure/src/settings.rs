@@ -7,7 +7,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use serde::{Deserialize, Serialize};
 
 use crate::candidate::{NominatedPath, NominationKind};
-use crate::windows_fs::{self, DirectoryGuard, PathFailure};
+use crate::platform_fs::{self, DirectoryGuard, PathFailure};
 use crate::{MAX_NOMINATIONS, MAX_SETTINGS_BYTES, SETTINGS_SCHEMA};
 
 const SETTINGS_DIRECTORY: &str = "local.ivalice.companion";
@@ -68,12 +68,14 @@ pub struct SettingsStore {
 impl SettingsStore {
     pub fn for_current_user() -> Result<Self, SettingsError> {
         let local_app_data = dirs::data_local_dir().ok_or(SettingsError::KnownFolderUnavailable)?;
+        #[cfg(target_os = "linux")]
+        platform_fs::ensure_data_directory(&local_app_data).map_err(map_path_failure)?;
         Self::for_local_app_data(local_app_data)
     }
 
     pub fn for_local_app_data(local_app_data: impl Into<PathBuf>) -> Result<Self, SettingsError> {
         let local_app_data = local_app_data.into();
-        windows_fs::validate_path_shape(&local_app_data).map_err(map_path_failure)?;
+        platform_fs::validate_path_shape(&local_app_data).map_err(map_path_failure)?;
         Ok(Self {
             root: local_app_data.join(SETTINGS_DIRECTORY),
             local_app_data,
@@ -147,8 +149,8 @@ impl SettingsStore {
     }
 
     fn prepare_root(&self) -> Result<(DirectoryGuard, cap_std::fs::Dir), SettingsError> {
-        windows_fs::validate_supported_volume(&self.local_app_data).map_err(map_path_failure)?;
-        windows_fs::validate_components(&self.local_app_data).map_err(map_path_failure)?;
+        platform_fs::validate_supported_volume(&self.local_app_data).map_err(map_path_failure)?;
+        platform_fs::validate_components(&self.local_app_data).map_err(map_path_failure)?;
         let base_guard = DirectoryGuard::pin(&self.local_app_data).map_err(map_path_failure)?;
         if !self.root.try_exists().map_err(map_io_error)? {
             fs::create_dir(&self.root).map_err(map_io_error)?;
@@ -183,7 +185,7 @@ impl SettingsStore {
         temporary.sync_all().map_err(map_io_error)?;
         drop(temporary);
 
-        let expected_identity = windows_fs::safe_single_link_file(temp_path)
+        let expected_identity = platform_fs::safe_single_link_file(temp_path)
             .map_err(|_| SettingsError::UnsafeDestination)?;
         guard.validate().map_err(map_path_failure)?;
         self.reject_overlaps(protected_sources)?;
@@ -194,7 +196,9 @@ impl SettingsStore {
         root_directory
             .rename(temp_name, root_directory, SETTINGS_FILE)
             .map_err(map_io_error)?;
-        let published_identity = windows_fs::safe_single_link_file(settings_path)
+        #[cfg(target_os = "linux")]
+        guard.sync().map_err(map_path_failure)?;
+        let published_identity = platform_fs::safe_single_link_file(settings_path)
             .map_err(|_| SettingsError::UnsafeDestination)?;
         if published_identity != expected_identity {
             return Err(SettingsError::UnsafeDestination);
@@ -205,13 +209,13 @@ impl SettingsStore {
 
     fn reject_overlaps(&self, protected_sources: &[PathBuf]) -> Result<(), SettingsError> {
         for source in protected_sources {
-            windows_fs::validate_path_shape(source).map_err(map_path_failure)?;
-            if windows_fs::paths_overlap(&self.root, source) {
+            platform_fs::validate_path_shape(source).map_err(map_path_failure)?;
+            if platform_fs::paths_overlap(&self.root, source) {
                 return Err(SettingsError::DestinationOverlap);
             }
             if let (Ok(root), Ok(source)) = (fs::canonicalize(&self.root), fs::canonicalize(source))
             {
-                if windows_fs::paths_overlap(&root, &source) {
+                if platform_fs::paths_overlap(&root, &source) {
                     return Err(SettingsError::DestinationOverlap);
                 }
             }
@@ -237,16 +241,16 @@ fn validate_settings(settings: &Settings) -> Result<(), SettingsError> {
         return Err(SettingsError::TooManyNominations);
     }
     for nomination in &settings.nominations {
-        windows_fs::validate_path_shape(&nomination.path).map_err(map_path_failure)?;
+        platform_fs::validate_path_shape(&nomination.path).map_err(map_path_failure)?;
     }
     if let Some(selected) = &settings.selected_file {
-        windows_fs::validate_path_shape(selected).map_err(map_path_failure)?;
+        platform_fs::validate_path_shape(selected).map_err(map_path_failure)?;
     }
     Ok(())
 }
 
 fn validate_settings_target(path: &Path) -> Result<(), SettingsError> {
-    windows_fs::safe_single_link_file(path).map_err(|_| SettingsError::UnsafeDestination)?;
+    platform_fs::safe_single_link_file(path).map_err(|_| SettingsError::UnsafeDestination)?;
     Ok(())
 }
 
@@ -346,5 +350,5 @@ fn map_path_failure(failure: PathFailure) -> SettingsError {
 }
 
 fn map_io_error(error: io::Error) -> SettingsError {
-    map_path_failure(windows_fs::map_io_error(error))
+    map_path_failure(platform_fs::map_io_error(error))
 }

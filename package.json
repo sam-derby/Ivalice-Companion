@@ -10,8 +10,8 @@
   "scripts": {
     "dev": "tauri dev",
     "dev:web": "vite",
-    "build": "tauri build --config src-tauri/tauri.installer.conf.json -- --locked",
-    "build:installer": "tauri build --config src-tauri/tauri.installer.conf.json -- --locked",
+    "build": "node .github/scripts/build-desktop.mjs",
+    "build:installer": "node .github/scripts/build-desktop.mjs",
     "build:web": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
@@ -20,7 +20,8 @@
     "test": "vitest run",
     "tauri": "tauri",
     "check:rust": "cargo check --workspace --all-targets --locked && cargo clippy --workspace --all-targets --locked -- -D warnings && cargo test --workspace --locked",
-    "validate": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run check:rust && npm run build"
+    "validate": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run test:release && npm run check:rust && npm run build",
+    "test:release": "node --test .github/scripts/release-controls.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "2.11.1",

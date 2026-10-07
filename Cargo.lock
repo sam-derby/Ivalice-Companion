@@ -1615,6 +1615,7 @@ dependencies = [
  "cap-std",
  "dirs",
  "ivalice-domain",
+ "rustix",
  "serde",
  "serde_json",
  "sha2",
