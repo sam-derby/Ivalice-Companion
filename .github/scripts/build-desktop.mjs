@@ -2,9 +2,11 @@ import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { stageRustNotices, appendNativeNotices } from './linux-notices.mjs';
 
+// Keep packaging configuration out of Tauri's automatically merged platform
+// files: ordinary cargo checks run before generated notices are staged.
 const configs = {
   win32: 'src-tauri/tauri.installer.conf.json',
-  linux: 'src-tauri/tauri.linux.conf.json',
+  linux: 'src-tauri/tauri.linux.installer.conf.json',
 };
 const config = configs[process.platform];
 if (!config) throw new Error('Desktop builds support Windows and Linux only');

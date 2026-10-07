@@ -311,14 +311,14 @@ export function packageLinux(root, assets) {
     throw new Error('Debian package metadata differs');
   const extracted = path.join(assets, 'deb-check');
   run('dpkg-deb', ['-x', deb, extracted], root);
-  verifyBundled(root, extracted, 'tauri.linux.conf.json', true);
+  verifyBundled(root, extracted, 'tauri.linux.installer.conf.json', true);
   const appDir = path.join(assets, 'image-check');
   fs.mkdirSync(appDir);
   run(image, ['--appimage-extract'], appDir);
   verifyBundled(
     root,
     path.join(appDir, 'squashfs-root'),
-    'tauri.linux.conf.json',
+    'tauri.linux.installer.conf.json',
     true,
   );
   fs.rmSync(extracted, { recursive: true });
