@@ -26,7 +26,7 @@ impl JobRequirementsLoader {
         if !path.exists() {
             return Err(JobRequirementsLoadError::Missing);
         }
-        platform_fs::validate_regular_file(&path)
+        platform_fs::validate_regular_resource_file(&path)
             .map_err(|_| JobRequirementsLoadError::UnsafePath)?;
         let size = fs::metadata(&path)
             .map_err(|_| JobRequirementsLoadError::UnsafePath)?

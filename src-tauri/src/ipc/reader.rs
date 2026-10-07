@@ -1775,9 +1775,10 @@ mod tests {
     }
 
     fn projected(identity: ReaderIdentity) -> Result<ValidatedReader, IpcError> {
-        let mut document: ReaderDocument =
-            serde_json::from_slice(include_bytes!("../../../tests/fixtures/reader-v2.json"))
-                .map_err(|_| worker_error())?;
+        let mut document: ReaderDocument = serde_json::from_slice(include_bytes!(
+            "../../../tests/fixtures/reader-v2.json"
+        ))
+        .map_err(|_| worker_error())?;
         document.identity = identity;
         ValidatedReader::validate(document).map_err(|_| worker_error())
     }
@@ -2001,7 +2002,7 @@ mod tests {
                     cmd: command.into(),
                     callback: tauri::ipc::CallbackFn(0),
                     error: tauri::ipc::CallbackFn(1),
-                    url: "http://tauri.localhost"
+                    url: crate::ipc::test_invoke_url()
                         .parse()
                         .unwrap_or_else(|error| panic!("{error}")),
                     body: tauri::ipc::InvokeBody::Json(body),

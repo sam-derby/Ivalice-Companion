@@ -16,11 +16,14 @@ test-package workflow artifacts, without creating a release.
 
 Linux is x86_64 GNU/Linux. Ubuntu 22.04 is the packaging baseline to limit the
 minimum glibc requirement. The Linux filesystem implementation accepts local
-ext-family, Btrfs, XFS, tmpfs and overlay filesystems; squashfs permits AppImage
-resource reads. Network filesystems, symlinks in selected paths and hard-linked
-write targets are rejected. If Steam's shortcut directory is a symlink, select
-the real save directory instead. Saves remain where the user selects them; Linux
-settings use the current user's XDG data directory.
+ext-family, Btrfs, XFS, tmpfs and overlay filesystems. Bundled resources may
+also be read from read-only FUSE/AppImage mounts; save access retains the local
+filesystem restrictions. CI mounts a synthetic squashfs image through FUSE and
+checks resource reading and save rejection. Network filesystems, symlinks in
+selected paths and hard-linked write targets are rejected. If Steam's shortcut
+directory is a symlink, select the real save directory instead. Saves remain
+where the user selects them; Linux settings use the current user's XDG data
+directory.
 
 ## Build four downloads without publishing
 

@@ -95,7 +95,7 @@ impl ReaderCatalogueLoader {
         Self {
             path: root.join(RESOURCE_DIRECTORY).join(RESOURCE_FILE),
             bundled_path: None,
-            reader: SnapshotReader::new(),
+            reader: SnapshotReader::for_resources(),
         }
     }
 

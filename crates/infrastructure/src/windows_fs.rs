@@ -115,6 +115,10 @@ pub(crate) fn safe_single_link_file(path: &Path) -> Result<FileIdentity, PathFai
     Ok(identity)
 }
 
+pub(crate) fn validate_regular_resource_file(path: &Path) -> Result<FileIdentity, PathFailure> {
+    validate_regular_file(path)
+}
+
 pub(crate) fn has_unsupported_attributes(metadata: &Metadata) -> bool {
     metadata.file_attributes() & UNSUPPORTED_ATTRIBUTES != 0
 }

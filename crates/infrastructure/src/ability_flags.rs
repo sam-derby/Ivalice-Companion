@@ -18,7 +18,7 @@ impl AbilityFlagsLoader {
         let path = resource_root
             .join("resources")
             .join("ability-flags-v1.json");
-        platform_fs::validate_regular_file(&path)
+        platform_fs::validate_regular_resource_file(&path)
             .map_err(|_| AbilityFlagsLoadError::Unavailable)?;
         let size = fs::metadata(&path)
             .map_err(|_| AbilityFlagsLoadError::Unavailable)?

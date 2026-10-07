@@ -242,6 +242,7 @@ fn reparse_settings_root_is_rejected() -> Result<(), Box<dyn Error>> {
     let script = "New-Item -ItemType Junction -Path $env:IVALICE_D001_LINK -Target $env:IVALICE_D001_TARGET | Out-Null";
     let status = Command::new("powershell.exe")
         .args(["-NoProfile", "-Command", script])
+        .env_remove("PSModulePath")
         .env("IVALICE_D001_LINK", store.root())
         .env("IVALICE_D001_TARGET", &junction_target)
         .status()?;

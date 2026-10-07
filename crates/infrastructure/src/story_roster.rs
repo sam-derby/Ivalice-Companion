@@ -16,7 +16,8 @@ pub enum StoryRosterLoadError {
 impl StoryRosterLoader {
     pub fn load(resource_root: &Path) -> Result<ValidatedStoryRoster, StoryRosterLoadError> {
         let path = resource_root.join("resources").join("story-roster-v1.json");
-        platform_fs::validate_regular_file(&path).map_err(|_| StoryRosterLoadError::Unavailable)?;
+        platform_fs::validate_regular_resource_file(&path)
+            .map_err(|_| StoryRosterLoadError::Unavailable)?;
         let size = fs::metadata(&path)
             .map_err(|_| StoryRosterLoadError::Unavailable)?
             .len();

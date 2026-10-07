@@ -225,6 +225,7 @@ impl CancellationToken {
 #[derive(Clone, Default)]
 pub struct SnapshotReader {
     state: Arc<ReaderState>,
+    read_only_resource: bool,
 }
 
 #[derive(Default)]
@@ -236,6 +237,13 @@ struct ReaderState {
 impl SnapshotReader {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    pub(crate) fn for_resources() -> Self {
+        Self {
+            read_only_resource: true,
+            ..Self::default()
+        }
     }
 
     pub fn cancel_current(&self) {
@@ -345,8 +353,9 @@ fn acquire_attempt(
     ever_observed: &mut bool,
     max_bytes: u64,
 ) -> Result<Snapshot, AttemptFailure> {
-    let expected_path_identity = validate_source_path(path, *ever_observed)?;
-    let mut first = open_source(path, *ever_observed)?;
+    let resource = context.reader.read_only_resource;
+    let expected_path_identity = validate_source_path(path, *ever_observed, resource)?;
+    let mut first = open_source(path, *ever_observed, resource)?;
     let observation = observe_handle(&first)?;
     if observation.identity != expected_path_identity {
         return Err(AttemptFailure::changed());
@@ -374,7 +383,7 @@ fn acquire_attempt(
         .checkpoint(Checkpoint::AfterFirstPass, context.attempt);
     check_stop_attempt(context)?;
     require_unchanged_handle(&first, observation)?;
-    require_current_path(path, observation)?;
+    require_current_path(path, observation, resource)?;
     drop(first);
 
     interruptible_wait_attempt(context, OBSERVATION_INTERVAL)?;
@@ -383,11 +392,11 @@ fn acquire_attempt(
         .checkpoint(Checkpoint::BeforeSecondOpen, context.attempt);
     check_stop_attempt(context)?;
 
-    let expected_second_identity = validate_source_path(path, true)?;
+    let expected_second_identity = validate_source_path(path, true, resource)?;
     if expected_second_identity != observation.identity {
         return Err(AttemptFailure::changed());
     }
-    let mut second = open_source(path, true)?;
+    let mut second = open_source(path, true, resource)?;
     let second_observation = observe_handle(&second)?;
     if !observation.same_source(second_observation) {
         return Err(AttemptFailure::changed());
@@ -398,7 +407,7 @@ fn acquire_attempt(
         .checkpoint(Checkpoint::AfterSecondPass, context.attempt);
     check_stop_attempt(context)?;
     require_unchanged_handle(&second, observation)?;
-    require_current_path(path, observation)?;
+    require_current_path(path, observation, resource)?;
     drop(second);
 
     let digest: [u8; 32] = Sha256::digest(&bytes).into();
@@ -409,8 +418,17 @@ fn acquire_attempt(
     })
 }
 
-fn validate_source_path(path: &Path, was_observed: bool) -> Result<FileIdentity, AttemptFailure> {
-    platform_fs::validate_regular_file(path).map_err(|failure| {
+fn validate_source_path(
+    path: &Path,
+    was_observed: bool,
+    resource: bool,
+) -> Result<FileIdentity, AttemptFailure> {
+    let validation = if resource {
+        platform_fs::validate_regular_resource_file(path)
+    } else {
+        platform_fs::validate_regular_file(path)
+    };
+    validation.map_err(|failure| {
         let mapped = map_path_failure(failure);
         if was_observed && mapped.code == SnapshotErrorCode::NotFound {
             AttemptFailure::changed()
@@ -421,7 +439,11 @@ fn validate_source_path(path: &Path, was_observed: bool) -> Result<FileIdentity,
 }
 
 #[cfg(windows)]
-fn open_source(path: &Path, was_observed: bool) -> Result<SourceHandle, AttemptFailure> {
+fn open_source(
+    path: &Path,
+    was_observed: bool,
+    _resource: bool,
+) -> Result<SourceHandle, AttemptFailure> {
     let path = path
         .to_str()
         .ok_or_else(|| AttemptFailure::terminal(SnapshotErrorCode::InvalidPath, None))?;
@@ -567,12 +589,16 @@ fn require_unchanged_handle(
     }
 }
 
-fn require_current_path(path: &Path, expected: Observation) -> Result<(), AttemptFailure> {
-    let identity = validate_source_path(path, true)?;
+fn require_current_path(
+    path: &Path,
+    expected: Observation,
+    resource: bool,
+) -> Result<(), AttemptFailure> {
+    let identity = validate_source_path(path, true, resource)?;
     if identity != expected.identity {
         return Err(AttemptFailure::changed());
     }
-    let fresh = open_source(path, true)?;
+    let fresh = open_source(path, true, resource)?;
     if expected.same_source(observe_handle(&fresh)?) {
         Ok(())
     } else {
@@ -1208,6 +1234,9 @@ try {
 "#;
         let mut child = Command::new("powershell.exe")
             .args(["-NoProfile", "-NonInteractive", "-Command", script])
+            // PowerShell 7's inherited module path can make Windows PowerShell
+            // load incompatible Core modules on hosted runners.
+            .env_remove("PSModulePath")
             .env("IVALICE_D002_PATH", &path)
             .env("IVALICE_D002_READY", &ready)
             .env("IVALICE_D002_RELEASE", &release)

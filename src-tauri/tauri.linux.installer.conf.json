@@ -1,7 +1,10 @@
 {
   "bundle": {
     "active": true,
-    "targets": ["deb", "appimage"],
+    "targets": [
+      "deb",
+      "appimage"
+    ],
     "category": "Utility",
     "shortDescription": "Offline Ivalice Chronicles save companion and editor",
     "resources": {
