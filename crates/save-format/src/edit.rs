@@ -1661,9 +1661,8 @@ fn named_character_id(character: u8) -> bool {
     matches!(character, 4..=52 | 60 | 62 | 64..=65 | 67 | 69 | 72..=76 | 115..=127)
 }
 
-/// Creature identities cannot use the human donor initializer: it would inherit
-/// human metadata and fall back to Squire. CharaName/Job tables at d3123d2;
-/// their complete creature construction remains T074/T075.
+/// Creatures need their own initializer; a human donor would make them Squires.
+/// Human identities come from the CharaName/Job tables at d3123d2.
 pub fn named_human_initialization_supported(character: u8) -> bool {
     matches!(character, 4..=52 | 74..=76 | 120..=127)
 }

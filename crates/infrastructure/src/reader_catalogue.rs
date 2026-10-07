@@ -622,7 +622,7 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "run only under D032's registered local source-artifact reproduction"]
+    #[ignore = "requires the locally generated catalogue fixture"]
     fn registered_offline_artifact_loads_without_changing_source() -> Result<(), Box<dyn Error>> {
         let repository = Path::new(env!("CARGO_MANIFEST_DIR"))
             .parent()

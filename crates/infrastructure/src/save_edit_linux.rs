@@ -226,8 +226,8 @@ fn rotate_save(
         if recovery.identity != backup_copy_id || recovery.bytes != original {
             return Err(SaveEditError::BackupFailed);
         }
-        // The backup must have its own inode. A game retaining an open source
-        // descriptor can otherwise modify a renamed backup after we return.
+        // Copy the backup: a game with the old file open could still write to
+        // its inode after a rename.
         guard
             .rename(backup_copy, backup, backup_exists)
             .map_err(|_| SaveEditError::BackupFailed)?;

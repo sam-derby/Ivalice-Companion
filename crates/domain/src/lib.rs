@@ -1,8 +1,5 @@
-//! Evidence-aware normalized save values.
-//!
-//! This crate deliberately contains no binary coordinates, paths, filesystem
-//! access, Tauri types, or game-data labels. Adapters translate verified binary
-//! records into these values only after their own bounds and support checks.
+//! Normalized save values and deterministic rules. Binary decoding and I/O
+//! live in the format and infrastructure crates.
 
 use serde::{Deserialize, Serialize};
 
@@ -94,10 +91,7 @@ pub struct SnapshotProvenance {
     pub byte_length: SnapshotByteLength,
 }
 
-/// An evidence-scoped game writer build label.
-///
-/// The current supported structure has no verified writer build, so production
-/// D004 values use `ValueState::Unknown` rather than inventing one.
+/// Game build that wrote the save. Currently unknown for supported saves.
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct GameBuild(String);
@@ -141,7 +135,7 @@ pub struct ContainerMetadata {
 pub struct ManualSlotId(u8);
 
 impl ManualSlotId {
-    /// The R005 manual layout contains exactly fifty positions, indexed 0–49.
+    /// Manual slots run from 0 to 49.
     pub fn new(index: u8) -> Result<Self, DomainValueError> {
         if index >= 50 {
             return Err(DomainValueError::ManualSlotOutOfRange(index));
@@ -202,8 +196,7 @@ pub struct SamuraiPrerequisiteLevels {
     pub dragoon: u8,
 }
 
-/// The installed selected Samurai row from R027/R028. This evaluates level
-/// requirements only; per-unit Change Job availability remains unknown.
+/// Samurai's installed level requirements. Change Job availability is separate.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum RequirementState {
@@ -246,7 +239,7 @@ fn compare_level(current_level: u8, required_level: u8) -> LevelRequirementProgr
     }
 }
 
-/// Compare only the six installed Samurai level thresholds verified by R027.
+/// Compare the six verified Samurai level requirements.
 #[must_use]
 pub fn compare_samurai_prerequisites(
     levels: &SamuraiPrerequisiteLevels,
@@ -278,7 +271,7 @@ pub struct ManualSlot {
     pub id: ManualSlotId,
 }
 
-/// The complete D004 normalized result prepared for later IPC serialization.
+/// Normalized save data for IPC.
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct NormalizedSave {
