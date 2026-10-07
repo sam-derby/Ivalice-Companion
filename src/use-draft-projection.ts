@@ -28,7 +28,7 @@ function projected(operation: Operation): boolean {
   );
 }
 
-/** Only operations which affect these mechanics invalidate their projection. */
+// Unrelated edits shouldn't restart the stat preview.
 function transactionKey(transaction: SaveTransactionRequest | null): string {
   return transaction
     ? JSON.stringify([
@@ -42,7 +42,7 @@ function transactionKey(transaction: SaveTransactionRequest | null): string {
     : '';
 }
 
-/** Text is committed on blur/Enter/review. Only Rust-computed bases enter the draft. */
+/** Commit inputs on blur, Enter or review, using Rust's calculated bases. */
 export function useDraftProjection(
   transaction: SaveTransactionRequest | null,
   onBase: (position: number, stat: BaseStatKind, base: number) => void,
@@ -71,7 +71,7 @@ export function useDraftProjection(
       if (!transaction || failure?.key === key) return;
       const input = pending;
       const document = projection?.key === key ? projection.reader : baseline;
-      // Gear/movement must be projected before using their new bonuses for an input.
+      // Refresh gear and movement bonuses before calculating an input.
       if (needsProjection || !input) {
         void previewDraft({ transaction })
           .then((result) => {
@@ -175,7 +175,6 @@ export function useDraftProjection(
             ],
           });
           onBase(input.position, input.stat, result.storedBase);
-          // Presentation copies the backend's one-field result; no stat formula runs here.
           setProjection({
             key: acceptedKey,
             reader: {
@@ -229,7 +228,7 @@ export function useDraftProjection(
   useEffect(() => {
     if (!key || (!needsProjection && !inputKey)) return;
     let active = true;
-    // Only equipment/movement changes need a debounced full-draft preview.
+    // Debounce gear changes; stat inputs are already committed explicitly.
     const timer = window.setTimeout(
       () => {
         runPreview(() => active, key);

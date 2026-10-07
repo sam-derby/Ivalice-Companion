@@ -1,7 +1,6 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
-/** A small info icon carrying a description, for text without its own icon. */
 export function InfoHint({
   text,
   label,
