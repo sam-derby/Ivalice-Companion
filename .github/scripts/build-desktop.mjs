@@ -3,8 +3,7 @@ import path from 'node:path';
 import { stageRustNotices, appendNativeNotices } from './linux-notices.mjs';
 import { stageReaderArt } from './reader-art-input.mjs';
 
-// Keep packaging configuration out of Tauri's automatically merged platform
-// files: ordinary cargo checks run before generated notices are staged.
+// Pass bundle configs explicitly: cargo check runs before notices are generated.
 const configs = {
   win32: 'src-tauri/tauri.installer.conf.json',
   linux: 'src-tauri/tauri.linux.installer.conf.json',

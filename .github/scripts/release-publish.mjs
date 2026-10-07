@@ -1,4 +1,4 @@
-// Called only by the trusted release job after both platform jobs succeed.
+// Runs after both platform builds pass.
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
@@ -85,7 +85,7 @@ export function publishDraft(root, tag) {
     requireDraft(JSON.parse(existing.stdout));
     gh(['release', 'upload', tag, ...assets, '--clobber']);
   } else {
-    // Creation fails if a release exists, including on an ambiguous read error.
+    // Let creation fail if the earlier lookup missed an existing release.
     gh([
       'release',
       'create',
@@ -99,7 +99,7 @@ export function publishDraft(root, tag) {
       ...assets,
     ]);
   }
-  // Confirm all uploaded bytes using GitHub's asset digests before reporting.
+  // Check GitHub's digests against the files we uploaded.
   const repo = process.env.GH_REPO;
   if (!repo || !/^[\w.-]+\/[\w.-]+$/.test(repo))
     throw new Error('Invalid release repository');
