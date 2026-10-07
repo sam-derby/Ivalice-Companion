@@ -6,7 +6,17 @@ use std::time::{Duration, Instant};
 
 use sha2::{Digest, Sha256};
 
-use crate::windows_fs::{self, FileIdentity, PathFailure};
+use crate::platform_fs::{self, FileIdentity, PathFailure};
+
+#[cfg(windows)]
+type LastWriteTime = u64;
+#[cfg(target_os = "linux")]
+type LastWriteTime = (i64, i64, i64, i64);
+#[cfg(target_os = "linux")]
+#[path = "snapshot_linux.rs"]
+mod linux;
+#[cfg(target_os = "linux")]
+use linux::{observe_handle, open_source, SourceHandle};
 
 pub const MAX_SNAPSHOT_BYTES: u64 = 64 * 1024 * 1024;
 pub const SNAPSHOT_ATTEMPTS: u8 = 3;
@@ -14,11 +24,17 @@ const READ_CHUNK_BYTES: usize = 1024 * 1024;
 const OBSERVATION_INTERVAL: Duration = Duration::from_millis(100);
 const RETRY_DELAYS: [Duration; 2] = [Duration::from_millis(100), Duration::from_millis(200)];
 const ELAPSED_BUDGET: Duration = Duration::from_secs(2);
+#[cfg(windows)]
 const FILE_ATTRIBUTE_DIRECTORY: u32 = 0x0000_0010;
+#[cfg(windows)]
 const FILE_ATTRIBUTE_REPARSE_POINT: u32 = 0x0000_0400;
+#[cfg(windows)]
 const FILE_ATTRIBUTE_OFFLINE: u32 = 0x0000_1000;
+#[cfg(windows)]
 const FILE_ATTRIBUTE_RECALL_ON_OPEN: u32 = 0x0004_0000;
+#[cfg(windows)]
 const FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS: u32 = 0x0040_0000;
+#[cfg(windows)]
 const UNSUPPORTED_ATTRIBUTES: u32 = FILE_ATTRIBUTE_REPARSE_POINT
     | FILE_ATTRIBUTE_OFFLINE
     | FILE_ATTRIBUTE_RECALL_ON_OPEN
@@ -130,10 +146,11 @@ impl Snapshot {
 struct Observation {
     identity: FileIdentity,
     length: u64,
-    last_write_time: u64,
+    last_write_time: LastWriteTime,
 }
 
 impl Observation {
+    #[cfg(windows)]
     fn from_information(
         information: &winsafe::BY_HANDLE_FILE_INFORMATION,
     ) -> Result<Self, AttemptFailure> {
@@ -155,7 +172,7 @@ impl Observation {
         }
         Ok(Self {
             identity: FileIdentity {
-                volume: information.dwVolumeSerialNumber,
+                volume: u64::from(information.dwVolumeSerialNumber),
                 index: information.nFileIndex(),
             },
             length: information.nFileSize(),
@@ -393,7 +410,7 @@ fn acquire_attempt(
 }
 
 fn validate_source_path(path: &Path, was_observed: bool) -> Result<FileIdentity, AttemptFailure> {
-    windows_fs::validate_regular_file(path).map_err(|failure| {
+    platform_fs::validate_regular_file(path).map_err(|failure| {
         let mapped = map_path_failure(failure);
         if was_observed && mapped.code == SnapshotErrorCode::NotFound {
             AttemptFailure::changed()
@@ -403,6 +420,7 @@ fn validate_source_path(path: &Path, was_observed: bool) -> Result<FileIdentity,
     })
 }
 
+#[cfg(windows)]
 fn open_source(path: &Path, was_observed: bool) -> Result<SourceHandle, AttemptFailure> {
     let path = path
         .to_str()
@@ -425,10 +443,12 @@ fn open_source(path: &Path, was_observed: bool) -> Result<SourceHandle, AttemptF
     .map_err(|error| map_windows_failure(error, was_observed))
 }
 
+#[cfg(windows)]
 struct SourceHandle {
     handle: winsafe::guard::CloseHandleGuard<winsafe::HFILE>,
 }
 
+#[cfg(windows)]
 impl SourceHandle {
     fn read_chunk(&self, buffer: &mut [u8]) -> Result<usize, AttemptFailure> {
         self.handle
@@ -448,6 +468,7 @@ impl ChunkSource for SourceHandle {
     }
 }
 
+#[cfg(windows)]
 fn observe_handle(file: &SourceHandle) -> Result<Observation, AttemptFailure> {
     if file
         .handle
@@ -705,6 +726,7 @@ fn map_path_failure(failure: PathFailure) -> AttemptFailure {
     )
 }
 
+#[cfg(windows)]
 fn map_windows_failure(error: winsafe::co::ERROR, was_observed: bool) -> AttemptFailure {
     let os_code = Some(error.raw());
     match os_code {
@@ -727,13 +749,19 @@ fn lock_recover<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
 #[cfg(test)]
 mod tests {
     use std::error::Error;
-    use std::fs::{self, File, FileTimes, OpenOptions};
+    #[cfg(windows)]
+    use std::fs::File;
+    use std::fs::{self, FileTimes, OpenOptions};
     use std::io::{Cursor, Read};
+    #[cfg(windows)]
     use std::os::windows::fs::{MetadataExt, OpenOptionsExt};
     use std::path::{Path, PathBuf};
+    #[cfg(windows)]
     use std::process::{Command, Stdio};
     use std::sync::atomic::{AtomicU64, Ordering};
+    #[cfg(windows)]
     use std::thread;
+    #[cfg(windows)]
     use std::time::Instant;
 
     use super::*;
@@ -765,12 +793,10 @@ mod tests {
         let after_acquisition = fs::metadata(&path)?;
         assert_eq!(fs::read(&path)?, before);
         assert_eq!(after_acquisition.len(), metadata.len());
-        assert_eq!(
-            after_acquisition.last_write_time(),
-            metadata.last_write_time()
-        );
+        assert_eq!(after_acquisition.modified()?, metadata.modified()?);
         let expected_digest: [u8; 32] = Sha256::digest(&before).into();
         assert_eq!(snapshot.sha256, expected_digest);
+        #[cfg(windows)]
         assert_eq!(
             snapshot.observed.last_write_time,
             metadata.last_write_time()
@@ -1103,6 +1129,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(windows)]
     fn sharing_violation_retries_three_times_without_changing_source() -> Result<(), Box<dyn Error>>
     {
         let bytes = b"busy synthetic source";
@@ -1126,6 +1153,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(windows)]
     fn read_data_denial_is_terminal_and_acl_is_restored() -> Result<(), Box<dyn Error>> {
         let bytes = b"denied synthetic source";
         let path = synthetic_file("denied", bytes)?;

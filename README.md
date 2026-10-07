@@ -1,7 +1,7 @@
 # Ivalice Companion
 
-An offline Windows save reader and editor for FINAL FANTASY TACTICS - The
-Ivalice Chronicles (Steam Enhanced).
+An offline save reader and editor for FINAL FANTASY TACTICS - The Ivalice
+Chronicles (Steam Enhanced).
 
 ## Download
 
@@ -10,6 +10,13 @@ or
 [the portable ZIP](https://github.com/sam-derby/Ivalice-Companion/releases/download/v0.1.5/Ivalice.Companion_0.1.5_x64-portable.zip).
 SHA-256 checksums are listed in the
 [release notes](https://github.com/sam-derby/Ivalice-Companion/releases/tag/v0.1.5).
+
+Linux / Steam Deck test builds are prepared by the
+[package workflow](https://github.com/sam-derby/Ivalice-Companion/actions/workflows/release.yml):
+a `.deb` installer for Debian/Ubuntu and an AppImage portable for x86_64 Linux.
+They are separate from the existing Windows v0.1.5 downloads. See
+[desktop deployment](.github/DEPLOYMENT.md) for build artifacts and
+installation.
 
 ## Features
 
@@ -45,10 +52,23 @@ WebView2. Run `npm ci`, then `npm run build`. The installer is written to
 `target/release/bundle/nsis/`; required runtime resources are included in
 source.
 
+On Linux, install the same Node and pinned Rust toolchain, plus
+[Tauri's Linux prerequisites](https://v2.tauri.app/start/prerequisites/#linux).
+Run `npm ci`, then `npm run build` for the `.deb` and AppImage under
+`target/release/bundle/`. Ubuntu 22.04 is the CI build baseline. Linux settings
+use the current user's XDG data directory. Use Steam Deck Desktop Mode for the
+AppImage, and select the real save directory if a Steam shortcut is a symlink.
+
 Run `npm run validate` for formatting, lint, TypeScript, frontend regressions,
 Rust checks, Clippy, tests and the installer build. Optional real-save tests are
 ignored or skipped without private inputs; no private inputs are needed for
 validation.
+
+Pull requests and branch pushes validate on Windows and Ubuntu and upload test
+packages. The package workflow produces both installers and both portables,
+verifies their resources and notices, and creates checksums. A matching new
+version tag prepares a draft release; publishing it remains an explicit owner
+action.
 
 ## Licence
 

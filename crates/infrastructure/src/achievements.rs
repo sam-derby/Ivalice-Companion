@@ -4,7 +4,7 @@ use std::{fs, path::Path};
 
 use ivalice_domain::achievements::ValidatedAchievements;
 
-use crate::windows_fs;
+use crate::platform_fs;
 
 pub struct AchievementsLoader;
 
@@ -16,7 +16,8 @@ pub enum AchievementsLoadError {
 impl AchievementsLoader {
     pub fn load(resource_root: &Path) -> Result<ValidatedAchievements, AchievementsLoadError> {
         let path = resource_root.join("resources").join("achievements-v1.json");
-        windows_fs::validate_regular_file(&path).map_err(|_| AchievementsLoadError::Unavailable)?;
+        platform_fs::validate_regular_file(&path)
+            .map_err(|_| AchievementsLoadError::Unavailable)?;
         let size = fs::metadata(&path)
             .map_err(|_| AchievementsLoadError::Unavailable)?
             .len();

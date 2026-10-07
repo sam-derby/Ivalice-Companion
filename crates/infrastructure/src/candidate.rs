@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use crate::windows_fs::{self, PathFailure};
+use crate::platform_fs::{self, PathFailure};
 use crate::MAX_NOMINATIONS;
 
 const DISCOVERED_FILENAME: &str = "enhanced.png";
@@ -45,7 +45,7 @@ impl NominatedPath {
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct CandidateIdentity {
-    pub volume: u32,
+    pub volume: u64,
     pub file_index: u64,
 }
 
@@ -111,17 +111,17 @@ impl CandidateValidator for NativeCandidateValidator {
         let lexical_overlap = self
             .settings_root
             .as_deref()
-            .is_some_and(|root| windows_fs::paths_overlap(path, root));
+            .is_some_and(|root| platform_fs::paths_overlap(path, root));
         let resolved_overlap = self.settings_root.as_deref().is_some_and(|root| {
             fs::canonicalize(path)
                 .ok()
                 .zip(fs::canonicalize(root).ok())
-                .is_some_and(|(path, root)| windows_fs::paths_overlap(&path, &root))
+                .is_some_and(|(path, root)| platform_fs::paths_overlap(&path, &root))
         });
         if lexical_overlap || resolved_overlap {
             return Err(CandidateErrorCode::UnsupportedLocation);
         }
-        windows_fs::validate_regular_file(path)
+        platform_fs::validate_regular_file(path)
             .map(|identity| CandidateIdentity {
                 volume: identity.volume,
                 file_index: identity.index,
@@ -184,6 +184,7 @@ fn classify(mut candidates: Vec<Candidate>) -> CandidateSet {
     }
 }
 
+#[cfg(windows)]
 fn ordinal_path_key(path: &Path) -> (Vec<u16>, Vec<u16>) {
     let exact: Vec<u16> = path.as_os_str().encode_wide().collect();
     let folded: Vec<u16> = path
@@ -207,4 +208,11 @@ fn map_path_failure(failure: PathFailure) -> CandidateErrorCode {
     }
 }
 
+#[cfg(windows)]
 use std::os::windows::ffi::OsStrExt;
+
+#[cfg(target_os = "linux")]
+fn ordinal_path_key(path: &Path) -> Vec<u8> {
+    use std::os::unix::ffi::OsStrExt;
+    path.as_os_str().as_bytes().to_vec()
+}

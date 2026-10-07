@@ -16,7 +16,7 @@ const UNSUPPORTED_ATTRIBUTES: u32 = FILE_ATTRIBUTE_REPARSE_POINT
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub(crate) struct FileIdentity {
-    pub(crate) volume: u32,
+    pub(crate) volume: u64,
     pub(crate) index: u64,
 }
 
@@ -200,7 +200,7 @@ fn query_path_info(
 
 fn identity_from_information(information: &winsafe::BY_HANDLE_FILE_INFORMATION) -> FileIdentity {
     FileIdentity {
-        volume: information.dwVolumeSerialNumber,
+        volume: u64::from(information.dwVolumeSerialNumber),
         index: information.nFileIndex(),
     }
 }
