@@ -15,8 +15,7 @@ revision `07ea857a0d2b7a96190f18ee10cfd99dbcf37a1b` (GPL-3.0):
 TICSaveEditor credits Nenkai's MIT-licensed FF16Tools
 `FF16Tools.Files/Save/FaithSaveFile.cs` and `CompressDict.cs` at revision
 `dd91fb451d3b2e97bc637b5d43388e7118c145bf` for the UMIF implementation and
-dictionary. Matching the XOR key and byte processing does not by itself show
-that the Rust code copied FF16Tools source. See the
+dictionary. This port follows TICSaveEditor's implementation. See the
 [root notices](../../NOTICE.md) and [MIT terms](../../LICENSES/Nenkai-MIT.txt).
 
 The port adds bounds and integrity checks and scoped manual-slot edits. File

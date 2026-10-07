@@ -1,4 +1,4 @@
-// Package only files from the curated checkout. No private workspace inputs.
+// Assemble and check the four downloads from a public checkout.
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
@@ -19,7 +19,6 @@ function verifyBuiltArtwork(root) {
   verifyReaderArt(path.join(root, 'dist/reader-art'), source);
 }
 
-/** The portable package's instructions for one version. */
 export function portableText(version) {
   return [
     `${PRODUCT} ${version} - portable Windows x64 package`,

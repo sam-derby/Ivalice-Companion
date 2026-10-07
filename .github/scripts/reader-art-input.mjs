@@ -1,7 +1,6 @@
-// Recover only the artwork already shipped in the pinned public release.
+// Recover reader artwork from the pinned release.
 // Tauri Dumper v0.2.2, MIT, source revision ca887d212f5963baad85589baaabd086bb08c3f4:
 // https://github.com/Mas0nShi/tauri-dumper/tree/ca887d212f5963baad85589baaabd086bb08c3f4
-// This tool and the extracted game artwork remain ignored development inputs.
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
@@ -101,7 +100,7 @@ export async function stageReaderArt(root) {
     'bin',
     process.platform === 'win32' ? 'tauri-dumper.exe' : 'tauri-dumper',
   );
-  // Compile on the host's baseline, avoiding a newer prebuilt tool's glibc floor.
+  // Build locally so the tool works with the runner's glibc.
   run(
     'cargo',
     [

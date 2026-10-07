@@ -1,97 +1,83 @@
 # Desktop builds and releases
 
-This directory is synced into the curated public repository. The application
-version stays at 0.1.5 until the owner requests a version change. Existing
-published releases are never changed by these workflows.
+## Test builds
 
-## Validation
+`Validate` runs on pull requests, branch pushes and manual dispatch. It checks
+formatting, lint, TypeScript, frontend tests, Rust, Clippy and packaging on
+Windows 2022 and Ubuntu 22.04. Both jobs upload test packages; they don't create
+a release.
 
-`Validate` runs on pull requests, branch pushes, and manual dispatch. Windows
-2022 and Ubuntu 22.04 run the public `npm run validate`: formatting, lint,
-TypeScript, frontend and packaging controls, Rust check, Clippy with warnings
-denied, tests, and the platform's installer build. Node and Rust are pinned by
-the repository; actions use exact commit revisions. WIP features stay hidden.
-Successful validation also uploads both platforms' installer and portable as
-test-package workflow artifacts, without creating a release.
-
-Linux is x86_64 GNU/Linux. Ubuntu 22.04 is the packaging baseline to limit the
-minimum glibc requirement. The Linux filesystem implementation accepts local
-ext-family, Btrfs, XFS, tmpfs and overlay filesystems. Bundled resources may
-also be read from read-only FUSE/AppImage mounts; save access retains the local
-filesystem restrictions. CI mounts a synthetic squashfs image through FUSE and
-checks resource reading and save rejection. Network filesystems, symlinks in
-selected paths and hard-linked write targets are rejected. If Steam's shortcut
-directory is a symlink, select the real save directory instead. Saves remain
-where the user selects them; Linux settings use the current user's XDG data
-directory.
-
-Linux saves flush an independent backup before replacing the selected file, so a
-process retaining an old source descriptor cannot later mutate that backup.
-Failed publication preserves the original or reports that recovery is required;
-it never replaces a file that appeared concurrently at the selected name.
-
-## Build four downloads without publishing
-
-Run `Build release packages` manually on the desired branch. Leave `tag` empty
+To build a particular branch, run `Build release packages` with an empty `tag`
 and `create_draft` disabled. Download the `packages-windows` and
-`packages-linux` workflow artifacts. They expire after 30 days.
+`packages-linux` artifacts within 30 days.
 
 | Platform     | Installer                               | Portable                                   |
 | ------------ | --------------------------------------- | ------------------------------------------ |
 | Windows x64  | `Ivalice.Companion_X.Y.Z_x64-setup.exe` | `Ivalice.Companion_X.Y.Z_x64-portable.zip` |
 | Linux x86_64 | `Ivalice.Companion_X.Y.Z_amd64.deb`     | `Ivalice.Companion_X.Y.Z_x86_64.AppImage`  |
 
-Each package includes the eight runtime resources and five licence notices.
-Fresh builds recover the 481 reader images from the SHA-256-pinned published
-v0.1.5 portable using Tauri Dumper at a fixed source revision. The recovered
-manifest and every image must match the recorded artwork tree hash. Artwork and
-the extraction tool stay in ignored build directories; raw images are not
-committed. The frontend is rebuilt from current source, and packaging verifies
-the artwork copied into `dist/` before accepting either platform's downloads.
-Linux builds extend the existing dependency notice with the selected locked Rust
-runtime tree and the linked distribution libraries' copyright files before
-bundling. Missing licence texts fail the build; upstream workspace licences are
-retrieved only at the exact revision recorded in the package archive. Windows
-portable files come from the extracted installer and are verified against the
-build; no WebView2 or installation behavior changes. Linux packages are
-extracted and their resources/notices checked before upload. Package scripts
-refuse stale bundles, collisions and missing files, and create SHA-256
-manifests.
+Each package includes the runtime resources and licence notices, with a
+`SHA256SUMS.txt` alongside the downloads. Packaging checks the extracted files
+before uploading them. The Windows ZIP comes from the installer, so both ship
+the same executable and resources. WebView2 and installation behavior are
+unchanged.
 
-Install the Linux `.deb` using the distribution's package manager, for example
-`sudo apt install ./Ivalice.Companion_X.Y.Z_amd64.deb`. Steam Deck users should
-use the AppImage in Desktop Mode. Make it executable with `chmod +x`, then open
-it. If FUSE is unavailable, try the AppImage's `--appimage-extract-and-run`
-option. The AppImage needs no installation; settings still live in the XDG data
-directory.
+## Linux notes
 
-## Prepare a release
+Ubuntu 22.04 is the build baseline. Install the `.deb` with the package manager,
+for example `sudo apt install ./Ivalice.Companion_X.Y.Z_amd64.deb`.
 
-1. Obtain the owner's authorization for a release and version change. Update
-   npm, Tauri and Cargo application versions and lockfiles together.
-2. Review and commit the curated source. Push a new matching `vX.Y.Z` tag.
-   Alternatively, dispatch the package workflow with that existing tag and
-   enable `create_draft`. Never move an old tag to redeploy.
-3. Both platforms must validate and produce their installer and portable. Only
-   then does the write-enabled job create a **draft** GitHub release with all
-   four packages and `SHA256SUMS.txt`. It verifies uploaded asset digests.
-   Reruns may update drafts; published releases are refused.
-4. Review the draft, checksums and actual package smoke tests. Verify Windows
-   install/upgrade and portable behavior. On Linux/Steam Deck, use disposable
-   save copies to test read, edit, backup, save, game loading, restore and game
-   loading again. Check the app header matches the package version.
-5. Publish the draft on GitHub when ready. Linux packages initially remain Linux
-   / Steam Deck test builds until the owner accepts runtime results.
+For Steam Deck, use the AppImage in Desktop Mode. Make it executable with
+`chmod +x`, then open it. If FUSE is unavailable, try
+`--appimage-extract-and-run`. Settings live in the user's XDG data directory.
 
-No workflow automatically increments versions, changes game installations,
-uploads personal saves, publishes to Nexus, or pushes source changes.
+Saves can be on local ext-family, Btrfs, XFS, tmpfs or overlay filesystems.
+Network filesystems, symlinks in the selected path and hard-linked write targets
+are rejected. If a Steam shortcut is a symlink, choose the real save directory.
+AppImage resources can be read through FUSE; saves can't.
 
-## Local commands in the public checkout
+Before replacing a save, the Linux writer flushes an independent backup. Copying
+matters here: the game may still have the old file open. A failed replacement
+leaves the original in place or reports that recovery is needed. It won't
+overwrite a file that appeared at the same name during the write.
 
-Run `npm ci`, then `npm run validate`. `npm run build` selects NSIS on Windows
-and `.deb` plus AppImage on Linux. To verify and assemble downloads, run
-`node .github/scripts/release-package.mjs windows` or the equivalent `linux`.
-The output is `target/release-assets/<platform>/`. On Windows, 7-Zip must be on
-PATH, or set `SEVEN_ZIP` to its executable. Packaging outputs must be absent
-before rerunning. These commands need only the curated checkout's committed
-resources and artwork, never private development inputs.
+Linux packages are test builds until real Linux/Steam Deck testing confirms read
+→ edit → backup → save → game load, plus restore and another game load. Use
+disposable save copies. CI covers filesystem behavior, including a real FUSE
+mount, but doesn't test the GUI or Proton.
+
+## Build from the public checkout
+
+Run `npm ci`, then `npm run validate`. For just a build, `npm run build`
+produces NSIS on Windows or a `.deb` and AppImage on Linux. Assemble the
+downloads with `node .github/scripts/release-package.mjs windows` (or `linux`).
+Output goes to `target/release-assets/<platform>/`; clear old packaging outputs
+before rerunning. Windows needs 7-Zip on PATH, or `SEVEN_ZIP` set to its
+executable.
+
+Fresh builds recover 481 reader images and their manifest from the pinned v0.1.5
+portable using Tauri Dumper at a fixed revision. The archive, recovered tree and
+built artwork are checked against SHA-256 hashes. The tool and raw artwork stay
+in ignored build directories.
+
+Linux builds also collect notices for locked Rust dependencies and linked
+distribution libraries. Missing licence texts fail the build; any fetched
+workspace licence comes from the crate's recorded revision.
+
+## Release
+
+Keep the app at 0.1.5 until a version change is requested.
+
+1. Update npm, Tauri and Cargo versions and lockfiles together for an approved
+   release. Commit the curated source and push a new matching `vX.Y.Z` tag.
+   Don't move old tags.
+2. The workflow builds all four packages and creates a **draft** release with
+   checksums. You can also run it manually with an existing matching tag and
+   `create_draft` enabled. Reruns can update drafts; published releases are left
+   alone.
+3. Check the downloads, Windows installation/upgrade and portable behavior.
+   Confirm the app header matches the package version and review Linux runtime
+   results.
+4. Publish the draft when ready. Nexus uploads are separate.
+
+The workflows don't bump versions or publish drafts automatically.

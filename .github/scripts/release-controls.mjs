@@ -89,7 +89,7 @@ test('portable ZIP reads back exact executable and resource bytes and rejects co
     assert.deepEqual([...readZip(file)], entries);
     const bytes = fs.readFileSync(file);
     bytes[14] ^= 1;
-    // Corrupt the compressed payload, rather than metadata ignored by readers.
+    // Damage the payload so the CRC check has something to catch.
     bytes[30 + Buffer.byteLength(entries[0][0])] ^= 0xff;
     fs.writeFileSync(file, bytes);
     assert.throws(() => readZip(file));

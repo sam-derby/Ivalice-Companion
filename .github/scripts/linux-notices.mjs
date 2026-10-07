@@ -1,4 +1,4 @@
-// Development-only notice staging. The installed app never downloads anything.
+// Collect the notices needed by Linux packages.
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
@@ -41,8 +41,8 @@ async function licenceTexts(pkg) {
           `${name}\n\n${fs.readFileSync(path.join(directory, name), 'utf8')}`,
       )
       .join('\n\n');
-  // Some workspace crates omit the shared licence from their registry archive.
-  // Read it at the exact source revision recorded in that archive, never HEAD.
+  // Registry archives sometimes omit workspace licences. Fetch the missing
+  // text from the revision recorded in the archive.
   const vcs = JSON.parse(
     fs.readFileSync(path.join(directory, '.cargo_vcs_info.json'), 'utf8'),
   );
