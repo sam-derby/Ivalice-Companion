@@ -15,6 +15,7 @@ import {
   expectedAssets,
   verifyAssets,
   requireDraft,
+  draftApiPath,
 } from './release-publish.mjs';
 import { runtimePackages } from './linux-notices.mjs';
 import { inspectReaderArt, verifyReaderArt } from './reader-art-input.mjs';
@@ -240,4 +241,25 @@ test('published releases cannot be overwritten', () => {
   requireDraft({ isDraft: true });
   assert.throws(() => requireDraft({ isDraft: false }), /published/);
   assert.throws(() => requireDraft({}), /published/);
+});
+
+test('draft verification uses its release ID and rejects published or unrelated endpoints', () => {
+  const draft = {
+    isDraft: true,
+    apiUrl: 'https://api.github.com/repos/owner/app/releases/123',
+  };
+  assert.equal(
+    draftApiPath(draft, 'owner/app'),
+    'repos/owner/app/releases/123',
+  );
+  assert.throws(
+    () => draftApiPath({ ...draft, isDraft: false }, 'owner/app'),
+    /published/,
+  );
+  assert.throws(() => draftApiPath(draft, 'other/app'), /endpoint/);
+  assert.throws(
+    () =>
+      draftApiPath({ ...draft, apiUrl: draft.apiUrl + '/assets' }, 'owner/app'),
+    /endpoint/,
+  );
 });

@@ -61,6 +61,18 @@ export function requireDraft(release) {
     );
 }
 
+export function draftApiPath(release, repository) {
+  requireDraft(release);
+  const prefix = `https://api.github.com/repos/${repository}/releases/`;
+  if (
+    typeof release.apiUrl !== 'string' ||
+    !release.apiUrl.startsWith(prefix) ||
+    !/^\d+$/.test(release.apiUrl.slice(prefix.length))
+  )
+    throw new Error('Invalid draft release endpoint');
+  return `repos/${repository}/releases/${release.apiUrl.slice(prefix.length)}`;
+}
+
 function gh(args) {
   const result = spawnSync('gh', args, { encoding: 'utf8' });
   if (result.error || result.status !== 0)
@@ -109,9 +121,10 @@ export function publishDraft(root, tag) {
   const repo = process.env.GH_REPO;
   if (!repo || !/^[\w.-]+\/[\w.-]+$/.test(repo))
     throw new Error('Invalid release repository');
-  const released = JSON.parse(
-    gh(['api', `repos/${repo}/releases/tags/${tag}`]),
+  const draft = JSON.parse(
+    gh(['release', 'view', tag, '--json', 'apiUrl,isDraft']),
   );
+  const released = JSON.parse(gh(['api', draftApiPath(draft, repo)]));
   if (released.draft !== true) throw new Error('Release is no longer a draft');
   for (const file of assets) {
     const matches = released.assets.filter(
