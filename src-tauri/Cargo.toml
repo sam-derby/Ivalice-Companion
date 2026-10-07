@@ -1,6 +1,6 @@
 [package]
 name = "ivalice-companion"
-version = "0.1.5"
+version = "0.1.6"
 description = "Local deterministic Ivalice Companion desktop shell"
 edition = "2021"
 publish = false
