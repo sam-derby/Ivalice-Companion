@@ -1,9 +1,7 @@
 {
   "bundle": {
     "active": true,
-    "targets": [
-      "nsis"
-    ],
+    "targets": ["nsis"],
     "resources": {
       "installer-resources/CompressDict.bin": "resources/CompressDict.bin",
       "installer-resources/reader-catalogue-v1.json": "resources/reader-catalogue-v1.json",
