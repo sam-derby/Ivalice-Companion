@@ -76,7 +76,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libdbus-1-dev libayatana-appindicator3-dev librsvg2-dev patchelf
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libdbus-1-dev libayatana-appindicator3-dev librsvg2-dev patchelf libfuse2 squashfs-tools squashfuse
       - name: Install pinned Rust components
         run: |
           rustup show
@@ -87,6 +87,9 @@ jobs:
           cache-on-failure: true
       - run: npm ci
       - run: npm run validate
+      - name: Verify read-only AppImage resource access
+        if: runner.os == 'Linux'
+        run: bash .github/scripts/check-linux-fuse.sh
       - name: Verify source version and tag
         run:
           node --input-type=module -e "import { verifyVersion } from

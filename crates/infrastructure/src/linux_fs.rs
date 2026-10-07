@@ -138,6 +138,18 @@ impl DirectoryGuard {
     }
 
     pub(crate) fn open_file(&self, name: &std::ffi::OsStr) -> Result<File, PathFailure> {
+        self.open_with_policy(name, false)
+    }
+
+    pub(crate) fn open_resource_file(&self, name: &std::ffi::OsStr) -> Result<File, PathFailure> {
+        self.open_with_policy(name, true)
+    }
+
+    fn open_with_policy(
+        &self,
+        name: &std::ffi::OsStr,
+        resource: bool,
+    ) -> Result<File, PathFailure> {
         self.validate()?;
         let file = File::from(
             native::openat(
@@ -158,7 +170,7 @@ impl DirectoryGuard {
         if metadata.nlink() == 0 {
             return Err(PathFailure::UnsupportedLocation);
         }
-        validate_volume(&file)?;
+        validate_volume_policy(&file, resource)?;
         self.validate()?;
         Ok(file)
     }
@@ -225,15 +237,29 @@ impl DirectoryGuard {
 // local filesystems; squashfs also permits read-only AppImage resource loading.
 // https://github.com/torvalds/linux/blob/v6.12/include/uapi/linux/magic.h
 fn validate_volume(file: &File) -> Result<(), PathFailure> {
+    validate_volume_policy(file, false)
+}
+
+fn validate_volume_policy(file: &File, resource: bool) -> Result<(), PathFailure> {
     let filesystem = native::fstatfs(file).map_err(|_| PathFailure::UnsupportedLocation)?;
     let kind = u64::try_from(filesystem.f_type).map_err(|_| PathFailure::UnsupportedLocation)?;
-    if !matches!(
-        kind,
-        0xef53 | 0x9123_683e | 0x5846_5342 | 0x0102_1994 | 0x794c_7630 | 0x7371_7368
-    ) {
+    let read_only = native::fstatvfs(file)
+        .map_err(|_| PathFailure::UnsupportedLocation)?
+        .f_flag
+        .contains(native::StatVfsMountFlags::RDONLY);
+    if !supported_filesystem(kind, read_only, resource) {
         return Err(PathFailure::UnsupportedLocation);
     }
     Ok(())
+}
+
+// FUSE's statfs reports FUSE_SUPER_MAGIC even for squashfuse/AppImage mounts
+// (Linux v6.12 fs/fuse/inode.c). Permit it only for read-only resource reads.
+fn supported_filesystem(kind: u64, read_only: bool, resource: bool) -> bool {
+    matches!(
+        kind,
+        0xef53 | 0x9123_683e | 0x5846_5342 | 0x0102_1994 | 0x794c_7630 | 0x7371_7368
+    ) || (kind == 0x6573_5546 && read_only && resource)
 }
 
 pub(crate) fn ensure_data_directory(path: &Path) -> Result<(), PathFailure> {
@@ -264,6 +290,13 @@ pub(crate) fn safe_single_link_file(path: &Path) -> Result<FileIdentity, PathFai
         return Err(PathFailure::UnsupportedLocation);
     }
     Ok(identity(&metadata))
+}
+
+pub(crate) fn validate_regular_resource_file(path: &Path) -> Result<FileIdentity, PathFailure> {
+    validate_path_shape(path)?;
+    let guard = DirectoryGuard::pin(path.parent().ok_or(PathFailure::Invalid)?)?;
+    let file = guard.open_resource_file(path.file_name().ok_or(PathFailure::Invalid)?)?;
+    Ok(identity(&file.metadata().map_err(map_io_error)?))
 }
 
 pub(crate) fn paths_overlap(left: &Path, right: &Path) -> bool {

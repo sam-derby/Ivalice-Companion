@@ -18,7 +18,7 @@ impl StoryProgressLoader {
         let path = resource_root
             .join("resources")
             .join("story-progress-v3.json");
-        platform_fs::validate_regular_file(&path)
+        platform_fs::validate_regular_resource_file(&path)
             .map_err(|_| StoryProgressLoadError::Unavailable)?;
         let size = fs::metadata(&path)
             .map_err(|_| StoryProgressLoadError::Unavailable)?

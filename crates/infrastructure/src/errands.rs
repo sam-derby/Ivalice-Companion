@@ -16,7 +16,8 @@ pub enum ErrandsLoadError {
 impl ErrandsLoader {
     pub fn load(resource_root: &Path) -> Result<ValidatedErrands, ErrandsLoadError> {
         let path = resource_root.join("resources").join("errands-v1.json");
-        platform_fs::validate_regular_file(&path).map_err(|_| ErrandsLoadError::Unavailable)?;
+        platform_fs::validate_regular_resource_file(&path)
+            .map_err(|_| ErrandsLoadError::Unavailable)?;
         let size = fs::metadata(&path)
             .map_err(|_| ErrandsLoadError::Unavailable)?
             .len();

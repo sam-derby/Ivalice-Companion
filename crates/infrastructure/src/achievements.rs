@@ -16,7 +16,7 @@ pub enum AchievementsLoadError {
 impl AchievementsLoader {
     pub fn load(resource_root: &Path) -> Result<ValidatedAchievements, AchievementsLoadError> {
         let path = resource_root.join("resources").join("achievements-v1.json");
-        platform_fs::validate_regular_file(&path)
+        platform_fs::validate_regular_resource_file(&path)
             .map_err(|_| AchievementsLoadError::Unavailable)?;
         let size = fs::metadata(&path)
             .map_err(|_| AchievementsLoadError::Unavailable)?

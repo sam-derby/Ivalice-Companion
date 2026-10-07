@@ -11,10 +11,19 @@ pub(super) struct SourceHandle {
     guard: DirectoryGuard,
 }
 
-pub(super) fn open_source(path: &Path, was_observed: bool) -> Result<SourceHandle, AttemptFailure> {
+pub(super) fn open_source(
+    path: &Path,
+    was_observed: bool,
+    resource: bool,
+) -> Result<SourceHandle, AttemptFailure> {
     let open = || {
         let guard = DirectoryGuard::pin(path.parent().ok_or(PathFailure::Invalid)?)?;
-        let file = guard.open_file(path.file_name().ok_or(PathFailure::Invalid)?)?;
+        let name = path.file_name().ok_or(PathFailure::Invalid)?;
+        let file = if resource {
+            guard.open_resource_file(name)?
+        } else {
+            guard.open_file(name)?
+        };
         Ok(SourceHandle { file, guard })
     };
     open().map_err(|failure| {

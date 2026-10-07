@@ -32,6 +32,50 @@ impl Drop for Scratch {
 }
 
 #[test]
+fn fuse_resource_permission_never_enables_save_access() {
+    use super::supported_filesystem;
+    let fuse = 0x6573_5546;
+    assert!(supported_filesystem(fuse, true, true));
+    assert!(!supported_filesystem(fuse, false, true));
+    assert!(!supported_filesystem(fuse, true, false));
+    assert!(!supported_filesystem(fuse, false, false));
+    // NFS remains unsupported even for read-only resources.
+    assert!(!supported_filesystem(0x6969, true, true));
+}
+
+#[test]
+#[ignore = "requires the CI-created read-only FUSE image"]
+fn read_only_fuse_resources_preserve_save_restrictions() -> Result<(), Box<dyn Error>> {
+    use crate::{CancellationToken, SnapshotErrorCode, SnapshotReader};
+    let path = PathBuf::from(
+        std::env::var_os("IVALICE_TEST_RESOURCE").ok_or("missing synthetic FUSE resource")?,
+    );
+    let cancellation = CancellationToken::default();
+    let snapshot = SnapshotReader::for_resources().acquire(&path, &cancellation)?;
+    assert_eq!(snapshot.bytes(), b"synthetic bundled resource");
+    let save_error = SnapshotReader::new()
+        .acquire(&path, &cancellation)
+        .err()
+        .ok_or("FUSE save unexpectedly accepted")?;
+    assert_eq!(save_error.code, SnapshotErrorCode::UnsupportedLocation);
+    assert_eq!(
+        replace_save_with_backup_if_unchanged(
+            &path,
+            Sha256::digest(snapshot.bytes()).into(),
+            snapshot.bytes(),
+            b"edited"
+        ),
+        Err(SaveEditError::UnsafePath)
+    );
+    assert_eq!(fs::read(&path)?, snapshot.bytes());
+    assert_eq!(
+        fs::read_dir(path.parent().ok_or("missing FUSE parent")?)?.count(),
+        1
+    );
+    Ok(())
+}
+
+#[test]
 fn denied_read_is_explicit_and_permissions_are_restored() -> Result<(), Box<dyn Error>> {
     let scratch = Scratch::new()?;
     let path = scratch.0.join("denied.png");
