@@ -1,2 +1,2 @@
-// Work-in-progress sections show only in builds with VITE_SHOW_WIP=true, set in an ignored .env.*.local file.
+// Set VITE_SHOW_WIP=true in .env.local to try unfinished sections.
 export const showWip = import.meta.env.VITE_SHOW_WIP === 'true';

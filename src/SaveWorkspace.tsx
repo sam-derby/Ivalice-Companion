@@ -66,9 +66,9 @@ interface Props {
   occupiedSlots?: number[];
   slotSummaries?: SlotSummary[];
   initialView: WorkspaceView | undefined;
-  /** Section shown when this slot has no remembered view. */
+  /** Used until this slot has a remembered view. */
   defaultSection?: WorkspaceSection;
-  /** Shows the read-only Quests section (local work in progress). */
+  /** Enable the unfinished Quests view. */
   showQuests?: boolean;
   onViewChange: (slot: number, view: WorkspaceView) => void;
 }
@@ -2208,7 +2208,7 @@ export function SaveWorkspace({
             }}
             onPointerDown={(event) => {
               if (event.button !== 0) return;
-              // Blur can start the calculation before click fires; retain the review request.
+              // Blur may start a calculation before this click reaches us.
               statsPreview.commitAll();
               setReviewOpen(true);
             }}

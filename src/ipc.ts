@@ -108,7 +108,6 @@ export async function chooseSave(): Promise<SaveSelectionStatus | null> {
   return invoke<SaveSelectionStatus>('set_save_selection', { path });
 }
 
-/** A save file to import a slot from; the selected save is unaffected. */
 export async function chooseImportFile(): Promise<string | null> {
   return open({
     title: 'Choose a save to import from',
@@ -118,7 +117,7 @@ export async function chooseImportFile(): Promise<string | null> {
   });
 }
 
-/** Where to write an exported slot; the system dialog confirms any replacement. */
+/** The system dialog confirms overwrites. */
 export async function chooseExportFile(slot: number): Promise<string | null> {
   return save({
     title: `Export slot ${String(slot + 1)}`,

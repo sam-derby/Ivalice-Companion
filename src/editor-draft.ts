@@ -132,7 +132,6 @@ export function storyStepLabel(context: EditContext, progress: number): string {
     .join(' · ');
 }
 
-/** Guests the story step edit rebuilds from the game's battle data. */
 export function storyGuestsLabel(
   context: EditContext,
   progress: number,
@@ -143,7 +142,6 @@ export function storyGuestsLabel(
   return guests.length > 0 ? guests.join(', ') : 'No guests';
 }
 
-/** Story members the step edit adds to or removes from the saved party. */
 export function storyPartyLabel(
   context: EditContext,
   progress: number,

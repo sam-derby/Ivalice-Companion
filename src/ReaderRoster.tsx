@@ -856,7 +856,7 @@ export function UnitDetails({
   );
 }
 
-// The accepted producer currently supports positive signed-32-bit Unix seconds.
+// Saved timestamps use positive signed 32-bit Unix seconds.
 const MAX_SUPPORTED_SAVED_AT_SECONDS = 2_147_483_647;
 
 function SavedAt({ fact }: { fact: Fact<number> }) {
@@ -877,7 +877,7 @@ function SavedAt({ fact }: { fact: Fact<number> }) {
   );
 }
 
-/** App keys this component by the complete snapshot/resource identity. */
+// App remounts this when the snapshot or resources change.
 export function ReaderRoster({ reader }: { reader: ReaderDocument }) {
   const art = useReaderArt();
   const [section, setSection] = useState<'party' | 'inventory' | 'save'>(
