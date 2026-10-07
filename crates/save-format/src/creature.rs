@@ -1,4 +1,4 @@
-//! Experimental independent creature initialization (T074/T078).
+//! Experimental creature initialization.
 //! Layout: TICSaveEditor UnitSaveDataLayout.cs at 07ea857. Relations: pinned
 //! Job/CharaName tables and mod-loader JobData/JobCommandData.xml at ba92f91.
 //! Defaults are an owner-authorized hypothesis, not a game-verified constructor.

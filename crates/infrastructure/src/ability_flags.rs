@@ -4,7 +4,7 @@ use std::{fs, path::Path};
 
 use ivalice_domain::ability_flags::ValidatedAbilityFlags;
 
-use crate::windows_fs;
+use crate::platform_fs;
 
 pub struct AbilityFlagsLoader;
 
@@ -18,7 +18,8 @@ impl AbilityFlagsLoader {
         let path = resource_root
             .join("resources")
             .join("ability-flags-v1.json");
-        windows_fs::validate_regular_file(&path).map_err(|_| AbilityFlagsLoadError::Unavailable)?;
+        platform_fs::validate_regular_resource_file(&path)
+            .map_err(|_| AbilityFlagsLoadError::Unavailable)?;
         let size = fs::metadata(&path)
             .map_err(|_| AbilityFlagsLoadError::Unavailable)?
             .len();

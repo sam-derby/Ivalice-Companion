@@ -1,4 +1,4 @@
-//! Bounded, validated reference facts. Raw table columns and save IDs do not enter this module.
+//! Validated game references, separate from raw tables and save IDs.
 
 use crate::ValueState;
 use serde::{Deserialize, Serialize};
@@ -21,8 +21,8 @@ pub enum GameDataSchema {
     V1,
 }
 
-/// This profile names the exact R011 catalogue and R022 installed-job parity/evaluator evidence.
-/// It does not assert that the other R011 tables came from installed build 24304444.
+/// Catalogue and job-requirement sources. Only the job requirements were
+/// checked against installed build 24304444.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum SourceProfile {
@@ -113,7 +113,7 @@ pub struct Membership {
     pub spoiler: SpoilerLevel,
 }
 
-/// Only conjunction and a level lower bound are evidenced. No OR or eligibility result exists.
+/// Verified level requirements. Meeting them doesn't guarantee job availability.
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Requirement {
@@ -132,17 +132,17 @@ pub struct Count {
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Coverage {
-    /// R011's 174 job identities. A selected job may still have unknown fields.
+    /// 174 job identities; some fields remain unknown.
     pub jobs: Count,
-    /// R011's 227 command identities. V1 accepts only command 25 for memberships.
+    /// 227 command identities; V1 only supports memberships for command 25.
     pub commands: Count,
-    /// R011's 512 ability identities; only accepted cost facts count here.
+    /// 512 ability identities; counts verified costs only.
     pub ability_costs: Count,
-    /// R011's 1,061 nonzero accepted membership edges are the bounded source pool.
+    /// Drawn from 1,061 nonzero membership entries.
     pub memberships: Count,
-    /// R022's 32 GeneralJob numeric requirements, one accepted.
+    /// 32 GeneralJob numeric requirements, one verified.
     pub prerequisites: Count,
-    /// R022 accepts no job as having no requirements.
+    /// No jobs have been verified as requiring nothing.
     pub no_requirement_jobs: Count,
 }
 
@@ -158,7 +158,7 @@ pub struct GameDataArtifact {
     pub memberships: Vec<Membership>,
 }
 
-/// The only queryable form. Its field is private so consumers must validate first.
+/// Validated data, ready for queries.
 #[derive(Clone, Debug)]
 pub struct ValidatedGameData(GameDataArtifact);
 
@@ -292,7 +292,7 @@ fn visit<'a>(
 }
 
 impl ValidatedGameData {
-    /// Deserialize a bounded UTF-8 JSON artifact, then validate every queryable fact.
+    /// Parse and validate a size-limited JSON catalogue.
     pub fn from_json(bytes: &[u8]) -> Result<Self, ValidationError> {
         if bytes.len() > MAX_ARTIFACT_BYTES {
             return Err(error(ValidationCode::TooLarge, 0));
@@ -300,8 +300,8 @@ impl ValidatedGameData {
         let artifact: GameDataArtifact = match serde_json::from_slice(bytes) {
             Ok(artifact) => artifact,
             Err(_) => {
-                // The typed pass detects duplicate object keys. Inspect a failed input
-                // only to select a stable error code; never deserialize from Value.
+                // Keep the typed parser's duplicate-key checks. Value is only
+                // used to classify the error.
                 let value: serde_json::Value = serde_json::from_slice(bytes)
                     .map_err(|_| error(ValidationCode::InvalidJson, 0))?;
                 if value.get("schema").and_then(serde_json::Value::as_str) != Some("v1") {

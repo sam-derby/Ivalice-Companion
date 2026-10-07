@@ -203,8 +203,8 @@ fn project_unit(
             job,
             level: known(unit.job_levels[index]),
             current_jp: known(unit.job_points[index]),
-            // TICSaveEditor UnitSaveData.cs at 07ea857 calls this TotalJobPoint;
-            // the owner's T033 game load displays the same value as Job EXP.
+            // TotalJobPoint in TICSaveEditor UnitSaveData.cs at 07ea857;
+            // shown as Job EXP in-game.
             total_jp: known(unit.total_job_points[index]),
         });
     }

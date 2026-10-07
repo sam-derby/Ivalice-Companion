@@ -16,7 +16,7 @@ const UNSUPPORTED_ATTRIBUTES: u32 = FILE_ATTRIBUTE_REPARSE_POINT
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub(crate) struct FileIdentity {
-    pub(crate) volume: u32,
+    pub(crate) volume: u64,
     pub(crate) index: u64,
 }
 
@@ -115,6 +115,10 @@ pub(crate) fn safe_single_link_file(path: &Path) -> Result<FileIdentity, PathFai
     Ok(identity)
 }
 
+pub(crate) fn validate_regular_resource_file(path: &Path) -> Result<FileIdentity, PathFailure> {
+    validate_regular_file(path)
+}
+
 pub(crate) fn has_unsupported_attributes(metadata: &Metadata) -> bool {
     metadata.file_attributes() & UNSUPPORTED_ATTRIBUTES != 0
 }
@@ -200,7 +204,7 @@ fn query_path_info(
 
 fn identity_from_information(information: &winsafe::BY_HANDLE_FILE_INFORMATION) -> FileIdentity {
     FileIdentity {
-        volume: information.dwVolumeSerialNumber,
+        volume: u64::from(information.dwVolumeSerialNumber),
         index: information.nFileIndex(),
     }
 }
