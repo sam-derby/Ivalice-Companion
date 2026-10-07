@@ -4,7 +4,7 @@ use std::{fs, path::Path};
 
 use ivalice_domain::story_progress::ValidatedStoryProgress;
 
-use crate::windows_fs;
+use crate::platform_fs;
 
 pub struct StoryProgressLoader;
 
@@ -18,7 +18,7 @@ impl StoryProgressLoader {
         let path = resource_root
             .join("resources")
             .join("story-progress-v3.json");
-        windows_fs::validate_regular_file(&path)
+        platform_fs::validate_regular_resource_file(&path)
             .map_err(|_| StoryProgressLoadError::Unavailable)?;
         let size = fs::metadata(&path)
             .map_err(|_| StoryProgressLoadError::Unavailable)?

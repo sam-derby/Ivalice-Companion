@@ -1,0 +1,23 @@
+{
+  "bundle": {
+    "active": true,
+    "targets": ["deb", "appimage"],
+    "category": "Utility",
+    "shortDescription": "Offline Ivalice Chronicles save companion and editor",
+    "resources": {
+      "installer-resources/CompressDict.bin": "resources/CompressDict.bin",
+      "installer-resources/reader-catalogue-v1.json": "resources/reader-catalogue-v1.json",
+      "installer-resources/job-requirements-v1.json": "resources/job-requirements-v1.json",
+      "installer-resources/ability-flags-v1.json": "resources/ability-flags-v1.json",
+      "installer-resources/story-progress-v3.json": "resources/story-progress-v3.json",
+      "installer-resources/story-roster-v1.json": "resources/story-roster-v1.json",
+      "installer-resources/achievements-v1.json": "resources/achievements-v1.json",
+      "installer-resources/errands-v1.json": "resources/errands-v1.json",
+      "../LICENSE": "licenses/Ivalice-Companion-GPL-3.0.txt",
+      "../NOTICE.md": "licenses/NOTICE.md",
+      "../LICENSES/Nenkai-MIT.txt": "licenses/Nenkai-MIT.txt",
+      "../public/fonts/Alegreya-OFL.txt": "licenses/Alegreya-OFL.txt",
+      "installer-resources/linux-dependency-notices.txt": "licenses/dependencies.txt"
+    }
+  }
+}

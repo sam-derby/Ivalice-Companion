@@ -6,7 +6,17 @@ use std::time::{Duration, Instant};
 
 use sha2::{Digest, Sha256};
 
-use crate::windows_fs::{self, FileIdentity, PathFailure};
+use crate::platform_fs::{self, FileIdentity, PathFailure};
+
+#[cfg(windows)]
+type LastWriteTime = u64;
+#[cfg(target_os = "linux")]
+type LastWriteTime = (i64, i64, i64, i64);
+#[cfg(target_os = "linux")]
+#[path = "snapshot_linux.rs"]
+mod linux;
+#[cfg(target_os = "linux")]
+use linux::{observe_handle, open_source, SourceHandle};
 
 pub const MAX_SNAPSHOT_BYTES: u64 = 64 * 1024 * 1024;
 pub const SNAPSHOT_ATTEMPTS: u8 = 3;
@@ -14,11 +24,17 @@ const READ_CHUNK_BYTES: usize = 1024 * 1024;
 const OBSERVATION_INTERVAL: Duration = Duration::from_millis(100);
 const RETRY_DELAYS: [Duration; 2] = [Duration::from_millis(100), Duration::from_millis(200)];
 const ELAPSED_BUDGET: Duration = Duration::from_secs(2);
+#[cfg(windows)]
 const FILE_ATTRIBUTE_DIRECTORY: u32 = 0x0000_0010;
+#[cfg(windows)]
 const FILE_ATTRIBUTE_REPARSE_POINT: u32 = 0x0000_0400;
+#[cfg(windows)]
 const FILE_ATTRIBUTE_OFFLINE: u32 = 0x0000_1000;
+#[cfg(windows)]
 const FILE_ATTRIBUTE_RECALL_ON_OPEN: u32 = 0x0004_0000;
+#[cfg(windows)]
 const FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS: u32 = 0x0040_0000;
+#[cfg(windows)]
 const UNSUPPORTED_ATTRIBUTES: u32 = FILE_ATTRIBUTE_REPARSE_POINT
     | FILE_ATTRIBUTE_OFFLINE
     | FILE_ATTRIBUTE_RECALL_ON_OPEN
@@ -130,10 +146,11 @@ impl Snapshot {
 struct Observation {
     identity: FileIdentity,
     length: u64,
-    last_write_time: u64,
+    last_write_time: LastWriteTime,
 }
 
 impl Observation {
+    #[cfg(windows)]
     fn from_information(
         information: &winsafe::BY_HANDLE_FILE_INFORMATION,
     ) -> Result<Self, AttemptFailure> {
@@ -155,7 +172,7 @@ impl Observation {
         }
         Ok(Self {
             identity: FileIdentity {
-                volume: information.dwVolumeSerialNumber,
+                volume: u64::from(information.dwVolumeSerialNumber),
                 index: information.nFileIndex(),
             },
             length: information.nFileSize(),
@@ -208,6 +225,7 @@ impl CancellationToken {
 #[derive(Clone, Default)]
 pub struct SnapshotReader {
     state: Arc<ReaderState>,
+    read_only_resource: bool,
 }
 
 #[derive(Default)]
@@ -219,6 +237,13 @@ struct ReaderState {
 impl SnapshotReader {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    pub(crate) fn for_resources() -> Self {
+        Self {
+            read_only_resource: true,
+            ..Self::default()
+        }
     }
 
     pub fn cancel_current(&self) {
@@ -328,8 +353,9 @@ fn acquire_attempt(
     ever_observed: &mut bool,
     max_bytes: u64,
 ) -> Result<Snapshot, AttemptFailure> {
-    let expected_path_identity = validate_source_path(path, *ever_observed)?;
-    let mut first = open_source(path, *ever_observed)?;
+    let resource = context.reader.read_only_resource;
+    let expected_path_identity = validate_source_path(path, *ever_observed, resource)?;
+    let mut first = open_source(path, *ever_observed, resource)?;
     let observation = observe_handle(&first)?;
     if observation.identity != expected_path_identity {
         return Err(AttemptFailure::changed());
@@ -357,7 +383,7 @@ fn acquire_attempt(
         .checkpoint(Checkpoint::AfterFirstPass, context.attempt);
     check_stop_attempt(context)?;
     require_unchanged_handle(&first, observation)?;
-    require_current_path(path, observation)?;
+    require_current_path(path, observation, resource)?;
     drop(first);
 
     interruptible_wait_attempt(context, OBSERVATION_INTERVAL)?;
@@ -366,11 +392,11 @@ fn acquire_attempt(
         .checkpoint(Checkpoint::BeforeSecondOpen, context.attempt);
     check_stop_attempt(context)?;
 
-    let expected_second_identity = validate_source_path(path, true)?;
+    let expected_second_identity = validate_source_path(path, true, resource)?;
     if expected_second_identity != observation.identity {
         return Err(AttemptFailure::changed());
     }
-    let mut second = open_source(path, true)?;
+    let mut second = open_source(path, true, resource)?;
     let second_observation = observe_handle(&second)?;
     if !observation.same_source(second_observation) {
         return Err(AttemptFailure::changed());
@@ -381,7 +407,7 @@ fn acquire_attempt(
         .checkpoint(Checkpoint::AfterSecondPass, context.attempt);
     check_stop_attempt(context)?;
     require_unchanged_handle(&second, observation)?;
-    require_current_path(path, observation)?;
+    require_current_path(path, observation, resource)?;
     drop(second);
 
     let digest: [u8; 32] = Sha256::digest(&bytes).into();
@@ -392,8 +418,17 @@ fn acquire_attempt(
     })
 }
 
-fn validate_source_path(path: &Path, was_observed: bool) -> Result<FileIdentity, AttemptFailure> {
-    windows_fs::validate_regular_file(path).map_err(|failure| {
+fn validate_source_path(
+    path: &Path,
+    was_observed: bool,
+    resource: bool,
+) -> Result<FileIdentity, AttemptFailure> {
+    let validation = if resource {
+        platform_fs::validate_regular_resource_file(path)
+    } else {
+        platform_fs::validate_regular_file(path)
+    };
+    validation.map_err(|failure| {
         let mapped = map_path_failure(failure);
         if was_observed && mapped.code == SnapshotErrorCode::NotFound {
             AttemptFailure::changed()
@@ -403,7 +438,12 @@ fn validate_source_path(path: &Path, was_observed: bool) -> Result<FileIdentity,
     })
 }
 
-fn open_source(path: &Path, was_observed: bool) -> Result<SourceHandle, AttemptFailure> {
+#[cfg(windows)]
+fn open_source(
+    path: &Path,
+    was_observed: bool,
+    _resource: bool,
+) -> Result<SourceHandle, AttemptFailure> {
     let path = path
         .to_str()
         .ok_or_else(|| AttemptFailure::terminal(SnapshotErrorCode::InvalidPath, None))?;
@@ -425,10 +465,12 @@ fn open_source(path: &Path, was_observed: bool) -> Result<SourceHandle, AttemptF
     .map_err(|error| map_windows_failure(error, was_observed))
 }
 
+#[cfg(windows)]
 struct SourceHandle {
     handle: winsafe::guard::CloseHandleGuard<winsafe::HFILE>,
 }
 
+#[cfg(windows)]
 impl SourceHandle {
     fn read_chunk(&self, buffer: &mut [u8]) -> Result<usize, AttemptFailure> {
         self.handle
@@ -448,6 +490,7 @@ impl ChunkSource for SourceHandle {
     }
 }
 
+#[cfg(windows)]
 fn observe_handle(file: &SourceHandle) -> Result<Observation, AttemptFailure> {
     if file
         .handle
@@ -546,12 +589,16 @@ fn require_unchanged_handle(
     }
 }
 
-fn require_current_path(path: &Path, expected: Observation) -> Result<(), AttemptFailure> {
-    let identity = validate_source_path(path, true)?;
+fn require_current_path(
+    path: &Path,
+    expected: Observation,
+    resource: bool,
+) -> Result<(), AttemptFailure> {
+    let identity = validate_source_path(path, true, resource)?;
     if identity != expected.identity {
         return Err(AttemptFailure::changed());
     }
-    let fresh = open_source(path, true)?;
+    let fresh = open_source(path, true, resource)?;
     if expected.same_source(observe_handle(&fresh)?) {
         Ok(())
     } else {
@@ -705,6 +752,7 @@ fn map_path_failure(failure: PathFailure) -> AttemptFailure {
     )
 }
 
+#[cfg(windows)]
 fn map_windows_failure(error: winsafe::co::ERROR, was_observed: bool) -> AttemptFailure {
     let os_code = Some(error.raw());
     match os_code {
@@ -727,13 +775,19 @@ fn lock_recover<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
 #[cfg(test)]
 mod tests {
     use std::error::Error;
-    use std::fs::{self, File, FileTimes, OpenOptions};
+    #[cfg(windows)]
+    use std::fs::File;
+    use std::fs::{self, FileTimes, OpenOptions};
     use std::io::{Cursor, Read};
+    #[cfg(windows)]
     use std::os::windows::fs::{MetadataExt, OpenOptionsExt};
     use std::path::{Path, PathBuf};
+    #[cfg(windows)]
     use std::process::{Command, Stdio};
     use std::sync::atomic::{AtomicU64, Ordering};
+    #[cfg(windows)]
     use std::thread;
+    #[cfg(windows)]
     use std::time::Instant;
 
     use super::*;
@@ -765,12 +819,10 @@ mod tests {
         let after_acquisition = fs::metadata(&path)?;
         assert_eq!(fs::read(&path)?, before);
         assert_eq!(after_acquisition.len(), metadata.len());
-        assert_eq!(
-            after_acquisition.last_write_time(),
-            metadata.last_write_time()
-        );
+        assert_eq!(after_acquisition.modified()?, metadata.modified()?);
         let expected_digest: [u8; 32] = Sha256::digest(&before).into();
         assert_eq!(snapshot.sha256, expected_digest);
+        #[cfg(windows)]
         assert_eq!(
             snapshot.observed.last_write_time,
             metadata.last_write_time()
@@ -806,7 +858,14 @@ mod tests {
             .write(true)
             .open(&exact)?
             .set_len(MAX_SNAPSHOT_BYTES)?;
-        let snapshot = acquire(&exact)?;
+        // This checks the byte boundary, not the host's disk throughput. Keep
+        // the production deadline covered by the separate clock-driven tests.
+        let snapshot = acquire_with_runtime(
+            &SnapshotReader::new(),
+            &exact,
+            &CancellationToken::default(),
+            &HookRuntime::new(|_, _| {}),
+        )?;
         assert_eq!(u64::try_from(snapshot.len())?, MAX_SNAPSHOT_BYTES);
         Ok(())
     }
@@ -1103,6 +1162,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(windows)]
     fn sharing_violation_retries_three_times_without_changing_source() -> Result<(), Box<dyn Error>>
     {
         let bytes = b"busy synthetic source";
@@ -1126,40 +1186,77 @@ mod tests {
     }
 
     #[test]
+    #[cfg(windows)]
     fn read_data_denial_is_terminal_and_acl_is_restored() -> Result<(), Box<dyn Error>> {
         let bytes = b"denied synthetic source";
         let path = synthetic_file("denied", bytes)?;
         let root = path.parent().ok_or("synthetic source has no parent")?;
         let ready = root.join("acl-ready");
         let release = root.join("acl-release");
+        let fault = root.join("acl-fault");
         let script = r#"
+$ErrorActionPreference = 'Stop'
 $path = $env:IVALICE_D002_PATH
 $ready = $env:IVALICE_D002_READY
 $release = $env:IVALICE_D002_RELEASE
-$acl = Get-Acl -LiteralPath $path
-$changed = Get-Acl -LiteralPath $path
+$fault = $env:IVALICE_D002_FAULT
+$stage = 'read-acl'
+try {
+$sections = [Security.AccessControl.AccessControlSections]::Access
+$originalSecurity = Get-Acl -LiteralPath $path
+$original = $originalSecurity.GetSecurityDescriptorSddlForm($sections)
+function AccessKeys($security) {
+  $security.GetAccessRules($true, $true, [Security.Principal.SecurityIdentifier]) | ForEach-Object {
+    $_.IdentityReference.Value + ':' + [int]$_.FileSystemRights + ':' + [int]$_.AccessControlType + ':' + $_.IsInherited + ':' + [int]$_.InheritanceFlags + ':' + [int]$_.PropagationFlags
+  } | Sort-Object
+}
+$originalKeys = (AccessKeys $originalSecurity) -join ';'
+$acl = [Security.AccessControl.FileSecurity]::new()
+$acl.SetSecurityDescriptorSddlForm($original, $sections)
+$changed = [Security.AccessControl.FileSecurity]::new()
+$changed.SetSecurityDescriptorSddlForm($original, $sections)
 $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
 try {
+  $stage = 'deny-read'
   $rule = [Security.AccessControl.FileSystemAccessRule]::new($identity.User, [Security.AccessControl.FileSystemRights]::ReadData, [Security.AccessControl.AccessControlType]::Deny)
   [void]$changed.AddAccessRule($rule)
   Set-Acl -LiteralPath $path -AclObject $changed
   [IO.File]::WriteAllText($ready, 'ready')
+  $stage = 'wait-for-release'
   while (-not (Test-Path -LiteralPath $release)) { Start-Sleep -Milliseconds 10 }
 } finally {
-  Set-Acl -LiteralPath $path -AclObject $acl
-  $identity.Dispose()
+  try {
+    $stage = 'restore-acl'
+    Set-Acl -LiteralPath $path -AclObject $acl
+    $stage = 'verify-restored-acl'
+    $restored = Get-Acl -LiteralPath $path
+    # Windows can normalize SDDL control flags while preserving the exact rules.
+    if (((AccessKeys $restored) -join ';') -ne $originalKeys -or $restored.AreAccessRulesProtected -ne $originalSecurity.AreAccessRulesProtected) {
+      throw 'ACL restoration differed'
+    }
+  } finally { $identity.Dispose() }
+}
+} catch {
+  [IO.File]::WriteAllText($fault, ($stage + ':' + $_.Exception.HResult))
+  exit 1
 }
 "#;
         let mut child = Command::new("powershell.exe")
-            .args(["-NoProfile", "-Command", script])
+            .args(["-NoProfile", "-NonInteractive", "-Command", script])
+            // PowerShell 7's inherited module path can make Windows PowerShell
+            // load incompatible Core modules on hosted runners.
+            .env_remove("PSModulePath")
             .env("IVALICE_D002_PATH", &path)
             .env("IVALICE_D002_READY", &ready)
             .env("IVALICE_D002_RELEASE", &release)
+            .env("IVALICE_D002_FAULT", &fault)
             .stdout(Stdio::null())
             .stderr(Stdio::null())
             .spawn()?;
-        let deadline = Instant::now() + Duration::from_secs(5);
-        while !ready.exists() && Instant::now() < deadline {
+        // Allow process startup on a loaded CI host; this is independent of
+        // snapshot acquisition's unchanged two-second production deadline.
+        let deadline = Instant::now() + Duration::from_secs(30);
+        while !ready.exists() && Instant::now() < deadline && child.try_wait()?.is_none() {
             thread::sleep(Duration::from_millis(10));
         }
 
@@ -1182,7 +1279,8 @@ try {
         };
         fs::write(&release, b"release")?;
         let status = child.wait()?;
-        assert!(status.success(), "ACL helper failed");
+        let diagnostic = fs::read_to_string(&fault).unwrap_or_else(|_| "no fault status".into());
+        assert!(status.success(), "ACL helper failed: {diagnostic}");
         assert_eq!(direct_os_code, Some(5), "ACL did not deny a direct read");
         let error = result
             .err()

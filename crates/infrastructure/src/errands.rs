@@ -4,7 +4,7 @@ use std::{fs, path::Path};
 
 use ivalice_domain::errands::ValidatedErrands;
 
-use crate::windows_fs;
+use crate::platform_fs;
 
 pub struct ErrandsLoader;
 
@@ -16,7 +16,8 @@ pub enum ErrandsLoadError {
 impl ErrandsLoader {
     pub fn load(resource_root: &Path) -> Result<ValidatedErrands, ErrandsLoadError> {
         let path = resource_root.join("resources").join("errands-v1.json");
-        windows_fs::validate_regular_file(&path).map_err(|_| ErrandsLoadError::Unavailable)?;
+        platform_fs::validate_regular_resource_file(&path)
+            .map_err(|_| ErrandsLoadError::Unavailable)?;
         let size = fs::metadata(&path)
             .map_err(|_| ErrandsLoadError::Unavailable)?
             .len();

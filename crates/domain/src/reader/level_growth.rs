@@ -1,5 +1,4 @@
-//! Candidate level simulation from CHARACTER_LEVEL_STATS_EDITING.md.
-//! TIC transition parity is still required: this module is not exposed by desktop IPC.
+//! Experimental level growth. Not wired into desktop IPC yet; game parity still needs checking.
 use super::{
     stat_edit::{BaseStatKind, MAX_BASE},
     GrowthCoefficients, StoredBases,

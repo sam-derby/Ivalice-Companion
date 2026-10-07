@@ -1,22 +1,29 @@
-//! Windows filesystem infrastructure for explicit save candidates and local settings.
+//! Platform filesystem infrastructure for explicit save candidates and local settings.
 
-#![cfg_attr(not(windows), allow(dead_code))]
-
-#[cfg(not(windows))]
-compile_error!("ivalice-infrastructure currently supports the Windows target only");
+#[cfg(not(any(windows, target_os = "linux")))]
+compile_error!("ivalice-infrastructure supports Windows and Linux targets only");
 
 mod ability_flags;
 mod achievements;
 mod candidate;
 mod errands;
 mod job_eligibility;
+#[cfg(windows)]
+#[path = "windows_fs.rs"]
+mod platform_fs;
+#[cfg(target_os = "linux")]
+#[path = "linux_fs.rs"]
+mod platform_fs;
 mod reader_catalogue;
+#[cfg(windows)]
+mod save_edit;
+#[cfg(target_os = "linux")]
+#[path = "save_edit_linux.rs"]
 mod save_edit;
 mod settings;
 mod snapshot;
 mod story_progress;
 mod story_roster;
-mod windows_fs;
 
 pub use ability_flags::AbilityFlagsLoader;
 pub use achievements::{AchievementsLoadError, AchievementsLoader};

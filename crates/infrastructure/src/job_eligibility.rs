@@ -5,7 +5,7 @@ use std::path::Path;
 
 use ivalice_domain::job_eligibility::ValidatedJobRequirements;
 
-use crate::windows_fs;
+use crate::platform_fs;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum JobRequirementsLoadError {
@@ -26,7 +26,7 @@ impl JobRequirementsLoader {
         if !path.exists() {
             return Err(JobRequirementsLoadError::Missing);
         }
-        windows_fs::validate_regular_file(&path)
+        platform_fs::validate_regular_resource_file(&path)
             .map_err(|_| JobRequirementsLoadError::UnsafePath)?;
         let size = fs::metadata(&path)
             .map_err(|_| JobRequirementsLoadError::UnsafePath)?

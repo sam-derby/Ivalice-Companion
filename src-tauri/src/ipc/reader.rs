@@ -2001,7 +2001,7 @@ mod tests {
                     cmd: command.into(),
                     callback: tauri::ipc::CallbackFn(0),
                     error: tauri::ipc::CallbackFn(1),
-                    url: "http://tauri.localhost"
+                    url: crate::ipc::test_invoke_url()
                         .parse()
                         .unwrap_or_else(|error| panic!("{error}")),
                     body: tauri::ipc::InvokeBody::Json(body),

@@ -51,6 +51,15 @@ const DICTIONARY_DIRECTORY: &str = "resources";
 const DICTIONARY_FILENAME: &str = "CompressDict.bin";
 const MAX_SAFE_GENERATION: u64 = 9_007_199_254_740_991;
 
+#[cfg(test)]
+fn test_invoke_url() -> &'static str {
+    if cfg!(windows) {
+        "http://tauri.localhost"
+    } else {
+        "tauri://localhost"
+    }
+}
+
 #[derive(Clone)]
 pub struct DesktopState {
     settings: Result<SettingsStore, SettingsError>,
@@ -743,7 +752,7 @@ mod tests {
     ) -> Result<(), Box<dyn std::error::Error>> {
         let root = test_root("success")?;
         let source = root.join("enhanced.png");
-        let original = b"original synthetic D006 snapshot".to_vec();
+        let original = b"original synthetic snapshot".to_vec();
         fs::write(&source, &original)?;
         let state = state(&root)?;
         let generation = state.begin_load();
@@ -833,7 +842,7 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "requires ignored R006 private input, observation, catalogue, and dictionary"]
+    #[ignore = "requires local save, expected roster, catalogue and dictionary"]
     fn private_production_pipeline_matches_independent_roster_without_writes(
     ) -> Result<(), Box<dyn std::error::Error>> {
         let workspace = workspace_root();
@@ -998,7 +1007,7 @@ mod tests {
                 cmd: "get_save_selection".into(),
                 callback: tauri::ipc::CallbackFn(0),
                 error: tauri::ipc::CallbackFn(1),
-                url: "http://tauri.localhost".parse()?,
+                url: test_invoke_url().parse()?,
                 body: tauri::ipc::InvokeBody::default(),
                 headers: Default::default(),
                 invoke_key: tauri::test::INVOKE_KEY.to_string(),
@@ -1014,7 +1023,7 @@ mod tests {
                 cmd: "test_unknown_contract".into(),
                 callback: tauri::ipc::CallbackFn(2),
                 error: tauri::ipc::CallbackFn(3),
-                url: "http://tauri.localhost".parse()?,
+                url: test_invoke_url().parse()?,
                 body: tauri::ipc::InvokeBody::default(),
                 headers: Default::default(),
                 invoke_key: tauri::test::INVOKE_KEY.to_string(),
@@ -1034,7 +1043,7 @@ mod tests {
                 cmd: "load_reader".into(),
                 callback: tauri::ipc::CallbackFn(4),
                 error: tauri::ipc::CallbackFn(5),
-                url: "http://tauri.localhost".parse()?,
+                url: test_invoke_url().parse()?,
                 body: tauri::ipc::InvokeBody::Json(serde_json::json!({
                     "request": { "requestId": 78, "manualSlotId": null }
                 })),
