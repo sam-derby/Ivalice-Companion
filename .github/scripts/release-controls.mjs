@@ -18,6 +18,76 @@ import {
 } from './release-publish.mjs';
 import { runtimePackages } from './linux-notices.mjs';
 import { inspectReaderArt, verifyReaderArt } from './reader-art-input.mjs';
+import { latestBuild, requirePackages } from './release-source.mjs';
+
+test('release reuses only the latest successful main build for the exact commit', () => {
+  const success = {
+    id: 1,
+    head_sha: 'source',
+    event: 'push',
+    head_branch: 'main',
+    status: 'completed',
+    conclusion: 'success',
+    created_at: '2026-10-01',
+  };
+  assert.equal(latestBuild([success], 'source'), 1);
+  assert.equal(
+    latestBuild([{ ...success, event: 'workflow_dispatch' }], 'source'),
+    1,
+  );
+  assert.equal(
+    latestBuild([{ ...success, head_branch: 'other' }], 'source'),
+    null,
+  );
+  assert.equal(latestBuild([success], 'other'), null);
+  assert.equal(
+    latestBuild([{ ...success, event: 'pull_request' }], 'source'),
+    null,
+  );
+  assert.equal(
+    latestBuild([{ ...success, status: 'in_progress' }], 'source'),
+    null,
+  );
+  assert.throws(
+    () =>
+      latestBuild(
+        [
+          success,
+          {
+            ...success,
+            id: 2,
+            created_at: '2026-10-02',
+            conclusion: 'failure',
+          },
+        ],
+        'source',
+      ),
+    /failed/,
+  );
+});
+
+test('release rejects expired, duplicate or mismatched package artifacts', () => {
+  const artifacts = ['packages-windows', 'packages-linux'].map((name) => ({
+    name,
+    expired: false,
+    workflow_run: { head_sha: 'source' },
+  }));
+  requirePackages(artifacts, 'source');
+  assert.throws(() => requirePackages(artifacts.slice(1), 'source'), /missing/);
+  assert.throws(
+    () => requirePackages([...artifacts, artifacts[0]], 'source'),
+    /missing/,
+  );
+  assert.throws(() => requirePackages(artifacts, 'other'), /missing/);
+  assert.throws(
+    () =>
+      requirePackages(
+        artifacts.map((a) => ({ ...a, expired: true })),
+        'source',
+      ),
+    /expired/,
+  );
+});
 
 test('reader artwork integrity rejects missing or changed images', () =>
   temporary((root) => {
@@ -154,6 +224,12 @@ test('release requires all four packages and their original build checksums', ()
     writeChecksums(root, names.slice(0, 2), 'windows');
     writeChecksums(root, names.slice(2), 'linux');
     assert.equal(verifyAssets(root, '0.1.5').trim().split('\n').length, 4);
+    const combined = verifyAssets(root, '0.1.5');
+    write(root, 'SHA256SUMS.txt', combined);
+    assert.equal(verifyAssets(root, '0.1.5'), combined);
+    write(root, 'SHA256SUMS.txt', 'wrong');
+    assert.throws(() => verifyAssets(root, '0.1.5'), /combined/);
+    fs.unlinkSync(path.join(root, 'SHA256SUMS.txt'));
     write(root, names[2], 'modified');
     assert.throws(() => verifyAssets(root, '0.1.5'), /checksum/);
     fs.unlinkSync(path.join(root, names[3]));

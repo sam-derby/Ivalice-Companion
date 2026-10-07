@@ -1,4 +1,4 @@
-name: Build release packages
+name: Release
 
 on:
   push:
@@ -7,32 +7,33 @@ on:
     inputs:
       tag:
         description:
-          'Optional existing tag to build; empty builds the selected branch'
+          'Existing version tag; empty downloads the current main build'
         type: string
         default: ''
       create_draft:
-        description:
-          'Create or update a draft release (requires a matching version tag)'
+        description: 'Prepare a draft release for the selected tag'
         type: boolean
         default: false
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: release-${{ inputs.tag || github.ref }}
   cancel-in-progress: false
 
 env:
-  VITE_SHOW_WIP: 'false'
   RELEASE_TAG:
     ${{ inputs.tag || (github.ref_type == 'tag' && github.ref_name) || '' }}
 
 jobs:
   source:
     runs-on: ubuntu-22.04
+    timeout-minutes: 35
     outputs:
-      sha: ${{ steps.revision.outputs.sha }}
+      sha: ${{ steps.source.outputs.sha }}
+      run_id: ${{ steps.build.outputs.run_id }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -43,26 +44,23 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '22.22.2'
-      - name: Verify source version and tag
+      - name: Verify version and tag
         env:
           CREATE_DRAFT: ${{ inputs.create_draft || false }}
         run: |
           node --input-type=module -e "import { verifyVersion } from './.github/scripts/release-package.mjs'; if (process.env.CREATE_DRAFT === 'true' && !process.env.RELEASE_TAG) throw new Error('A release tag is required'); verifyVersion(process.cwd(), process.env.RELEASE_TAG)"
-      - id: revision
+      - id: source
         run: printf 'sha=%s\n' "$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Find verified packages
+        id: build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_SHA: ${{ steps.source.outputs.sha }}
+        run: node .github/scripts/release-source.mjs
 
   packages:
     needs: source
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: windows-2022
-            platform: windows
-          - os: ubuntu-22.04
-            platform: linux
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -71,36 +69,21 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '22.22.2'
-          cache: npm
-      - name: Install Linux build dependencies
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libdbus-1-dev libayatana-appindicator3-dev librsvg2-dev patchelf libfuse2 squashfs-tools squashfuse
-      - name: Install pinned Rust components
-        run: |
-          rustup show
-          rustup component add rustfmt clippy
-      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+      - name: Download the tested packages
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          workspaces: '. -> target'
-          cache-on-failure: true
-      - run: npm ci
-      - run: npm run validate
-      - name: Verify read-only AppImage resource access
-        if: runner.os == 'Linux'
-        run: bash .github/scripts/check-linux-fuse.sh
-      - name: Verify source version and tag
-        run:
-          node --input-type=module -e "import { verifyVersion } from
-          './.github/scripts/release-package.mjs'; verifyVersion(process.cwd(),
-          process.env.RELEASE_TAG)"
-      - name: Verify installers and assemble portable packages
-        run: node .github/scripts/release-package.mjs ${{ matrix.platform }}
+          github-token: ${{ github.token }}
+          run-id: ${{ needs.source.outputs.run_id }}
+          pattern: packages-*
+          merge-multiple: true
+          path: target/release-assets/combined
+      - name: Verify all four checksums
+        run: |
+          node --input-type=module -e "import fs from 'node:fs'; import { verifyAssets } from './.github/scripts/release-publish.mjs'; const version = JSON.parse(fs.readFileSync('package.json')).version; const root = 'target/release-assets/combined'; fs.writeFileSync(root + '/SHA256SUMS.txt', verifyAssets(root, version));"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: packages-${{ matrix.platform }}
-          path: target/release-assets/${{ matrix.platform }}/*
+          name: release-packages
+          path: target/release-assets/combined/*
           if-no-files-found: error
           retention-days: 30
 
@@ -120,10 +103,9 @@ jobs:
           node-version: '22.22.2'
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          pattern: packages-*
-          merge-multiple: true
+          name: release-packages
           path: target/release-assets/combined
-      - name: Create draft with all four packages
+      - name: Prepare the draft
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}

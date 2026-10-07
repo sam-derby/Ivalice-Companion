@@ -1,0 +1,31 @@
+name: Desktop build tools
+description: Install the pinned toolchain and restore build dependencies
+inputs:
+  cache:
+    description: Rust cache shared by jobs with the same build profile
+    required: true
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      with:
+        node-version: '22.22.2'
+        cache: npm
+    - name: Install Linux dependencies
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libdbus-1-dev libayatana-appindicator3-dev librsvg2-dev patchelf libfuse2 squashfs-tools squashfuse
+    - name: Install Rust components
+      shell: bash
+      run: |
+        rustup show
+        rustup component add rustfmt clippy
+    - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+      with:
+        shared-key: ${{ inputs.cache }}
+        workspaces: '. -> target'
+        cache-on-failure: true
+    - run: npm ci
+      shell: bash

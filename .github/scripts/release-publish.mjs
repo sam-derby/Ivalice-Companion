@@ -22,6 +22,8 @@ export function verifyAssets(directory, version) {
     'SHA256SUMS-windows.txt',
     'SHA256SUMS-linux.txt',
   ]);
+  const combined = path.join(directory, 'SHA256SUMS.txt');
+  if (fs.existsSync(combined)) expected.add('SHA256SUMS.txt');
   const actual = fs.readdirSync(directory);
   if (
     actual.length !== expected.size ||
@@ -46,7 +48,10 @@ export function verifyAssets(directory, version) {
   });
   if (recorded.length !== names.length)
     throw new Error('Unexpected checksum entries');
-  return lines.join('\n') + '\n';
+  const sums = lines.join('\n') + '\n';
+  if (fs.existsSync(combined) && fs.readFileSync(combined, 'utf8') !== sums)
+    throw new Error('Invalid combined checksum manifest');
+  return sums;
 }
 
 export function requireDraft(release) {
@@ -70,7 +75,8 @@ export function publishDraft(root, tag) {
   const directory = path.join(root, 'target/release-assets/combined');
   const sums = verifyAssets(directory, version);
   const checksums = path.join(directory, 'SHA256SUMS.txt');
-  fs.writeFileSync(checksums, sums, { flag: 'wx' });
+  if (!fs.existsSync(checksums))
+    fs.writeFileSync(checksums, sums, { flag: 'wx' });
   const existing = spawnSync(
     'gh',
     ['release', 'view', tag, '--json', 'isDraft'],
