@@ -111,13 +111,13 @@ test('package checks require eight resources and five notices with exact bytes',
     }
     write(
       root,
-      'src-tauri/tauri.linux.conf.json',
+      'src-tauri/tauri.linux.installer.conf.json',
       JSON.stringify({ bundle: { resources } }),
     );
     verifyBundled(
       root,
       path.join(root, 'extracted'),
-      'tauri.linux.conf.json',
+      'tauri.linux.installer.conf.json',
       true,
     );
     write(root, 'extracted/usr/lib/app/resources/file-0', 'wrong');
@@ -126,7 +126,7 @@ test('package checks require eight resources and five notices with exact bytes',
         verifyBundled(
           root,
           path.join(root, 'extracted'),
-          'tauri.linux.conf.json',
+          'tauri.linux.installer.conf.json',
           true,
         ),
       /bytes differ/,

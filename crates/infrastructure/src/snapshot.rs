@@ -832,7 +832,14 @@ mod tests {
             .write(true)
             .open(&exact)?
             .set_len(MAX_SNAPSHOT_BYTES)?;
-        let snapshot = acquire(&exact)?;
+        // This checks the byte boundary, not the host's disk throughput. Keep
+        // the production deadline covered by the separate clock-driven tests.
+        let snapshot = acquire_with_runtime(
+            &SnapshotReader::new(),
+            &exact,
+            &CancellationToken::default(),
+            &HookRuntime::new(|_, _| {}),
+        )?;
         assert_eq!(u64::try_from(snapshot.len())?, MAX_SNAPSHOT_BYTES);
         Ok(())
     }
@@ -1160,34 +1167,58 @@ mod tests {
         let root = path.parent().ok_or("synthetic source has no parent")?;
         let ready = root.join("acl-ready");
         let release = root.join("acl-release");
+        let fault = root.join("acl-fault");
         let script = r#"
+$ErrorActionPreference = 'Stop'
 $path = $env:IVALICE_D002_PATH
 $ready = $env:IVALICE_D002_READY
 $release = $env:IVALICE_D002_RELEASE
-$acl = Get-Acl -LiteralPath $path
-$changed = Get-Acl -LiteralPath $path
+$fault = $env:IVALICE_D002_FAULT
+$stage = 'read-acl'
+try {
+$sections = [Security.AccessControl.AccessControlSections]::Access
+$original = (Get-Acl -LiteralPath $path).GetSecurityDescriptorSddlForm($sections)
+$acl = [Security.AccessControl.FileSecurity]::new()
+$acl.SetSecurityDescriptorSddlForm($original, $sections)
+$changed = [Security.AccessControl.FileSecurity]::new()
+$changed.SetSecurityDescriptorSddlForm($original, $sections)
 $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
 try {
+  $stage = 'deny-read'
   $rule = [Security.AccessControl.FileSystemAccessRule]::new($identity.User, [Security.AccessControl.FileSystemRights]::ReadData, [Security.AccessControl.AccessControlType]::Deny)
   [void]$changed.AddAccessRule($rule)
   Set-Acl -LiteralPath $path -AclObject $changed
   [IO.File]::WriteAllText($ready, 'ready')
+  $stage = 'wait-for-release'
   while (-not (Test-Path -LiteralPath $release)) { Start-Sleep -Milliseconds 10 }
 } finally {
-  Set-Acl -LiteralPath $path -AclObject $acl
-  $identity.Dispose()
+  try {
+    $stage = 'restore-acl'
+    Set-Acl -LiteralPath $path -AclObject $acl
+    $stage = 'verify-restored-acl'
+    if ((Get-Acl -LiteralPath $path).GetSecurityDescriptorSddlForm($sections) -ne $original) {
+      throw 'ACL restoration differed'
+    }
+  } finally { $identity.Dispose() }
+}
+} catch {
+  [IO.File]::WriteAllText($fault, ($stage + ':' + $_.Exception.HResult))
+  exit 1
 }
 "#;
         let mut child = Command::new("powershell.exe")
-            .args(["-NoProfile", "-Command", script])
+            .args(["-NoProfile", "-NonInteractive", "-Command", script])
             .env("IVALICE_D002_PATH", &path)
             .env("IVALICE_D002_READY", &ready)
             .env("IVALICE_D002_RELEASE", &release)
+            .env("IVALICE_D002_FAULT", &fault)
             .stdout(Stdio::null())
             .stderr(Stdio::null())
             .spawn()?;
-        let deadline = Instant::now() + Duration::from_secs(5);
-        while !ready.exists() && Instant::now() < deadline {
+        // Allow process startup on a loaded CI host; this is independent of
+        // snapshot acquisition's unchanged two-second production deadline.
+        let deadline = Instant::now() + Duration::from_secs(30);
+        while !ready.exists() && Instant::now() < deadline && child.try_wait()?.is_none() {
             thread::sleep(Duration::from_millis(10));
         }
 
@@ -1210,7 +1241,8 @@ try {
         };
         fs::write(&release, b"release")?;
         let status = child.wait()?;
-        assert!(status.success(), "ACL helper failed");
+        let diagnostic = fs::read_to_string(&fault).unwrap_or_else(|_| "no fault status".into());
+        assert!(status.success(), "ACL helper failed: {diagnostic}");
         assert_eq!(direct_os_code, Some(5), "ACL did not deny a direct read");
         let error = result
             .err()
