@@ -227,32 +227,44 @@ test('reset restores the exact saved base using current gear, without a full rep
   await waitFor(() => {
     expect(result.current.current).toBe(true);
   });
-  mocks.compute.mockResolvedValue({
-    storedBase: 8_847_360,
-    base: knownFact(540),
-    total: knownFact(660),
-  });
+  let resolveReset:
+    ((value: Awaited<ReturnType<typeof previewBaseStat>>) => void) | undefined;
+  mocks.compute.mockImplementationOnce(
+    () =>
+      new Promise((resolve) => {
+        resolveReset = resolve;
+      }),
+  );
   act(() => {
     result.current.resetStat(0, 'hp');
   });
   await waitFor(() => {
-    expect(onBase).toHaveBeenCalledWith(0, 'hp', 8_847_360);
+    expect(mocks.compute).toHaveBeenLastCalledWith({
+      stat: 'hp',
+      previousBase: 8_847_360,
+      value: null,
+      jobMultiplier: 100,
+      equipmentBonus: 120,
+    });
   });
-  expect(mocks.compute).toHaveBeenLastCalledWith({
-    stat: 'hp',
-    previousBase: 8_847_360,
-    value: null,
-    jobMultiplier: 100,
-    equipmentBonus: 120,
+  // Apply the parent's draft update in the same turn as the calculation.
+  await act(async () => {
+    resolveReset?.({
+      storedBase: 8_847_360,
+      base: knownFact(540),
+      total: knownFact(660),
+    });
+    await Promise.resolve();
+    rerender({
+      request: {
+        ...gear,
+        operations: gear.operations.filter(
+          (operation) => operation.kind !== 'base_stat',
+        ),
+      },
+    });
   });
-  rerender({
-    request: {
-      ...gear,
-      operations: gear.operations.filter(
-        (operation) => operation.kind !== 'base_stat',
-      ),
-    },
-  });
+  expect(onBase).toHaveBeenCalledWith(0, 'hp', 8_847_360);
   expect(result.current.current).toBe(true);
   const roster = result.current.reader?.roster.value;
   expect(roster?.state === 'known' && roster.value[0]?.effective.hp).toEqual(
