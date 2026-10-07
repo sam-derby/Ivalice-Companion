@@ -76,11 +76,12 @@ fn named_rotation_reuses_backup_and_preserves_filename() -> Result<(), Box<dyn s
     )
     .map_err(|error| format!("first save failed: {error:?}"))?;
     assert_eq!(backup.path(), root.join("enhanced - backup.png"));
-    assert_eq!(
-        crate::platform_fs::safe_single_link_file(backup.path())
-            .map_err(|_| "identity unavailable")?,
-        original_identity
-    );
+    let backup_identity = crate::platform_fs::safe_single_link_file(backup.path())
+        .map_err(|_| "identity unavailable")?;
+    #[cfg(windows)]
+    assert_eq!(backup_identity, original_identity);
+    #[cfg(target_os = "linux")]
+    assert_ne!(backup_identity, original_identity);
     let backup =
         replace_save_with_backup_if_unchanged(&path, Sha256::digest(first).into(), first, second)
             .map_err(|error| format!("second save failed: {error:?}"))?;

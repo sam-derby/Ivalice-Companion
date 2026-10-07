@@ -25,6 +25,11 @@ directory is a symlink, select the real save directory instead. Saves remain
 where the user selects them; Linux settings use the current user's XDG data
 directory.
 
+Linux saves flush an independent backup before replacing the selected file, so a
+process retaining an old source descriptor cannot later mutate that backup.
+Failed publication preserves the original or reports that recovery is required;
+it never replaces a file that appeared concurrently at the selected name.
+
 ## Build four downloads without publishing
 
 Run `Build release packages` manually on the desired branch. Leave `tag` empty

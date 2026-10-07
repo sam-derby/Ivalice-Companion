@@ -185,42 +185,67 @@ fn rotate_save(
     let backup = backup_path.file_name().ok_or(SaveEditError::UnsafePath)?;
     let copy_path = sibling_path(path, "copy")?;
     let copy = copy_path.file_name().ok_or(SaveEditError::UnsafePath)?;
+    let backup_copy_path = sibling_path(path, "backup copy")?;
+    let backup_copy = backup_copy_path
+        .file_name()
+        .ok_or(SaveEditError::UnsafePath)?;
+    let retired_path = sibling_path(path, "retired")?;
+    let retired = retired_path.file_name().ok_or(SaveEditError::UnsafePath)?;
+    if guard.open_file(retired).err() != Some(crate::platform_fs::PathFailure::NotFound) {
+        return Err(SaveEditError::UnsafePath);
+    }
+    let mut backup_exists = false;
     match guard.open_file(backup) {
         Ok(file)
             if file
                 .metadata()
                 .map_err(|_| SaveEditError::BackupFailed)?
                 .nlink()
-                == 1 => {}
+                == 1 =>
+        {
+            backup_exists = true;
+        }
         Err(crate::platform_fs::PathFailure::NotFound) => {}
         _ => return Err(SaveEditError::BackupFailed),
     }
     let copy_id = write_copy(&guard, copy, replacement, source.mode)?;
+    let backup_copy_id = match write_copy(&guard, backup_copy, original, source.mode) {
+        Ok(id) => id,
+        Err(_) => {
+            remove_owned(&guard, copy, copy_id);
+            return Err(SaveEditError::BackupFailed);
+        }
+    };
     let result = (|| {
         require_expected(&guard, name, &source, expected_sha256)?;
         let written = read_verified(&guard, copy)?;
         if written.identity != copy_id || written.bytes != replacement {
             return Err(SaveEditError::Io);
         }
-        if guard.rename(name, backup, true).is_err() {
-            // A synchronization error can follow a successful rename. Retain
-            // the original at its backup name and report recovery explicitly.
-            return Err(if guard.open_file(name).is_ok() {
-                SaveEditError::BackupFailed
-            } else {
-                SaveEditError::RecoveryRequired
-            });
+        let recovery = read_verified(&guard, backup_copy)?;
+        if recovery.identity != backup_copy_id || recovery.bytes != original {
+            return Err(SaveEditError::BackupFailed);
         }
-        let promoted = require_expected(&guard, backup, &source, expected_sha256)
+        // The backup must have its own inode. A game retaining an open source
+        // descriptor can otherwise modify a renamed backup after we return.
+        guard
+            .rename(backup_copy, backup, backup_exists)
+            .map_err(|_| SaveEditError::BackupFailed)?;
+        require_expected(&guard, name, &source, expected_sha256)?;
+        guard
+            .rename(name, retired, false)
+            .map_err(|_| SaveEditError::RecoveryRequired)?;
+        let promoted = require_expected(&guard, retired, &source, expected_sha256)
             .and_then(|()| promote(&guard, copy, name));
         if let Err(error) = promoted {
-            if require_expected(&guard, backup, &source, expected_sha256).is_err()
-                || guard.rename(backup, name, false).is_err()
+            if require_expected(&guard, retired, &source, expected_sha256).is_err()
+                || guard.rename(retired, name, false).is_err()
             {
                 return Err(SaveEditError::RecoveryRequired);
             }
             return Err(error);
         }
+        remove_owned(&guard, retired, source.identity);
         Ok(SaveBackup {
             path: backup_path.clone(),
             original_sha256: expected_sha256,
@@ -229,6 +254,7 @@ fn rotate_save(
     })();
     if result.is_err() {
         remove_owned(&guard, copy, copy_id);
+        remove_owned(&guard, backup_copy, backup_copy_id);
     }
     result
 }
@@ -362,7 +388,7 @@ mod linux_tests {
         });
         assert_eq!(failed, Err(SaveEditError::Io));
         assert_eq!(std::fs::read(&path)?, b"original");
-        assert!(!backup.exists());
+        assert_eq!(std::fs::read(&backup)?, b"original");
         assert!(!copy.exists());
         let failed = rotate_save(&path, digest, b"original", b"edited", |guard, from, to| {
             std::fs::write(&path, b"concurrent").map_err(|_| SaveEditError::Io)?;
