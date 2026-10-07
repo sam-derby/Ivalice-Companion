@@ -752,7 +752,7 @@ mod tests {
     ) -> Result<(), Box<dyn std::error::Error>> {
         let root = test_root("success")?;
         let source = root.join("enhanced.png");
-        let original = b"original synthetic D006 snapshot".to_vec();
+        let original = b"original synthetic snapshot".to_vec();
         fs::write(&source, &original)?;
         let state = state(&root)?;
         let generation = state.begin_load();
@@ -842,7 +842,7 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "requires ignored R006 private input, observation, catalogue, and dictionary"]
+    #[ignore = "requires local save, expected roster, catalogue and dictionary"]
     fn private_production_pipeline_matches_independent_roster_without_writes(
     ) -> Result<(), Box<dyn std::error::Error>> {
         let workspace = workspace_root();

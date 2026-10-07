@@ -1,5 +1,4 @@
-//! Linux filesystem operations use open directory descriptors, never a reopened
-//! ambient parent when creating, renaming or removing a save.
+//! Linux save operations stay relative to an open parent directory.
 use std::fs::{self, File, Metadata};
 use std::io;
 use std::os::unix::fs::MetadataExt;
@@ -233,8 +232,8 @@ impl DirectoryGuard {
     }
 }
 
-// Linux v6.12 include/uapi/linux/magic.h. Restrict saves and companion data to
-// local filesystems; squashfs also permits read-only AppImage resource loading.
+// Filesystem IDs from Linux v6.12 include/uapi/linux/magic.h.
+// Saves need a local filesystem; read-only resources also work on squashfs.
 // https://github.com/torvalds/linux/blob/v6.12/include/uapi/linux/magic.h
 fn validate_volume(file: &File) -> Result<(), PathFailure> {
     validate_volume_policy(file, false)
@@ -253,8 +252,8 @@ fn validate_volume_policy(file: &File, resource: bool) -> Result<(), PathFailure
     Ok(())
 }
 
-// FUSE's statfs reports FUSE_SUPER_MAGIC even for squashfuse/AppImage mounts
-// (Linux v6.12 fs/fuse/inode.c). Permit it only for read-only resource reads.
+// squashfuse/AppImage reports FUSE_SUPER_MAGIC (Linux v6.12 fs/fuse/inode.c).
+// Allow resource reads, but keep saves off FUSE.
 fn supported_filesystem(kind: u64, read_only: bool, resource: bool) -> bool {
     matches!(
         kind,
