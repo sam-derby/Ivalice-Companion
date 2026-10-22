@@ -90,10 +90,27 @@ struct LoadedEdit {
     generation: u64,
     path: PathBuf,
     sha256: [u8; 32],
+    #[cfg(target_os = "linux")]
+    file_identity: (u64, u64),
     slot: u8,
     gil: u32,
     catalogue_token: Option<String>,
     units: Vec<ivalice_save_format::UnitRecord>,
+}
+
+fn source_identity_changed(
+    loaded: &LoadedEdit,
+    snapshot: &ivalice_infrastructure::Snapshot,
+) -> bool {
+    #[cfg(target_os = "linux")]
+    {
+        loaded.file_identity != snapshot.file_identity()
+    }
+    #[cfg(windows)]
+    {
+        let _ = (loaded, snapshot);
+        false
+    }
 }
 
 impl DesktopState {
@@ -313,7 +330,8 @@ fn selection_status(state: &DesktopState) -> Result<SaveSelectionStatus, IpcErro
 
 fn set_selection(state: &DesktopState, path: String) -> Result<SaveSelectionStatus, IpcError> {
     validate_selection_text(&path)?;
-    let path = PathBuf::from(path);
+    let path =
+        ivalice_infrastructure::resolve_save_path(Path::new(&path)).map_err(map_candidate_error)?;
     let store = state.settings()?;
     let validator = NativeCandidateValidator::new(Some(store.root().to_path_buf()));
     validator.validate(&path).map_err(map_candidate_error)?;
@@ -347,7 +365,9 @@ fn selected_candidate(state: &DesktopState, settings: &Settings) -> Result<PathB
     .map_err(|_| IpcError::simple(IpcErrorCategory::Settings, "too_many_nominations", false))?;
 
     match discovery.candidates {
-        CandidateSet::SingleCandidate(candidate) => Ok(candidate.path),
+        CandidateSet::SingleCandidate(candidate) => {
+            ivalice_infrastructure::resolve_save_path(&candidate.path).map_err(map_candidate_error)
+        }
         CandidateSet::NoCandidates | CandidateSet::SelectionUnavailable(_) => {
             let error = discovery
                 .entry_errors
@@ -490,6 +510,7 @@ fn map_candidate_error(error: CandidateErrorCode) -> IpcError {
         CandidateErrorCode::AccessDenied => "access_denied",
         CandidateErrorCode::NotRegularFile => "not_regular_file",
         CandidateErrorCode::UnsupportedLocation => "unsupported_location",
+        CandidateErrorCode::LinkResolution => "link_resolution",
         CandidateErrorCode::IdentityUnavailable => "identity_unavailable",
         CandidateErrorCode::IoFailure => "io_failure",
     };
@@ -517,6 +538,7 @@ fn map_settings_error(error: SettingsError) -> IpcError {
 
 fn map_snapshot_error(error: SnapshotError) -> IpcError {
     let (category, code, retryable) = match error.code {
+        SnapshotErrorCode::LinkResolution => (IpcErrorCategory::Snapshot, "link_resolution", false),
         SnapshotErrorCode::InvalidPath => (IpcErrorCategory::Snapshot, "invalid_path", false),
         SnapshotErrorCode::NotRegularFile => {
             (IpcErrorCategory::Snapshot, "not_regular_file", false)
@@ -791,6 +813,79 @@ mod tests {
         assert_eq!(fs::read(&source)?, original);
 
         fs::remove_dir_all(root)?;
+        Ok(())
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn selected_links_persist_the_actual_target_across_retarget_and_restart(
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        use std::os::unix::fs::symlink;
+        let root = test_root("link-selection")?;
+        let original = root.join("original.png");
+        let other = root.join("other.png");
+        fs::write(&original, b"same content")?;
+        fs::write(&other, b"same content")?;
+        let directory = root.join("Steam library");
+        fs::create_dir(&directory)?;
+        let leaf = directory.join("enhanced.png");
+        symlink(&original, &leaf)?;
+        let ancestor = root.join("Proton prefix");
+        symlink(&directory, &ancestor)?;
+        let state = state(&root)?;
+        set_selection(
+            &state,
+            ancestor.join("enhanced.png").to_string_lossy().into_owned(),
+        )?;
+        fs::remove_file(&leaf)?;
+        symlink(&other, &leaf)?;
+        let other_directory = root.join("Other library");
+        fs::create_dir(&other_directory)?;
+        fs::write(other_directory.join("enhanced.png"), b"same content")?;
+        fs::remove_file(&ancestor)?;
+        symlink(&other_directory, &ancestor)?;
+        let settings = state.settings()?.load()?.ok_or("missing settings")?;
+        assert_eq!(settings.selected_file.as_deref(), Some(original.as_path()));
+        assert_eq!(selected_candidate(&state, &settings)?, original);
+        let restarted = super::tests::state(&root)?;
+        assert_eq!(selection_status(&restarted)?, SaveSelectionStatus::Selected);
+        fs::remove_file(&original)?;
+        assert!(matches!(
+            selection_status(&restarted)?,
+            SaveSelectionStatus::Unavailable { .. }
+        ));
+        assert_eq!(fs::read(&other)?, b"same content");
+        fs::remove_dir_all(root)?;
+        Ok(())
+    }
+
+    #[test]
+    fn location_and_resource_errors_serialize_explicit_codes_without_paths(
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        for (error, expected) in [
+            (
+                map_candidate_error(CandidateErrorCode::UnsupportedLocation),
+                "unsupported_location",
+            ),
+            (
+                map_candidate_error(CandidateErrorCode::AccessDenied),
+                "access_denied",
+            ),
+            (
+                map_candidate_error(CandidateErrorCode::LinkResolution),
+                "link_resolution",
+            ),
+            (
+                IpcError::simple(IpcErrorCategory::Resource, "resource_missing", false),
+                "resource_missing",
+            ),
+        ] {
+            let wire = serde_json::to_value(error)?;
+            assert_eq!(wire["code"], expected);
+            assert!(wire.get("path").is_none());
+            assert_eq!(wire["retryable"], false);
+            assert_eq!(wire.as_object().ok_or("expected error object")?.len(), 5);
+        }
         Ok(())
     }
 

@@ -35,6 +35,7 @@ pub struct LoadReaderResponse {
     pub reader: Option<ReaderDocument>,
     pub reader_error: Option<IpcError>,
     pub edit_context: Option<EditContext>,
+    pub edit_unavailable: Option<IpcError>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq, Serialize)]
@@ -406,6 +407,7 @@ pub(super) fn project_selected_reader(
         reader: None,
         reader_error: None,
         edit_context: None,
+        edit_unavailable: None,
     };
     if let Some(slot) = request.manual_slot_id {
         let metadata = decoded.slot_metadata(slot).map_err(map_manual_error)?;
@@ -1065,11 +1067,34 @@ pub(super) fn project_selected_reader(
         }
     }
     ensure_current(state, generation)?;
+    if let Some(restriction) =
+        ivalice_infrastructure::save_write_restriction(path).map_err(map_candidate_error)?
+    {
+        response.edit_context = None;
+        response.edit_unavailable = Some(IpcError::simple(
+            IpcErrorCategory::Snapshot,
+            match restriction {
+                ivalice_infrastructure::SaveWriteRestriction::ReadOnlyMount => {
+                    "save_mount_read_only"
+                }
+                ivalice_infrastructure::SaveWriteRestriction::UnverifiedDriver => {
+                    "save_driver_read_only"
+                }
+                ivalice_infrastructure::SaveWriteRestriction::NoReplaceRename => {
+                    "save_driver_no_safe_replace"
+                }
+            },
+            false,
+        ));
+        *lock_recover(&state.loaded_edit) = None;
+    }
     if let Some(context) = &response.edit_context {
         *lock_recover(&state.loaded_edit) = Some(LoadedEdit {
             generation,
             path: path.to_path_buf(),
             sha256: snapshot.sha256(),
+            #[cfg(target_os = "linux")]
+            file_identity: snapshot.file_identity(),
             slot: context.manual_slot_id,
             gil: context.gil,
             units: decoded
@@ -1860,11 +1885,18 @@ mod tests {
             reader: None,
             reader_error: Some(error),
             edit_context: None,
+            edit_unavailable: Some(IpcError::simple(
+                IpcErrorCategory::Snapshot,
+                "save_driver_read_only",
+                false,
+            )),
         };
         let wire = serde_json::to_value(response)?;
         assert!(wire.get("requestId").is_some());
         assert!(wire.get("occupiedManualSlots").is_some());
         assert_eq!(wire["readerError"]["code"], "reader_catalogue_invalid");
+        assert_eq!(wire["editUnavailable"]["code"], "save_driver_read_only");
+        assert!(wire.get("edit_unavailable").is_none());
         assert!(!wire.to_string().contains("secret"));
         assert!(!wire.to_string().contains(root.to_string_lossy().as_ref()));
         Ok(())
@@ -1982,6 +2014,7 @@ mod tests {
             reader: Some(projected(identity)?.document().clone()),
             reader_error: None,
             edit_context: None,
+            edit_unavailable: None,
         })
     }
 

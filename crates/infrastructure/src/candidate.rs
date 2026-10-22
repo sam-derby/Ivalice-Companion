@@ -62,6 +62,7 @@ pub enum CandidateErrorCode {
     AccessDenied,
     NotRegularFile,
     UnsupportedLocation,
+    LinkResolution,
     IdentityUnavailable,
     IoFailure,
 }
@@ -94,6 +95,49 @@ pub enum DiscoveryError {
 pub trait CandidateValidator {
     fn validate(&self, path: &Path) -> Result<CandidateIdentity, CandidateErrorCode>;
 }
+
+/// Linux selections store the resolved target; Windows retains its path policy.
+pub fn resolve_save_path(path: &Path) -> Result<PathBuf, CandidateErrorCode> {
+    #[cfg(target_os = "linux")]
+    {
+        platform_fs::resolve_save_path(path).map_err(map_path_failure)
+    }
+    #[cfg(windows)]
+    {
+        platform_fs::validate_regular_file(path).map_err(map_path_failure)?;
+        Ok(path.to_path_buf())
+    }
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum SaveWriteRestriction {
+    ReadOnlyMount,
+    UnverifiedDriver,
+    NoReplaceRename,
+}
+
+/// Capability inspection never creates probe files or changes the source.
+pub fn save_write_restriction(
+    path: &Path,
+) -> Result<Option<SaveWriteRestriction>, CandidateErrorCode> {
+    #[cfg(target_os = "linux")]
+    {
+        let guard = DirectoryGuard::pin(path.parent().ok_or(CandidateErrorCode::InvalidPath)?)
+            .map_err(map_path_failure)?;
+        let file = guard
+            .open_file(path.file_name().ok_or(CandidateErrorCode::InvalidPath)?)
+            .map_err(map_path_failure)?;
+        crate::linux_volume::write_restriction(&file).map_err(map_path_failure)
+    }
+    #[cfg(windows)]
+    {
+        let _ = path;
+        Ok(None)
+    }
+}
+
+#[cfg(target_os = "linux")]
+use crate::platform_fs::DirectoryGuard;
 
 #[derive(Clone, Debug, Default)]
 pub struct NativeCandidateValidator {
@@ -202,6 +246,8 @@ fn map_path_failure(failure: PathFailure) -> CandidateErrorCode {
         PathFailure::AccessDenied => CandidateErrorCode::AccessDenied,
         PathFailure::NotRegularFile => CandidateErrorCode::NotRegularFile,
         PathFailure::UnsupportedLocation => CandidateErrorCode::UnsupportedLocation,
+        #[cfg(target_os = "linux")]
+        PathFailure::LinkResolution => CandidateErrorCode::LinkResolution,
         PathFailure::IdentityUnavailable => CandidateErrorCode::IdentityUnavailable,
         PathFailure::Busy => CandidateErrorCode::IoFailure,
         PathFailure::Io => CandidateErrorCode::IoFailure,

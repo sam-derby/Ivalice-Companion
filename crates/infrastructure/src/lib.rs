@@ -8,6 +8,8 @@ mod achievements;
 mod candidate;
 mod errands;
 mod job_eligibility;
+#[cfg(target_os = "linux")]
+mod linux_volume;
 #[cfg(windows)]
 #[path = "windows_fs.rs"]
 mod platform_fs;
@@ -28,9 +30,10 @@ mod story_roster;
 pub use ability_flags::AbilityFlagsLoader;
 pub use achievements::{AchievementsLoadError, AchievementsLoader};
 pub use candidate::{
-    automatic_nominations, discover_candidates, Candidate, CandidateEntryError, CandidateErrorCode,
-    CandidateIdentity, CandidateSet, CandidateValidator, Discovery, DiscoveryError,
-    NativeCandidateValidator, NominatedPath, NominationKind,
+    automatic_nominations, discover_candidates, resolve_save_path, save_write_restriction,
+    Candidate, CandidateEntryError, CandidateErrorCode, CandidateIdentity, CandidateSet,
+    CandidateValidator, Discovery, DiscoveryError, NativeCandidateValidator, NominatedPath,
+    NominationKind, SaveWriteRestriction,
 };
 pub use errands::{ErrandsLoadError, ErrandsLoader};
 pub use job_eligibility::{JobRequirementsLoadError, JobRequirementsLoader};
@@ -42,6 +45,28 @@ pub use save_edit::{
     replace_save_if_unchanged, replace_save_with_backup_if_unchanged,
     restore_save_from_backup_if_unchanged, write_new_save_file, SaveBackup, SaveEditError,
 };
+#[cfg(target_os = "linux")]
+pub use save_edit::{
+    replace_save_snapshot_with_backup_if_unchanged, restore_save_snapshot_from_backup_if_unchanged,
+};
+
+#[cfg(windows)]
+pub fn replace_save_snapshot_with_backup_if_unchanged(
+    path: &std::path::Path,
+    snapshot: &Snapshot,
+    replacement: &[u8],
+) -> Result<SaveBackup, SaveEditError> {
+    replace_save_with_backup_if_unchanged(path, snapshot.sha256(), snapshot.bytes(), replacement)
+}
+
+#[cfg(windows)]
+pub fn restore_save_snapshot_from_backup_if_unchanged(
+    path: &std::path::Path,
+    snapshot: &Snapshot,
+    backup: &SaveBackup,
+) -> Result<(), SaveEditError> {
+    restore_save_from_backup_if_unchanged(path, snapshot.sha256(), backup)
+}
 pub use settings::{Settings, SettingsError, SettingsStore};
 pub use snapshot::{
     CancellationToken, Snapshot, SnapshotError, SnapshotErrorCode, SnapshotReader,

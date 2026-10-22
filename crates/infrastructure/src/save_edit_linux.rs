@@ -17,6 +17,7 @@ pub enum SaveEditError {
     RecoveryRequired,
     Io,
     Exists,
+    ReadOnlyLocation,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -60,6 +61,12 @@ fn read_verified(guard: &DirectoryGuard, name: &OsStr) -> Result<Verified, SaveE
         .open_file(name)
         .map_err(|_| SaveEditError::UnsafePath)?;
     let before = file.metadata().map_err(|_| SaveEditError::Io)?;
+    if crate::linux_volume::write_restriction(&file)
+        .map_err(|_| SaveEditError::UnsafePath)?
+        .is_some()
+    {
+        return Err(SaveEditError::ReadOnlyLocation);
+    }
     if before.nlink() != 1 {
         return Err(SaveEditError::UnsafePath);
     }
@@ -169,6 +176,32 @@ fn rotate_save(
     replacement: &[u8],
     promote: impl FnOnce(&DirectoryGuard, &OsStr, &OsStr) -> Result<(), SaveEditError>,
 ) -> Result<SaveBackup, SaveEditError> {
+    rotate_save_checked(path, expected_sha256, original, replacement, None, promote)
+}
+
+pub fn replace_save_snapshot_with_backup_if_unchanged(
+    path: &Path,
+    snapshot: &crate::Snapshot,
+    replacement: &[u8],
+) -> Result<SaveBackup, SaveEditError> {
+    rotate_save_checked(
+        path,
+        snapshot.sha256(),
+        snapshot.bytes(),
+        replacement,
+        Some(snapshot.file_identity()),
+        |guard, from, to| guard.rename(from, to, false).map_err(|_| SaveEditError::Io),
+    )
+}
+
+fn rotate_save_checked(
+    path: &Path,
+    expected_sha256: [u8; 32],
+    original: &[u8],
+    replacement: &[u8],
+    expected_identity: Option<(u64, u64)>,
+    promote: impl FnOnce(&DirectoryGuard, &OsStr, &OsStr) -> Result<(), SaveEditError>,
+) -> Result<SaveBackup, SaveEditError> {
     check_bytes(original)?;
     check_bytes(replacement)?;
     if <[u8; 32]>::from(Sha256::digest(original)) != expected_sha256 {
@@ -178,7 +211,10 @@ fn rotate_save(
         .map_err(|_| SaveEditError::UnsafePath)?;
     let name = path.file_name().ok_or(SaveEditError::UnsafePath)?;
     let source = read_verified(&guard, name)?;
-    if source.bytes != original {
+    if source.bytes != original
+        || expected_identity
+            .is_some_and(|expected| expected != (source.identity.volume, source.identity.index))
+    {
         return Err(SaveEditError::Changed);
     }
     let backup_path = sibling_path(path, "backup")?;
@@ -276,6 +312,14 @@ pub fn write_new_save_file(
     check_bytes(bytes)?;
     let guard = DirectoryGuard::pin(path.parent().ok_or(SaveEditError::UnsafePath)?)
         .map_err(|_| SaveEditError::UnsafePath)?;
+    if crate::linux_volume::write_restriction(
+        guard.directory().map_err(|_| SaveEditError::UnsafePath)?,
+    )
+    .map_err(|_| SaveEditError::UnsafePath)?
+    .is_some()
+    {
+        return Err(SaveEditError::ReadOnlyLocation);
+    }
     let name = path.file_name().ok_or(SaveEditError::UnsafePath)?;
     let previous = match guard.open_file(name) {
         Ok(_) if !overwrite => return Err(SaveEditError::Exists),
@@ -315,6 +359,28 @@ pub fn restore_save_from_backup_if_unchanged(
     edited_sha256: [u8; 32],
     backup: &SaveBackup,
 ) -> Result<(), SaveEditError> {
+    restore_checked(path, edited_sha256, backup, None)
+}
+
+pub fn restore_save_snapshot_from_backup_if_unchanged(
+    path: &Path,
+    snapshot: &crate::Snapshot,
+    backup: &SaveBackup,
+) -> Result<(), SaveEditError> {
+    restore_checked(
+        path,
+        snapshot.sha256(),
+        backup,
+        Some(snapshot.file_identity()),
+    )
+}
+
+fn restore_checked(
+    path: &Path,
+    edited_sha256: [u8; 32],
+    backup: &SaveBackup,
+    expected_identity: Option<(u64, u64)>,
+) -> Result<(), SaveEditError> {
     if backup.path.parent() != path.parent() {
         return Err(SaveEditError::UnsafePath);
     }
@@ -335,7 +401,7 @@ pub fn restore_save_from_backup_if_unchanged(
     if <[u8; 32]>::from(Sha256::digest(&original.bytes)) != backup.original_sha256 {
         return Err(SaveEditError::BackupFailed);
     }
-    replace_save_if_unchanged(path, edited_sha256, &original.bytes)
+    replace_checked(path, edited_sha256, &original.bytes, expected_identity)
 }
 
 pub fn replace_save_if_unchanged(
@@ -343,11 +409,25 @@ pub fn replace_save_if_unchanged(
     expected_sha256: [u8; 32],
     replacement: &[u8],
 ) -> Result<(), SaveEditError> {
+    replace_checked(path, expected_sha256, replacement, None)
+}
+
+fn replace_checked(
+    path: &Path,
+    expected_sha256: [u8; 32],
+    replacement: &[u8],
+    expected_identity: Option<(u64, u64)>,
+) -> Result<(), SaveEditError> {
     check_bytes(replacement)?;
     let guard = DirectoryGuard::pin(path.parent().ok_or(SaveEditError::UnsafePath)?)
         .map_err(|_| SaveEditError::UnsafePath)?;
     let name = path.file_name().ok_or(SaveEditError::UnsafePath)?;
     let source = read_verified(&guard, name)?;
+    if expected_identity
+        .is_some_and(|expected| expected != (source.identity.volume, source.identity.index))
+    {
+        return Err(SaveEditError::Changed);
+    }
     require_expected(&guard, name, &source, expected_sha256)?;
     let copy_path = sibling_path(path, "copy")?;
     let copy = copy_path.file_name().ok_or(SaveEditError::UnsafePath)?;
@@ -371,6 +451,34 @@ mod tests;
 #[cfg(test)]
 mod linux_tests {
     use super::*;
+
+    #[test]
+    #[ignore = "requires an explicit disposable native exFAT image mount"]
+    fn mounted_failed_promotion_recovers_original() -> Result<(), Box<dyn std::error::Error>> {
+        let base = PathBuf::from(
+            std::env::var_os("IVALICE_TEST_SAVE_DIRECTORY").ok_or("missing disposable mount")?,
+        );
+        let root = base.join(format!("ivalice-recovery-{}", std::process::id()));
+        std::fs::create_dir(&root)?;
+        let path = root.join("enhanced.png");
+        std::fs::write(&path, b"original")?;
+        let failed = rotate_save(
+            &path,
+            Sha256::digest(b"original").into(),
+            b"original",
+            b"edited",
+            |_, _, _| Err(SaveEditError::Io),
+        );
+        assert_eq!(failed, Err(SaveEditError::Io));
+        assert_eq!(std::fs::read(&path)?, b"original");
+        assert_eq!(
+            std::fs::read(root.join("enhanced - backup.png"))?,
+            b"original"
+        );
+        assert_eq!(std::fs::read_dir(&root)?.count(), 2);
+        std::fs::remove_dir_all(root)?;
+        Ok(())
+    }
 
     #[test]
     fn failed_promotion_restores_original_and_concurrent_file_keeps_backup(

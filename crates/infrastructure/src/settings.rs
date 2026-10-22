@@ -343,6 +343,8 @@ fn map_path_failure(failure: PathFailure) -> SettingsError {
         PathFailure::AccessDenied => SettingsError::AccessDenied,
         PathFailure::NotRegularFile => SettingsError::UnsafeDestination,
         PathFailure::UnsupportedLocation => SettingsError::UnsupportedLocation,
+        #[cfg(target_os = "linux")]
+        PathFailure::LinkResolution => SettingsError::UnsupportedLocation,
         PathFailure::IdentityUnavailable => SettingsError::IdentityUnavailable,
         PathFailure::Busy => SettingsError::IoFailure,
         PathFailure::Io => SettingsError::IoFailure,

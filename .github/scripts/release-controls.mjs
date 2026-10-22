@@ -17,9 +17,34 @@ import {
   requireDraft,
   draftApiPath,
 } from './release-publish.mjs';
-import { runtimePackages } from './linux-notices.mjs';
+import { nativeLibraryOwners, runtimePackages } from './linux-notices.mjs';
 import { inspectReaderArt, verifyReaderArt } from './reader-art-input.mjs';
 import { latestBuild, requirePackages } from './release-source.mjs';
+
+test('native library ownership ignores dpkg diversions and requires an actual owner', () => {
+  assert.deepEqual(
+    nativeLibraryOwners(
+      [
+        'diversion by libc6 from: /lib64/ld-linux-x86-64.so.2',
+        'diversion by libc6 to: /lib64/ld-linux-x86-64.so.2.usr-is-merged',
+        'libc6:amd64: /lib64/ld-linux-x86-64.so.2',
+        'libc6:amd64: /usr/lib/x86_64-linux-gnu/libc.so.6',
+        'libgtk-3-0t64:amd64: /usr/lib/x86_64-linux-gnu/libgtk-3.so.0',
+      ].join('\n'),
+    ),
+    ['libc6:amd64', 'libgtk-3-0t64:amd64'],
+  );
+  assert.deepEqual(
+    nativeLibraryOwners('libexample1: /usr/lib/libexample.so.1\n'),
+    ['libexample1'],
+  );
+  assert.throws(() =>
+    nativeLibraryOwners(
+      'diversion by libc6 from: /lib64/ld-linux-x86-64.so.2\n',
+    ),
+  );
+  assert.throws(() => nativeLibraryOwners('unrecognized output'));
+});
 
 test('release reuses only the latest successful main build for the exact commit', () => {
   const success = {

@@ -42,6 +42,7 @@ const UNSUPPORTED_ATTRIBUTES: u32 = FILE_ATTRIBUTE_REPARSE_POINT
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum SnapshotErrorCode {
+    LinkResolution,
     InvalidPath,
     NotRegularFile,
     UnsupportedLocation,
@@ -87,6 +88,7 @@ impl SnapshotError {
 impl fmt::Display for SnapshotError {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         formatter.write_str(match self.code {
+            SnapshotErrorCode::LinkResolution => "the save link could not be resolved safely",
             SnapshotErrorCode::InvalidPath => "snapshot path is invalid",
             SnapshotErrorCode::NotRegularFile => "snapshot source is not a regular file",
             SnapshotErrorCode::UnsupportedLocation => "snapshot source location is unsupported",
@@ -125,6 +127,10 @@ impl Clone for Snapshot {
 }
 
 impl Snapshot {
+    /// Filesystem identity, independent of byte content (including equal copies).
+    pub fn file_identity(&self) -> (u64, u64) {
+        (self.observed.identity.volume, self.observed.identity.index)
+    }
     pub fn bytes(&self) -> &[u8] {
         &self.bytes
     }
@@ -286,6 +292,17 @@ impl SnapshotReader {
         runtime: &dyn Runtime,
         max_bytes: u64,
     ) -> Result<Snapshot, SnapshotError> {
+        #[cfg(target_os = "linux")]
+        let resolved = if self.read_only_resource {
+            path.to_path_buf()
+        } else {
+            platform_fs::resolve_save_path(path).map_err(|failure| {
+                let mapped = map_path_failure(failure);
+                SnapshotError::terminal(mapped.code, 1, None)
+            })?
+        };
+        #[cfg(target_os = "linux")]
+        let path = resolved.as_path();
         let mut last_transient = None;
         let mut ever_observed = false;
 
@@ -744,6 +761,8 @@ fn map_path_failure(failure: PathFailure) -> AttemptFailure {
             PathFailure::AccessDenied => SnapshotErrorCode::AccessDenied,
             PathFailure::NotRegularFile => SnapshotErrorCode::NotRegularFile,
             PathFailure::UnsupportedLocation => SnapshotErrorCode::UnsupportedLocation,
+            #[cfg(target_os = "linux")]
+            PathFailure::LinkResolution => SnapshotErrorCode::LinkResolution,
             PathFailure::IdentityUnavailable => SnapshotErrorCode::IdentityUnavailable,
             PathFailure::Busy => return AttemptFailure::busy(None),
             PathFailure::Io => SnapshotErrorCode::IoFailure,
@@ -1097,6 +1116,57 @@ mod tests {
             Some(SnapshotTransientCode::SourceChanged)
         );
         assert_eq!(fs::read(&path)?, expected);
+        Ok(())
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn retargeted_alias_during_read_keeps_the_resolved_target() -> Result<(), Box<dyn Error>> {
+        use std::os::unix::fs::symlink;
+        let target = synthetic_file("resolved-target", b"original")?;
+        let other = synthetic_file("other-target", b"different")?;
+        let alias = target.with_extension("link");
+        symlink(&target, &alias)?;
+        let runtime = HookRuntime::new(|checkpoint, _| {
+            if matches!(checkpoint, Checkpoint::AfterFirstPass) {
+                let _remove = fs::remove_file(&alias);
+                let _link = symlink(&other, &alias);
+            }
+        });
+        let snapshot = acquire_with_runtime(
+            &SnapshotReader::new(),
+            &alias,
+            &CancellationToken::default(),
+            &runtime,
+        )?;
+        assert_eq!(snapshot.bytes(), b"original");
+        assert_eq!(fs::read(&alias)?, b"different");
+        assert_eq!(fs::read(&target)?, b"original");
+        Ok(())
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn link_inserted_at_resolved_target_during_read_fails_closed() -> Result<(), Box<dyn Error>> {
+        use std::os::unix::fs::symlink;
+        let target = synthetic_file("resolved-replaced", b"original")?;
+        let other = synthetic_file("replacement-target", b"original")?;
+        let runtime = HookRuntime::new(|checkpoint, _| {
+            if matches!(checkpoint, Checkpoint::AfterFirstPass) {
+                let _remove = fs::remove_file(&target);
+                let _link = symlink(&other, &target);
+            }
+        });
+        let error = acquire_with_runtime(
+            &SnapshotReader::new(),
+            &target,
+            &CancellationToken::default(),
+            &runtime,
+        )
+        .err()
+        .ok_or("replacement link unexpectedly loaded")?;
+        assert_eq!(error.code, SnapshotErrorCode::LinkResolution);
+        assert_eq!(fs::read(&other)?, b"original");
         Ok(())
     }
 

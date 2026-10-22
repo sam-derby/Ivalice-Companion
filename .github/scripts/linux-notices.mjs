@@ -129,6 +129,19 @@ export async function stageRustNotices(root) {
   return destination;
 }
 
+// dpkg-query -S may include diversion notices before the owning package.
+export function nativeLibraryOwners(output) {
+  const packages = output.split('\n').flatMap((line) => {
+    const match = line.match(
+      /^([a-z0-9][a-z0-9+.-]*(?::[a-z0-9][a-z0-9-]*)?): \/.+$/,
+    );
+    return match ? [match[1]] : [];
+  });
+  if (!packages.length)
+    throw new Error('Cannot identify native library package');
+  return [...new Set(packages)];
+}
+
 export function appendNativeNotices(root, destination) {
   const binary = path.join(root, 'target/release/ivalice-companion');
   const options = { encoding: 'utf8', maxBuffer: 20 * 1024 * 1024 };
@@ -144,18 +157,19 @@ export function appendNativeNotices(root, destination) {
     let owners;
     for (const variant of variants) {
       try {
-        owners = execFileSync('dpkg-query', ['-S', variant], {
-          ...options,
-          stdio: ['ignore', 'pipe', 'ignore'],
-        });
+        owners = nativeLibraryOwners(
+          execFileSync('dpkg-query', ['-S', variant], {
+            ...options,
+            stdio: ['ignore', 'pipe', 'ignore'],
+          }),
+        );
         break;
       } catch {
         /* Try the resolved library name. */
       }
     }
     if (!owners) throw new Error('Cannot identify native library package');
-    for (const line of owners.trim().split('\n'))
-      packages.add(line.slice(0, line.indexOf(': ')));
+    for (const owner of owners) packages.add(owner);
   }
   const notices = [];
   for (const pkg of [...packages].sort()) {

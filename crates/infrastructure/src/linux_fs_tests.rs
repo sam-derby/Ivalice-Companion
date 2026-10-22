@@ -33,7 +33,7 @@ impl Drop for Scratch {
 
 #[test]
 fn fuse_resource_permission_never_enables_save_access() {
-    use super::supported_filesystem;
+    use crate::linux_volume::supported_filesystem;
     let fuse = 0x6573_5546;
     assert!(supported_filesystem(fuse, true, true));
     assert!(!supported_filesystem(fuse, false, true));
@@ -108,7 +108,8 @@ fn device_inode_identity_and_case_are_preserved() -> Result<(), Box<dyn Error>> 
 }
 
 #[test]
-fn symlink_sources_ancestors_and_settings_are_rejected() -> Result<(), Box<dyn Error>> {
+fn resolved_save_links_load_but_unresolved_writers_and_settings_reject_links(
+) -> Result<(), Box<dyn Error>> {
     let scratch = Scratch::new()?;
     let real = scratch.0.join("real");
     fs::create_dir(&real)?;
@@ -119,6 +120,10 @@ fn symlink_sources_ancestors_and_settings_are_rejected() -> Result<(), Box<dyn E
     symlink(&path, &leaf)?;
     symlink(&real, &parent)?;
     for candidate in [leaf, parent.join("enhanced.png")] {
+        assert_eq!(super::resolve_save_path(&candidate), Ok(path.clone()));
+        let snapshot = crate::SnapshotReader::new()
+            .acquire(&candidate, &crate::CancellationToken::default())?;
+        assert_eq!(snapshot.bytes(), b"original");
         assert!(validate_regular_file(&candidate).is_err());
         assert_eq!(
             replace_save_with_backup_if_unchanged(

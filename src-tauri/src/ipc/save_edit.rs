@@ -8,7 +8,7 @@ use ivalice_domain::story_progress::CURRENT_AREA_VARIABLE;
 use ivalice_domain::story_roster::{plan_unit, RosterRole, RosterUnit, GUEST_POSITIONS};
 use ivalice_domain::{game_data::SpoilerLevel, ValueState};
 use ivalice_infrastructure::{
-    replace_save_with_backup_if_unchanged, restore_save_from_backup_if_unchanged,
+    replace_save_snapshot_with_backup_if_unchanged, restore_save_snapshot_from_backup_if_unchanged,
     AbilityFlagsLoader, JobRequirementsLoader, SaveEditError, StoryProgressLoader,
     StoryRosterLoader,
 };
@@ -916,7 +916,7 @@ pub(super) fn save_selected_operations(
         .reader
         .acquire(&loaded.path, &CancellationToken::default())
         .map_err(map_snapshot_error)?;
-    if snapshot.sha256() != loaded.sha256 {
+    if snapshot.sha256() != loaded.sha256 || source_identity_changed(&loaded, &snapshot) {
         return Err(IpcError::simple(
             IpcErrorCategory::Snapshot,
             "save_changed_since_load",
@@ -971,13 +971,9 @@ pub(super) fn save_selected_operations(
         });
     }
     ensure_current(state, generation)?;
-    let backup = replace_save_with_backup_if_unchanged(
-        &loaded.path,
-        loaded.sha256,
-        snapshot.bytes(),
-        &replacement,
-    )
-    .map_err(map_save_edit_error)?;
+    let backup =
+        replace_save_snapshot_with_backup_if_unchanged(&loaded.path, &snapshot, &replacement)
+            .map_err(map_save_edit_error)?;
     *lock_recover(&state.last_backup) = Some(BackupReceipt {
         path: loaded.path,
         slot,
@@ -1298,7 +1294,18 @@ fn restore_selected(state: &DesktopState, request: RestoreBackupRequest) -> Resu
     if selected_candidate(state, &settings)? != loaded.path {
         return Err(IpcError::stale());
     }
-    restore_save_from_backup_if_unchanged(&loaded.path, loaded.sha256, &receipt.backup)
+    let snapshot = state
+        .reader
+        .acquire(&loaded.path, &CancellationToken::default())
+        .map_err(map_snapshot_error)?;
+    if snapshot.sha256() != loaded.sha256 || source_identity_changed(&loaded, &snapshot) {
+        return Err(IpcError::simple(
+            IpcErrorCategory::Snapshot,
+            "save_changed_since_load",
+            false,
+        ));
+    }
+    restore_save_snapshot_from_backup_if_unchanged(&loaded.path, &snapshot, &receipt.backup)
         .map_err(map_save_edit_error)?;
     *lock_recover(&state.last_backup) = None;
     state.cancel_load();
@@ -1343,6 +1350,10 @@ pub(super) fn map_gil_edit_error(error: GilEditError) -> IpcError {
 
 pub(super) fn map_save_edit_error(error: SaveEditError) -> IpcError {
     match error {
+        #[cfg(target_os = "linux")]
+        SaveEditError::ReadOnlyLocation => {
+            IpcError::simple(IpcErrorCategory::Snapshot, "save_location_read_only", false)
+        }
         SaveEditError::UnsafePath => {
             IpcError::simple(IpcErrorCategory::Selection, "unsafe_save_path", false)
         }

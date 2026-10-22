@@ -46,6 +46,26 @@ function isIpcError(error: unknown): error is IpcError {
 }
 
 function errorMessage(error: IpcError | null): string {
+  if (error?.category === 'resource') {
+    return 'This app copy is missing a required runtime resource, or it cannot be read. Keep the complete resources folder beside the executable, check its permissions, then reload.';
+  }
+  switch (error?.code) {
+    case 'unsupported_location':
+    case 'identity_unavailable':
+      return 'This location cannot provide safe local save access. Copy the save to a supported local folder, then choose that copy.';
+    case 'access_denied':
+      return 'Permission to read the selected save or one of its folders was denied. Check the file and folder permissions, then choose the save again.';
+    case 'link_resolution':
+      return 'The selected save link could not be resolved safely. Check for a broken or looping link, or choose the actual save file.';
+    case 'not_found':
+      return 'The selected save or a link target no longer exists. Restore the file or choose its current location.';
+    case 'save_mount_read_only':
+      return 'This save is open for reading. Editing is disabled because its filesystem is mounted read-only.';
+    case 'save_driver_read_only':
+      return 'This save is open for reading. Editing is disabled because safe backup and replacement have not been verified for this filesystem driver. Choose a copy in a supported local folder to edit.';
+    case 'save_driver_no_safe_replace':
+      return 'This save is open for reading. Editing is disabled because NTFS-3G cannot safely replace the save without risking an overwrite of a concurrent file. Choose a copy in a supported local folder to edit.';
+  }
   if (error?.category === 'unsupported') {
     return 'This save format is unsupported. Choose an Enhanced save.';
   }
@@ -84,6 +104,7 @@ export function App() {
   const [reader, setReader] = useState<ReaderDocument | null>(null);
   const [readerError, setReaderError] = useState<IpcError | null>(null);
   const [editContext, setEditContext] = useState<EditContext | null>(null);
+  const [editUnavailable, setEditUnavailable] = useState<IpcError | null>(null);
   const [hasPending, setHasPending] = useState(false);
   const [pendingAction, setPendingAction] = useState<PendingAction | null>(
     null,
@@ -136,6 +157,7 @@ export function App() {
     setReader(null);
     setReaderError(null);
     setEditContext(null);
+    setEditUnavailable(null);
     setHasPending(false);
     setNotice(null);
     lastReaderIdentity.current = null;
@@ -153,6 +175,7 @@ export function App() {
     setReader(null);
     setReaderError(null);
     setEditContext(null);
+    setEditUnavailable(null);
     setHasPending(false);
     setNotice(null);
     try {
@@ -190,6 +213,7 @@ export function App() {
       setReader(response.reader);
       setReaderError(response.readerError);
       setEditContext(response.editContext ?? null);
+      setEditUnavailable(response.editUnavailable ?? null);
       setInitialWorkspaceView(
         manualSlotId === null
           ? undefined
@@ -235,6 +259,7 @@ export function App() {
       setSelection(status);
     } catch (error: unknown) {
       if (selectionSequence.current === selectionId) {
+        clearLoadedSave();
         setSelection({
           state: 'error',
           error: isIpcError(error) ? error : null,
@@ -389,6 +414,11 @@ export function App() {
             Gil remains available.
           </p>
         </section>
+      )}
+      {editUnavailable && (
+        <p className="app-status" role="status">
+          {errorMessage(editUnavailable)}
+        </p>
       )}
       {load.state === 'loaded' && save === null && slots.length === 0 && (
         <section className="app-empty">

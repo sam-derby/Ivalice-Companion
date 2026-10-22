@@ -3,7 +3,7 @@
 
 use super::save_edit::{map_gil_edit_error, map_save_edit_error};
 use super::*;
-use ivalice_infrastructure::{replace_save_with_backup_if_unchanged, write_new_save_file};
+use ivalice_infrastructure::{replace_save_snapshot_with_backup_if_unchanged, write_new_save_file};
 use ivalice_save_format::{apply_slot_operation, export_slot, SlotOperation};
 
 #[derive(Clone, Debug, Deserialize)]
@@ -137,7 +137,7 @@ fn loaded_snapshot(
         .reader
         .acquire(&loaded.path, &CancellationToken::default())
         .map_err(map_snapshot_error)?;
-    if snapshot.sha256() != loaded.sha256 {
+    if snapshot.sha256() != loaded.sha256 || source_identity_changed(&loaded, &snapshot) {
         return Err(IpcError::simple(
             IpcErrorCategory::Snapshot,
             "save_changed_since_load",
@@ -219,13 +219,9 @@ fn apply_requested(state: &DesktopState, request: &SlotOperationRequest) -> Resu
     let replacement = apply_slot_operation(snapshot.bytes(), &dictionary, &operation)
         .map_err(map_gil_edit_error)?;
     ensure_current(state, request.snapshot_generation)?;
-    let backup = replace_save_with_backup_if_unchanged(
-        &loaded.path,
-        loaded.sha256,
-        snapshot.bytes(),
-        &replacement,
-    )
-    .map_err(map_save_edit_error)?;
+    let backup =
+        replace_save_snapshot_with_backup_if_unchanged(&loaded.path, &snapshot, &replacement)
+            .map_err(map_save_edit_error)?;
     *lock_recover(&state.last_backup) = Some(BackupReceipt {
         path: loaded.path,
         slot: loaded.slot,

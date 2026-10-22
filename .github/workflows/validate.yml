@@ -5,6 +5,11 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      save_filesystem_checks:
+        description: Exercise disposable NTFS-3G and native exFAT image mounts
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -40,6 +45,15 @@ jobs:
       - name: Check AppImage resource access
         if: runner.os == 'Linux'
         run: bash .github/scripts/check-linux-fuse.sh
+      - name: Check local save filesystem drivers (opt-in)
+        if:
+          runner.os == 'Linux' && github.event_name == 'workflow_dispatch' &&
+          inputs.save_filesystem_checks
+        env:
+          IVALICE_TEST_LOCAL_FILESYSTEMS: '1'
+        run: |
+          sudo apt-get install -y ntfs-3g exfatprogs
+          bash .github/scripts/check-linux-save-filesystems.sh
 
   packages:
     if: github.event_name != 'pull_request'

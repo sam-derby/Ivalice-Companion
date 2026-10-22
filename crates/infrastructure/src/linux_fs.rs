@@ -19,6 +19,7 @@ pub(crate) enum PathFailure {
     AccessDenied,
     NotRegularFile,
     UnsupportedLocation,
+    LinkResolution,
     IdentityUnavailable,
     Busy,
     Io,
@@ -50,7 +51,7 @@ pub(crate) fn map_io_error(error: io::Error) -> PathFailure {
         io::ErrorKind::PermissionDenied => PathFailure::AccessDenied,
         io::ErrorKind::WouldBlock => PathFailure::Busy,
         _ if error.raw_os_error() == Some(rustix::io::Errno::LOOP.raw_os_error()) => {
-            PathFailure::UnsupportedLocation
+            PathFailure::LinkResolution
         }
         _ => PathFailure::Io,
     }
@@ -169,7 +170,7 @@ impl DirectoryGuard {
         if metadata.nlink() == 0 {
             return Err(PathFailure::UnsupportedLocation);
         }
-        validate_volume_policy(&file, resource)?;
+        super::linux_volume::validate_read(&file, resource)?;
         self.validate()?;
         Ok(file)
     }
@@ -180,7 +181,7 @@ impl DirectoryGuard {
         mode: u32,
     ) -> Result<File, PathFailure> {
         self.validate()?;
-        validate_volume(self.directory()?)?;
+        super::linux_volume::validate_write(self.directory()?)?;
         let file = File::from(
             native::openat(
                 self.directory()?,
@@ -232,33 +233,17 @@ impl DirectoryGuard {
     }
 }
 
-// Filesystem IDs from Linux v6.12 include/uapi/linux/magic.h.
-// Saves need a local filesystem; read-only resources also work on squashfs.
-// https://github.com/torvalds/linux/blob/v6.12/include/uapi/linux/magic.h
-fn validate_volume(file: &File) -> Result<(), PathFailure> {
-    validate_volume_policy(file, false)
-}
-
-fn validate_volume_policy(file: &File, resource: bool) -> Result<(), PathFailure> {
-    let filesystem = native::fstatfs(file).map_err(|_| PathFailure::UnsupportedLocation)?;
-    let kind = u64::try_from(filesystem.f_type).map_err(|_| PathFailure::UnsupportedLocation)?;
-    let read_only = native::fstatvfs(file)
-        .map_err(|_| PathFailure::UnsupportedLocation)?
-        .f_flag
-        .contains(native::StatVfsMountFlags::RDONLY);
-    if !supported_filesystem(kind, read_only, resource) {
-        return Err(PathFailure::UnsupportedLocation);
+/// Resolve once at selection/acquisition, then use NOFOLLOW descriptor traversal.
+/// Persist this target, never the link: retargeting a selected alias requires a
+/// new explicit selection. Writers still reject links at the resolved path.
+pub(crate) fn resolve_save_path(path: &Path) -> Result<PathBuf, PathFailure> {
+    validate_path_shape(path)?;
+    let resolved = fs::canonicalize(path).map_err(map_io_error)?;
+    validate_regular_file(&resolved)?;
+    if fs::canonicalize(path).map_err(map_io_error)? != resolved {
+        return Err(PathFailure::LinkResolution);
     }
-    Ok(())
-}
-
-// squashfuse/AppImage reports FUSE_SUPER_MAGIC (Linux v6.12 fs/fuse/inode.c).
-// Allow resource reads, but keep saves off FUSE.
-fn supported_filesystem(kind: u64, read_only: bool, resource: bool) -> bool {
-    matches!(
-        kind,
-        0xef53 | 0x9123_683e | 0x5846_5342 | 0x0102_1994 | 0x794c_7630 | 0x7371_7368
-    ) || (kind == 0x6573_5546 && read_only && resource)
+    Ok(resolved)
 }
 
 pub(crate) fn ensure_data_directory(path: &Path) -> Result<(), PathFailure> {
@@ -267,7 +252,7 @@ pub(crate) fn ensure_data_directory(path: &Path) -> Result<(), PathFailure> {
 
 pub(crate) fn validate_supported_volume(path: &Path) -> Result<(), PathFailure> {
     let guard = DirectoryGuard::pin(path)?;
-    validate_volume(guard.directory()?)
+    super::linux_volume::validate_write(guard.directory()?)
 }
 
 pub(crate) fn validate_components(path: &Path) -> Result<(), PathFailure> {
@@ -305,3 +290,7 @@ pub(crate) fn paths_overlap(left: &Path, right: &Path) -> bool {
 #[cfg(test)]
 #[path = "linux_fs_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "linux_save_location_tests.rs"]
+mod location_tests;

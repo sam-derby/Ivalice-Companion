@@ -387,6 +387,87 @@ beforeEach(() => {
 
 describe('workspace cleanup', () => {
   test.each([
+    ['unsupported_location', 'safe local save access'],
+    ['access_denied', 'Permission to read'],
+    ['link_resolution', 'broken or looping link'],
+    ['not_found', 'link target no longer exists'],
+  ])(
+    'a failed %s selection clears the old workspace and explains recovery',
+    async (code, message) => {
+      mocks.getSaveSelection.mockResolvedValue({ state: 'selected' });
+      mocks.loadReader.mockImplementation((request) =>
+        Promise.resolve(
+          readerResponse(
+            request,
+            request.manualSlotId === null
+              ? null
+              : readerFor(0, request.requestId, [readerUnit(0, 'Old roster')]),
+          ),
+        ),
+      );
+      render(<App />);
+      await openRoster();
+      expect(screen.getAllByText('Old roster').length).toBeGreaterThan(0);
+      mocks.chooseSave.mockRejectedValue({
+        ...loadError,
+        category: 'selection',
+        code,
+      });
+      fireEvent.click(screen.getByRole('button', { name: 'Choose save' }));
+      await screen.findByText(new RegExp(message));
+      expect(screen.queryByText('Old roster')).toBeNull();
+      expect(screen.queryByRole('button', { name: /Reload slot/ })).toBeNull();
+    },
+  );
+
+  test('missing runtime data is distinct from a corrupt save', async () => {
+    mocks.getSaveSelection.mockResolvedValue({ state: 'selected' });
+    mocks.loadReader.mockRejectedValue({
+      ...loadError,
+      category: 'resource',
+      code: 'resource_missing',
+    });
+    render(<App />);
+    expect(await screen.findByRole('alert')).toHaveProperty(
+      'textContent',
+      expect.stringContaining(
+        'complete resources folder beside the executable',
+      ),
+    );
+    expect(screen.queryByText(/could not be safely parsed/)).toBeNull();
+  });
+
+  test.each([
+    'save_mount_read_only',
+    'save_driver_read_only',
+    'save_driver_no_safe_replace',
+  ])(
+    'a %s save displays its roster and a specific editing restriction',
+    async (code) => {
+      mocks.getSaveSelection.mockResolvedValue({ state: 'selected' });
+      mocks.loadReader.mockImplementation((request) =>
+        Promise.resolve({
+          ...readerResponse(
+            request,
+            request.manualSlotId === null
+              ? null
+              : readerFor(0, request.requestId, [
+                  readerUnit(0, 'Readable roster'),
+                ]),
+          ),
+          editContext: null,
+          editUnavailable: { ...loadError, category: 'snapshot', code },
+        }),
+      );
+      render(<App />);
+      await openRoster();
+      expect(screen.getAllByText('Readable roster').length).toBeGreaterThan(0);
+      expect(screen.getByText(/Editing is disabled because/)).toBeTruthy();
+      expect(screen.queryByRole('button', { name: 'Save changes' })).toBeNull();
+    },
+  );
+
+  test.each([
     ['Equip from inventory', 'held', '1 → 0'],
     ['Create and equip', 'create_and_equip', '1 → 2'],
   ] as const)(
