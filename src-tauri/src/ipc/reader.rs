@@ -1094,7 +1094,7 @@ pub(super) fn project_selected_reader(
             path: path.to_path_buf(),
             sha256: snapshot.sha256(),
             #[cfg(target_os = "linux")]
-            file_identity: snapshot.file_identity(),
+            source_snapshot: snapshot.clone(),
             slot: context.manual_slot_id,
             gil: context.gil,
             units: decoded

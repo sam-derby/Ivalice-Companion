@@ -114,6 +114,12 @@ pub struct Snapshot {
     bytes: Arc<[u8]>,
     sha256: [u8; 32],
     observed: Observation,
+    // exFAT assigns in-memory inode numbers in exfat_build_inode; keep the
+    // opened inode alive for the snapshot/session lifetime. This also prevents
+    // inode reuse after a source replacement on other Linux filesystems.
+    // Linux v6.12 fs/exfat/inode.c, exfat_build_inode/exfat_evict_inode.
+    #[cfg(target_os = "linux")]
+    source_pin: Arc<std::fs::File>,
 }
 
 impl Clone for Snapshot {
@@ -122,6 +128,8 @@ impl Clone for Snapshot {
             bytes: Arc::clone(&self.bytes),
             sha256: self.sha256,
             observed: self.observed,
+            #[cfg(target_os = "linux")]
+            source_pin: Arc::clone(&self.source_pin),
         }
     }
 }
@@ -425,13 +433,18 @@ fn acquire_attempt(
     check_stop_attempt(context)?;
     require_unchanged_handle(&second, observation)?;
     require_current_path(path, observation, resource)?;
+    #[cfg(windows)]
     drop(second);
+    #[cfg(target_os = "linux")]
+    let source_pin = Arc::new(second.into_file());
 
     let digest: [u8; 32] = Sha256::digest(&bytes).into();
     Ok(Snapshot {
         bytes: Arc::from(bytes.into_boxed_slice()),
         sha256: digest,
         observed: observation,
+        #[cfg(target_os = "linux")]
+        source_pin,
     })
 }
 
@@ -1116,6 +1129,32 @@ mod tests {
             Some(SnapshotTransientCode::SourceChanged)
         );
         assert_eq!(fs::read(&path)?, expected);
+        Ok(())
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn linux_snapshot_clones_keep_the_source_inode_open_until_the_last_drop(
+    ) -> Result<(), Box<dyn Error>> {
+        use std::os::unix::fs::MetadataExt;
+        let path = synthetic_file("inode-pin", b"immutable bytes")?;
+        let snapshot = acquire(&path)?;
+        let expected = snapshot.file_identity();
+        let open_count = || -> Result<usize, std::io::Error> {
+            Ok(fs::read_dir("/proc/self/fd")?
+                .filter_map(Result::ok)
+                .filter_map(|entry| fs::metadata(entry.path()).ok())
+                .filter(|metadata| (metadata.dev(), metadata.ino()) == expected)
+                .count())
+        };
+        assert_eq!(open_count()?, 1);
+        let retained = snapshot.clone();
+        drop(snapshot);
+        assert_eq!(open_count()?, 1);
+        assert_eq!(retained.bytes(), b"immutable bytes");
+        drop(retained);
+        assert_eq!(open_count()?, 0);
+        assert_eq!(fs::read(&path)?, b"immutable bytes");
         Ok(())
     }
 

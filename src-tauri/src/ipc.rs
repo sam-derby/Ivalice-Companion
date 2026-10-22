@@ -91,7 +91,7 @@ struct LoadedEdit {
     path: PathBuf,
     sha256: [u8; 32],
     #[cfg(target_os = "linux")]
-    file_identity: (u64, u64),
+    source_snapshot: ivalice_infrastructure::Snapshot,
     slot: u8,
     gil: u32,
     catalogue_token: Option<String>,
@@ -104,7 +104,7 @@ fn source_identity_changed(
 ) -> bool {
     #[cfg(target_os = "linux")]
     {
-        loaded.file_identity != snapshot.file_identity()
+        loaded.source_snapshot.file_identity() != snapshot.file_identity()
     }
     #[cfg(windows)]
     {

@@ -36,6 +36,10 @@ pub(super) fn open_source(
 }
 
 impl SourceHandle {
+    pub(super) fn into_file(self) -> File {
+        self.file
+    }
+
     pub(super) fn read_chunk(&self, buffer: &mut [u8]) -> Result<usize, AttemptFailure> {
         let mut file = &self.file;
         file.read(buffer)
