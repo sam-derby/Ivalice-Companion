@@ -77,6 +77,13 @@ fn ntfs_mount_record(mounts: &str, mount_id: &str) -> bool {
 }
 
 pub(crate) fn validate_read(file: &File, resource: bool) -> Result<(), PathFailure> {
+    // User-selected saves are read through bounded, double-read snapshots.
+    // A filesystem name is not a read capability: FUSE/portal and other
+    // drivers can provide ordinary stable regular files. Keep publication
+    // policy separate, including when filesystem inspection is unavailable.
+    if !resource {
+        return Ok(());
+    }
     let (kind, readonly) = volume(file)?;
     if supported_filesystem(kind, readonly, resource) || (kind == FUSE && ntfs_3g(file)) {
         Ok(())
@@ -86,28 +93,39 @@ pub(crate) fn validate_read(file: &File, resource: bool) -> Result<(), PathFailu
 }
 
 pub(crate) fn supported_filesystem(kind: u64, readonly: bool, resource: bool) -> bool {
-    native_save_filesystem(kind) || (kind == FUSE && resource && readonly)
+    !resource || native_save_filesystem(kind) || (kind == FUSE && readonly)
 }
 
-pub(crate) fn write_restriction(file: &File) -> Result<Option<SaveWriteRestriction>, PathFailure> {
-    validate_read(file, false)?;
-    let (kind, readonly) = volume(file)?;
-    Ok(if readonly {
+pub(crate) fn write_restriction(file: &File) -> Option<SaveWriteRestriction> {
+    match volume(file) {
+        Ok((kind, readonly)) => write_policy(kind, readonly, kind == FUSE && ntfs_3g(file)),
+        // Failure to identify write guarantees must not discard a readable
+        // snapshot or claim verified publication. The guarded writer still
+        // requires every backup/replacement operation. No probes are created.
+        Err(_) => Some(SaveWriteRestriction::UnverifiedDriver),
+    }
+}
+
+fn write_policy(
+    kind: u64,
+    readonly: bool,
+    identified_ntfs_3g: bool,
+) -> Option<SaveWriteRestriction> {
+    if readonly {
         Some(SaveWriteRestriction::ReadOnlyMount)
-    } else if matches!(kind, NTFS | NTFS3) {
-        // Native ntfs3 publication/recovery has not been verified. Read safely.
-        Some(SaveWriteRestriction::UnverifiedDriver)
-    } else if kind == FUSE {
+    } else if kind == FUSE && identified_ntfs_3g {
         // NTFS-3G 2022.10.3 rejects renameat2(RENAME_NOREPLACE) with EINVAL.
         // Never fall back to a check-then-overwrite rename.
         Some(SaveWriteRestriction::NoReplaceRename)
+    } else if !native_save_filesystem(kind) || matches!(kind, NTFS | NTFS3) {
+        Some(SaveWriteRestriction::UnverifiedDriver)
     } else {
         None
-    })
+    }
 }
 
 pub(crate) fn validate_write(file: &File) -> Result<(), PathFailure> {
-    if write_restriction(file)?.is_some() {
+    if write_restriction(file).is_some_and(SaveWriteRestriction::blocks_editing) {
         Err(PathFailure::UnsupportedLocation)
     } else {
         Ok(())
@@ -119,13 +137,53 @@ mod tests {
     use super::*;
 
     #[test]
-    fn only_explicit_local_types_and_exact_mount_records_are_recognized() {
+    fn save_reads_and_guarded_write_attempts_do_not_require_a_known_filesystem() {
         assert!(native_save_filesystem(NTFS));
         assert!(native_save_filesystem(NTFS3));
         assert!(native_save_filesystem(EXFAT));
-        for kind in [FUSE, 0x6969, 0xff53_4d42, 0xfe53_4d42] {
+        for kind in [
+            FUSE,
+            0x6969,
+            0xff53_4d42,
+            0xfe53_4d42,
+            0x4d44,
+            0xf2f5_2010,
+            u64::MAX,
+        ] {
             assert!(!native_save_filesystem(kind));
+            for readonly in [false, true] {
+                assert!(supported_filesystem(kind, readonly, false));
+            }
+            assert_eq!(
+                write_policy(kind, false, false),
+                Some(SaveWriteRestriction::UnverifiedDriver)
+            );
+            assert!(
+                !write_policy(kind, false, false).is_some_and(SaveWriteRestriction::blocks_editing)
+            );
+            assert_eq!(
+                write_policy(kind, true, false),
+                Some(SaveWriteRestriction::ReadOnlyMount)
+            );
+            assert!(
+                write_policy(kind, true, false).is_some_and(SaveWriteRestriction::blocks_editing)
+            );
         }
+        assert_eq!(write_policy(0xef53, false, false), None);
+        assert_eq!(write_policy(EXFAT, false, false), None);
+        assert_eq!(
+            write_policy(FUSE, false, true),
+            Some(SaveWriteRestriction::NoReplaceRename)
+        );
+        assert!(!SaveWriteRestriction::NoReplaceRename.blocks_editing());
+        assert_eq!(
+            write_policy(NTFS3, false, false),
+            Some(SaveWriteRestriction::UnverifiedDriver)
+        );
+    }
+
+    #[test]
+    fn ntfs_driver_identification_uses_the_exact_mount_record() {
         let records = "21 1 0:9 / /a\\040b rw - fuseblk /dev/loop0 rw\n22 1 0:10 / /ssh rw - fuse.sshfs remote rw\n";
         assert!(ntfs_mount_record(records, "21"));
         assert!(!ntfs_mount_record(records, "22"));

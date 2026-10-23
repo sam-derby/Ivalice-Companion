@@ -272,6 +272,7 @@ export interface LoadReaderRequest {
 
 export interface LoadReaderResponse {
   editUnavailable?: IpcError | null;
+  editWarning?: IpcError | null;
   requestId: number;
   occupiedManualSlots: number[];
   slotSummaries: SlotSummary[];

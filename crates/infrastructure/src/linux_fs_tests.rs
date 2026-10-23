@@ -32,13 +32,13 @@ impl Drop for Scratch {
 }
 
 #[test]
-fn fuse_resource_permission_never_enables_save_access() {
+fn resource_policy_does_not_restrict_selected_save_reads() {
     use crate::linux_volume::supported_filesystem;
     let fuse = 0x6573_5546;
     assert!(supported_filesystem(fuse, true, true));
     assert!(!supported_filesystem(fuse, false, true));
-    assert!(!supported_filesystem(fuse, true, false));
-    assert!(!supported_filesystem(fuse, false, false));
+    assert!(supported_filesystem(fuse, true, false));
+    assert!(supported_filesystem(fuse, false, false));
     // NFS remains unsupported even for read-only resources.
     assert!(!supported_filesystem(0x6969, true, true));
 }
@@ -46,18 +46,19 @@ fn fuse_resource_permission_never_enables_save_access() {
 #[test]
 #[ignore = "requires the CI-created read-only FUSE image"]
 fn read_only_fuse_resources_preserve_save_restrictions() -> Result<(), Box<dyn Error>> {
-    use crate::{CancellationToken, SnapshotErrorCode, SnapshotReader};
+    use crate::{CancellationToken, SaveWriteRestriction, SnapshotReader};
     let path = PathBuf::from(
         std::env::var_os("IVALICE_TEST_RESOURCE").ok_or("missing synthetic FUSE resource")?,
     );
     let cancellation = CancellationToken::default();
     let snapshot = SnapshotReader::for_resources().acquire(&path, &cancellation)?;
     assert_eq!(snapshot.bytes(), b"synthetic bundled resource");
-    let save_error = SnapshotReader::new()
-        .acquire(&path, &cancellation)
-        .err()
-        .ok_or("FUSE save unexpectedly accepted")?;
-    assert_eq!(save_error.code, SnapshotErrorCode::UnsupportedLocation);
+    let selected_save = SnapshotReader::new().acquire(&path, &cancellation)?;
+    assert_eq!(selected_save.bytes(), snapshot.bytes());
+    assert_eq!(
+        crate::save_write_restriction(&path),
+        Ok(Some(SaveWriteRestriction::ReadOnlyMount))
+    );
     assert_eq!(
         replace_save_with_backup_if_unchanged(
             &path,
@@ -65,7 +66,7 @@ fn read_only_fuse_resources_preserve_save_restrictions() -> Result<(), Box<dyn E
             snapshot.bytes(),
             b"edited"
         ),
-        Err(SaveEditError::UnsafePath)
+        Err(SaveEditError::ReadOnlyLocation)
     );
     assert_eq!(fs::read(&path)?, snapshot.bytes());
     assert_eq!(

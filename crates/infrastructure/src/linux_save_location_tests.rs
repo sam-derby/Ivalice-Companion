@@ -174,7 +174,7 @@ fn mounted_save_publication() -> Result<(), Box<dyn Error>> {
         assert_eq!(snapshot.bytes(), b"original");
         assert_eq!(
             replace_save_snapshot_with_backup_if_unchanged(&source, &snapshot, b"edited"),
-            Err(SaveEditError::ReadOnlyLocation)
+            Err(SaveEditError::BackupFailed)
         );
         assert_eq!(fs::read_dir(&scratch.0)?.count(), 1);
         assert_eq!(fs::read(&source)?, b"original");
@@ -182,6 +182,62 @@ fn mounted_save_publication() -> Result<(), Box<dyn Error>> {
     } else {
         publication_contract(&base)
     }
+}
+
+#[test]
+#[ignore = "requires an explicit disposable writable filesystem mount without verified publication"]
+fn mounted_unverified_save_reads_and_attempts_guarded_publication() -> Result<(), Box<dyn Error>> {
+    let base = PathBuf::from(
+        std::env::var_os("IVALICE_TEST_SAVE_DIRECTORY")
+            .ok_or("missing disposable mount directory")?,
+    );
+    let scratch = Scratch::in_directory(&base)?;
+    let directory = scratch.0.join("Steam library/steamapps/compatdata/1004640/pfx/drive_c/users/steamuser/Documents/My Games/Test Game/Steam/test-profile");
+    fs::create_dir_all(&directory)?;
+    let source = directory.join("enhanced.png");
+    fs::write(&source, b"original")?;
+    let selected = resolve_save_path(&source).map_err(|_| "selection failed")?;
+    let reader = SnapshotReader::new();
+    let token = CancellationToken::default();
+    let snapshot = reader.acquire(&selected, &token)?;
+    assert_eq!(snapshot.bytes(), b"original");
+    assert_eq!(
+        save_write_restriction(&selected),
+        Ok(Some(crate::SaveWriteRestriction::UnverifiedDriver))
+    );
+    let attempted = replace_save_snapshot_with_backup_if_unchanged(&selected, &snapshot, b"edited");
+    if std::env::var("IVALICE_TEST_DRIVER").ok().as_deref() == Some("exfat-fuse")
+        && attempted.is_err()
+    {
+        // FUSE driver versions differ in rename-without-replace support.
+        // Unsupported publication must fail before changing the source,
+        // without leaving a staging file or falling back to overwrite.
+        assert_eq!(attempted, Err(SaveEditError::BackupFailed));
+        assert_eq!(fs::read_dir(&directory)?.count(), 1);
+        assert_eq!(fs::read(&selected)?, b"original");
+        println!("Required publication operation unsupported; attempted edit left the original and folder unchanged");
+    } else {
+        let backup = attempted
+            .map_err(|error| format!("unverified driver publication failed: {error:?}"))?;
+        assert_eq!(fs::read(backup.path())?, b"original");
+        assert_eq!(fs::read(&selected)?, b"edited");
+        let edited = reader.acquire(&selected, &token)?;
+        restore_save_snapshot_from_backup_if_unchanged(&selected, &edited, &backup)
+            .map_err(|error| format!("unverified driver restore failed: {error:?}"))?;
+        assert_eq!(fs::read(&selected)?, b"original");
+        assert_eq!(fs::read(backup.path())?, b"original");
+        assert_eq!(
+            replace_save_snapshot_with_backup_if_unchanged(&selected, &snapshot, b"stale"),
+            Err(SaveEditError::Changed)
+        );
+        println!("Unverified driver completed guarded publication, exact backup and restoration");
+    }
+    fs::write(&source, b"changed")?;
+    let reloaded = reader.acquire(&selected, &token)?;
+    assert_eq!(reloaded.bytes(), b"changed");
+    assert_ne!(snapshot.sha256(), reloaded.sha256());
+    assert_eq!(snapshot.bytes(), b"original");
+    Ok(())
 }
 
 #[test]

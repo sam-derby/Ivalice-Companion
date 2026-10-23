@@ -116,6 +116,14 @@ pub enum SaveWriteRestriction {
     NoReplaceRename,
 }
 
+impl SaveWriteRestriction {
+    /// Driver observations are advisories. The guarded writer may attempt
+    /// publication and must stop if any required operation fails.
+    pub fn blocks_editing(self) -> bool {
+        matches!(self, Self::ReadOnlyMount)
+    }
+}
+
 /// Capability inspection never creates probe files or changes the source.
 pub fn save_write_restriction(
     path: &Path,
@@ -127,7 +135,7 @@ pub fn save_write_restriction(
         let file = guard
             .open_file(path.file_name().ok_or(CandidateErrorCode::InvalidPath)?)
             .map_err(map_path_failure)?;
-        crate::linux_volume::write_restriction(&file).map_err(map_path_failure)
+        Ok(crate::linux_volume::write_restriction(&file))
     }
     #[cfg(windows)]
     {

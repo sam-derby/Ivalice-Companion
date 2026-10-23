@@ -62,8 +62,7 @@ fn read_verified(guard: &DirectoryGuard, name: &OsStr) -> Result<Verified, SaveE
         .map_err(|_| SaveEditError::UnsafePath)?;
     let before = file.metadata().map_err(|_| SaveEditError::Io)?;
     if crate::linux_volume::write_restriction(&file)
-        .map_err(|_| SaveEditError::UnsafePath)?
-        .is_some()
+        .is_some_and(crate::SaveWriteRestriction::blocks_editing)
     {
         return Err(SaveEditError::ReadOnlyLocation);
     }
@@ -315,8 +314,7 @@ pub fn write_new_save_file(
     if crate::linux_volume::write_restriction(
         guard.directory().map_err(|_| SaveEditError::UnsafePath)?,
     )
-    .map_err(|_| SaveEditError::UnsafePath)?
-    .is_some()
+    .is_some_and(crate::SaveWriteRestriction::blocks_editing)
     {
         return Err(SaveEditError::ReadOnlyLocation);
     }

@@ -7,7 +7,8 @@ on:
   workflow_dispatch:
     inputs:
       save_filesystem_checks:
-        description: Exercise disposable NTFS-3G and native exFAT image mounts
+        description:
+          Exercise disposable NTFS-3G, exFAT, FUSE and FAT32 image mounts
         type: boolean
         default: false
 
@@ -52,7 +53,7 @@ jobs:
         env:
           IVALICE_TEST_LOCAL_FILESYSTEMS: '1'
         run: |
-          sudo apt-get install -y ntfs-3g exfatprogs
+          sudo apt-get install -y ntfs-3g exfatprogs exfat-fuse dosfstools
           bash .github/scripts/check-linux-save-filesystems.sh
 
   packages:

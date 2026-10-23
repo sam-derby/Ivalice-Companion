@@ -16,9 +16,12 @@ Windows: run the installer, or extract the entire ZIP and open
 Linux: install the DEB on Debian/Ubuntu, or make the AppImage executable and
 open it. On Steam Deck, use Desktop Mode. **Linux is an early test build.**
 
-The Linux downloads were updated on 22 October 2026 to support symlinked save
-paths and local NTFS/exFAT reads. Editing is supported on writable ext4/exFAT;
-NTFS remains read-only. Steam Deck hardware and in-game loading are untested.
+The Linux filesystem follow-up supports stable reads from selected regular save
+files without requiring a recognised filesystem name. Unverified drivers show a
+backup warning and allow a guarded edit attempt. The editor still requires an
+unchanged source, a verified backup and safe file replacement; unsupported
+operations stop saving. Read-only mounts disable editing. Steam Deck hardware
+and in-game loading are untested.
 
 - View and edit your party, jobs, abilities and equipment.
 - Edit gil, the date, achievements and story progress.

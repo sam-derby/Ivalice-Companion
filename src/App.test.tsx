@@ -387,7 +387,8 @@ beforeEach(() => {
 
 describe('workspace cleanup', () => {
   test.each([
-    ['unsupported_location', 'safe local save access'],
+    ['unsupported_location', 'folders changed or could not be verified'],
+    ['identity_unavailable', 'did not provide a stable file identity'],
     ['access_denied', 'Permission to read'],
     ['link_resolution', 'broken or looping link'],
     ['not_found', 'link target no longer exists'],
@@ -466,6 +467,48 @@ describe('workspace cleanup', () => {
       expect(screen.queryByRole('button', { name: 'Save changes' })).toBeNull();
     },
   );
+
+  test('an unverified filesystem warns but keeps editing and confirmation available', async () => {
+    mocks.getSaveSelection.mockResolvedValue({ state: 'selected' });
+    mocks.loadReader.mockImplementation((request) =>
+      Promise.resolve({
+        ...readerResponse(
+          request,
+          request.manualSlotId === null
+            ? null
+            : readerFor(0, request.requestId, [
+                readerUnit(0, 'Readable roster'),
+              ]),
+        ),
+        editContext:
+          request.manualSlotId === null
+            ? null
+            : {
+                ...unavailableAdditions,
+                snapshotGeneration: request.requestId,
+                manualSlotId: 0,
+                gil: 100,
+              },
+        editWarning: {
+          ...loadError,
+          category: 'snapshot',
+          code: 'save_driver_unverified',
+        },
+      }),
+    );
+    render(<App />);
+    await chooseSlot(1);
+    const gil = await screen.findByRole('textbox', { name: 'Gil' });
+    expect(
+      screen.getByText(/Editing on this filesystem has not been verified/),
+    ).toBeTruthy();
+    expect(screen.queryByText(/Editing is disabled because/)).toBeNull();
+    fireEvent.change(gil, { target: { value: '101' } });
+    await openReview();
+    expect(
+      screen.getByRole('button', { name: 'Confirm and save' }),
+    ).toHaveProperty('disabled', false);
+  });
 
   test.each([
     ['Equip from inventory', 'held', '1 → 0'],
@@ -1079,6 +1122,29 @@ describe('workspace cleanup', () => {
     expect(screen.getByRole('button', { name: 'Review changes' })).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Reset Gil' }));
     expect(screen.queryByRole('button', { name: 'Review changes' })).toBeNull();
+  });
+
+  test('a backup operation failure explains that the original was not replaced', async () => {
+    setup([readerUnit(0, 'Ramza')]);
+    mocks.saveTransaction.mockRejectedValue({ code: 'save_backup_failed' });
+    render(<App />);
+    await openRoster();
+    await openSection('Game');
+    fireEvent.change(screen.getByRole('textbox', { name: 'Gil' }), {
+      target: { value: '101' },
+    });
+    await confirmChanges();
+    expect(
+      await screen.findByText(
+        /Could not create and verify the required backup/,
+      ),
+    ).toBeTruthy();
+    expect(screen.queryByText(/The file may have changed/)).toBeNull();
+    expect(screen.getByRole('textbox', { name: 'Gil' })).toHaveProperty(
+      'value',
+      '101',
+    );
+    expect(mocks.saveTransaction).toHaveBeenCalledTimes(1);
   });
 
   test('identifies the recovery file if save rotation cannot roll back', async () => {

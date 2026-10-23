@@ -820,13 +820,15 @@ export function SaveWorkspace({
       setSaveError(
         code === 'save_recovery_required'
           ? 'Could not finish saving. The original save is in the file with " - backup" in its name beside the selected save. Recover that file before trying again.'
-          : code === 'equipment_stock_exhausted'
-            ? 'Not enough held copies remain for the staged equipment changes.'
-            : code === 'equipment_stock_full'
-              ? 'The staged equipment changes would put a held item above 99.'
-              : code?.startsWith('equipment_')
-                ? 'This equipment change is unavailable for the selected job, slot or hand combination. Reload the save and review the choices.'
-                : `Could not save changes. The file may have changed; check the selected slot before trying again.${code ? ` Code: ${code}.` : ''}`,
+          : code === 'save_backup_failed'
+            ? 'Could not create and verify the required backup. The original save was not replaced. Check folder permissions, free space and filesystem support for file replacement.'
+            : code === 'equipment_stock_exhausted'
+              ? 'Not enough held copies remain for the staged equipment changes.'
+              : code === 'equipment_stock_full'
+                ? 'The staged equipment changes would put a held item above 99.'
+                : code?.startsWith('equipment_')
+                  ? 'This equipment change is unavailable for the selected job, slot or hand combination. Reload the save and review the choices.'
+                  : `Could not save changes. The file may have changed; check the selected slot before trying again.${code ? ` Code: ${code}.` : ''}`,
       );
       setReviewOpen(false);
     } finally {

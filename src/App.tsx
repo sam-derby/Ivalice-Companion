@@ -51,8 +51,9 @@ function errorMessage(error: IpcError | null): string {
   }
   switch (error?.code) {
     case 'unsupported_location':
+      return 'The selected file or one of its folders changed or could not be verified. Close the game, then choose the save again.';
     case 'identity_unavailable':
-      return 'This location cannot provide safe local save access. Copy the save to a supported local folder, then choose that copy.';
+      return 'The selected file did not provide a stable file identity. The save was not loaded. Close the game, then choose the save again.';
     case 'access_denied':
       return 'Permission to read the selected save or one of its folders was denied. Check the file and folder permissions, then choose the save again.';
     case 'link_resolution':
@@ -63,6 +64,10 @@ function errorMessage(error: IpcError | null): string {
       return 'This save is open for reading. Editing is disabled because its filesystem is mounted read-only.';
     case 'save_driver_read_only':
       return 'This save is open for reading. Editing is disabled because safe backup and replacement have not been verified for this filesystem driver. Choose a copy in a supported local folder to edit.';
+    case 'save_driver_unverified':
+      return 'Editing on this filesystem has not been verified. Keep a separate backup before saving. The editor will also create and verify a backup and stop if required file operations fail.';
+    case 'save_driver_atomic_replace':
+      return 'This filesystem driver may not support the file replacement required for saving. Keep a separate backup before saving. The editor will verify its backup and stop if the required replacement operation fails.';
     case 'save_driver_no_safe_replace':
       return 'This save is open for reading. Editing is disabled because NTFS-3G cannot safely replace the save without risking an overwrite of a concurrent file. Choose a copy in a supported local folder to edit.';
   }
@@ -105,6 +110,7 @@ export function App() {
   const [readerError, setReaderError] = useState<IpcError | null>(null);
   const [editContext, setEditContext] = useState<EditContext | null>(null);
   const [editUnavailable, setEditUnavailable] = useState<IpcError | null>(null);
+  const [editWarning, setEditWarning] = useState<IpcError | null>(null);
   const [hasPending, setHasPending] = useState(false);
   const [pendingAction, setPendingAction] = useState<PendingAction | null>(
     null,
@@ -158,6 +164,7 @@ export function App() {
     setReaderError(null);
     setEditContext(null);
     setEditUnavailable(null);
+    setEditWarning(null);
     setHasPending(false);
     setNotice(null);
     lastReaderIdentity.current = null;
@@ -176,6 +183,7 @@ export function App() {
     setReaderError(null);
     setEditContext(null);
     setEditUnavailable(null);
+    setEditWarning(null);
     setHasPending(false);
     setNotice(null);
     try {
@@ -214,6 +222,7 @@ export function App() {
       setReaderError(response.readerError);
       setEditContext(response.editContext ?? null);
       setEditUnavailable(response.editUnavailable ?? null);
+      setEditWarning(response.editWarning ?? null);
       setInitialWorkspaceView(
         manualSlotId === null
           ? undefined
@@ -418,6 +427,11 @@ export function App() {
       {editUnavailable && (
         <p className="app-status" role="status">
           {errorMessage(editUnavailable)}
+        </p>
+      )}
+      {editWarning && (
+        <p className="app-status" role="status">
+          {errorMessage(editWarning)}
         </p>
       )}
       {load.state === 'loaded' && save === null && slots.length === 0 && (
