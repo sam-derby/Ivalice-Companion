@@ -5,6 +5,7 @@ use super::ManualParseError;
 use ivalice_domain::reader::{SavedCombatSet, SavedUnitRecord};
 
 pub const SIZE: usize = 600;
+pub(crate) const IN_TRIP_OFFSET: usize = 0x11e;
 pub(crate) const EXP_OFFSET: usize = 0x1c;
 pub(crate) const LEVEL_OFFSET: usize = 0x1d;
 pub(crate) const HP_BASE_OFFSET: usize = 0x20;
@@ -74,6 +75,14 @@ pub struct CombatSetRecord {
 }
 
 impl UnitRecord {
+    /// Ramza's reserved position and all three chapter identities are protected.
+    #[must_use]
+    pub fn can_remove_from_roster(&self, position: usize) -> bool {
+        (1..54).contains(&position)
+            && self.is_active(position)
+            && ivalice_domain::story_roster::ramza_form(self.character).is_none()
+    }
+
     /// TICSaveEditor UnitSaveData.cs at 07ea857 uses 0x00ff for an empty
     /// active equipment field. Older empty records can also contain zero.
     #[must_use]
@@ -203,7 +212,7 @@ impl UnitRecord {
             custom_job_name_raw: copy(bytes, 0xec),
             unit_name_trailing: copy(bytes, 0xfc),
             name_no: u16_le(bytes, 0x11c),
-            in_trip: bytes[0x11e],
+            in_trip: bytes[IN_TRIP_OFFSET],
             parasite: bytes[0x11f],
             egg_color: bytes[0x120],
             psp_killed_num: bytes[0x121],

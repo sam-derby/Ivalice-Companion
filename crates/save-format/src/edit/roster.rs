@@ -23,6 +23,15 @@ const COMBAT_SET_SIZE: usize = 88;
 const SET_SKILLSETS: usize = 0x4c;
 const SET_JOB: usize = 0x56;
 
+/// UnitSaveDataLayout.cs at 07ea857: copy opaque donor bytes, rebind UnitIndex
+/// and clear InTrip. A newly added unit has no errand assignment in this slot.
+pub(crate) fn copy_for_addition(donor: &Record, position: u8) -> Record {
+    let mut added = *donor;
+    added[1] = position;
+    added[unit_record::IN_TRIP_OFFSET] = 0;
+    added
+}
+
 /// New records for every changed position; guest positions are always included
 /// when guests are given.
 pub(crate) fn changes(
@@ -33,6 +42,34 @@ pub(crate) fn changes(
         return Err(GilEditError::Encoding);
     }
     let mut working = current.to_vec();
+    let mut removals = BTreeSet::new();
+    for operation in operations {
+        if let EditOperation::RemoveUnit { unit_position } = operation {
+            if operations.iter().any(|other| {
+                matches!(
+                    other,
+                    EditOperation::StoryGuest { .. }
+                        | EditOperation::StoryMember { .. }
+                        | EditOperation::RamzaForm { .. }
+                )
+            }) {
+                return Err(GilEditError::InvalidField);
+            }
+            let position = usize::from(*unit_position);
+            if !removals.insert(position) {
+                return Err(GilEditError::DuplicateField);
+            }
+            let record = working
+                .get_mut(position)
+                .ok_or(GilEditError::InvalidField)?;
+            if !UnitRecord::parse(record)?.can_remove_from_roster(position) {
+                return Err(GilEditError::InvalidField);
+            }
+            // UnitSaveData.cs IsInActiveParty at 07ea857: dismissed units have
+            // UnitIndex 0xFF. Retain their other fields, including equipment.
+            record[1] = INACTIVE;
+        }
+    }
     let mut forms = operations.iter().filter_map(|operation| match operation {
         EditOperation::RamzaForm { character } => Some(*character),
         _ => None,

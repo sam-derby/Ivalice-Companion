@@ -108,6 +108,58 @@ function firstUnit(document: ReturnType<typeof draftDocument>) {
   return document.roster.value.value[0];
 }
 
+test('Ramza has no removal control; another character can be staged, undone, discarded and saved through review', async () => {
+  const reader = draftDocument();
+  const unit = structuredClone(firstUnit(reader));
+  unit.key = 4;
+  unit.name = knownFact({ text: 'Reis', origin: 'localized_catalogue' });
+  reader.roster = knownFact([firstUnit(reader), unit]);
+  const onReload = vi.fn().mockResolvedValue(undefined);
+  render(
+    <SaveWorkspace
+      reader={reader}
+      context={{
+        ...draftContext(),
+        removableUnitPositions: [4],
+        unitsOnErrands: [4],
+      }}
+      onDirtyChange={vi.fn()}
+      onReload={onReload}
+      manualSlotId={0}
+      initialView={undefined}
+      defaultSection="units"
+      onViewChange={vi.fn()}
+    />,
+  );
+  expect(screen.queryByRole('button', { name: 'Remove character' })).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: /Member .* Reis / }));
+  fireEvent.click(screen.getByRole('button', { name: 'Remove character' }));
+  expect(screen.getByText('Pending removal')).toBeTruthy();
+  expect(mocks.save).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByRole('button', { name: 'Undo removal' }));
+  expect(screen.queryByText('Pending removal')).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: 'Remove character' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Discard all' }));
+  expect(screen.queryByText('Pending removal')).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: 'Remove character' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Review changes' }));
+  const review = screen.getByRole('dialog', { name: 'Review changes' });
+  expect(review.textContent).toContain('Reis removed from roster');
+  fireEvent.click(
+    within(review).getByRole('button', { name: 'Confirm and save' }),
+  );
+  await waitFor(() => {
+    expect(mocks.save).toHaveBeenCalledWith({
+      snapshotGeneration: draftContext().snapshotGeneration,
+      manualSlotId: 0,
+      operations: [{ kind: 'remove_unit', unitPosition: 4 }],
+    });
+  });
+  await waitFor(() => {
+    expect(onReload).toHaveBeenCalled();
+  });
+});
+
 test('PA errors are immediate, typing defers calculation, and a committed input visibly calculates only that stat', async () => {
   const document = draftDocument();
   const unit = firstUnit(document);

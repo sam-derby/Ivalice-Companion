@@ -33,6 +33,9 @@ pub(super) struct SaveTransactionRequest {
     deny_unknown_fields
 )]
 enum RequestedOperation {
+    RemoveUnit {
+        unit_position: u8,
+    },
     CreateCreature {
         form_key: String,
         unit_position: u8,
@@ -265,6 +268,18 @@ pub(super) fn parse_transaction_request(
         .operations
         .iter()
         .map(|operation| match operation {
+            RequestedOperation::RemoveUnit { unit_position } => {
+                if !(1..54).contains(unit_position) {
+                    return Err(IpcError::simple(
+                        IpcErrorCategory::Input,
+                        "invalid_unit_removal",
+                        false,
+                    ));
+                }
+                Ok(EditOperation::RemoveUnit {
+                    unit_position: *unit_position,
+                })
+            }
             RequestedOperation::Gil { value } => {
                 parse_gil(value).map(|value| EditOperation::Gil { value })
             }
@@ -730,6 +745,7 @@ pub(super) fn parse_transaction_request(
     let mut fields = std::collections::BTreeSet::new();
     for operation in &operations {
         let field = match operation {
+            EditOperation::RemoveUnit { unit_position } => 1_400_000 + u32::from(*unit_position),
             EditOperation::CopyUnitFromSlot { .. }
             | EditOperation::RebindUnitFromSlot { .. }
             | EditOperation::EventVariable { .. }
@@ -928,7 +944,8 @@ pub(super) fn save_selected_operations(
         .iter()
         .find_map(|operation| match operation {
             EditOperation::Gil { value } => Some(*value),
-            EditOperation::StoryProgress { .. }
+            EditOperation::RemoveUnit { .. }
+            | EditOperation::StoryProgress { .. }
             | EditOperation::CalendarDate { .. }
             | EditOperation::Achievement { .. }
             | EditOperation::EventVariable { .. }
@@ -1380,6 +1397,28 @@ pub(super) fn map_save_edit_error(error: SaveEditError) -> IpcError {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn unit_removal_requests_are_explicit_bounded_and_duplicate_checked(
+    ) -> Result<(), super::IpcError> {
+        let request =
+            |operations| json!({"snapshotGeneration":1,"manualSlotId":0,"operations":operations});
+        let parsed =
+            parse_transaction_request(request(json!([{"kind":"remove_unit","unitPosition":4}])))?;
+        assert_eq!(
+            parsed.1,
+            vec![EditOperation::RemoveUnit { unit_position: 4 }]
+        );
+        for operations in [
+            json!([{"kind":"remove_unit","unitPosition":0}]),
+            json!([{"kind":"remove_unit","unitPosition":54}]),
+            json!([{"kind":"remove_unit","unitPosition":4,"character":2}]),
+            json!([{"kind":"remove_unit","unitPosition":4},{"kind":"remove_unit","unitPosition":4}]),
+        ] {
+            assert!(parse_transaction_request(request(operations)).is_err());
+        }
+        Ok(())
+    }
+
     #[test]
     fn progression_operations_are_independent_strict_and_duplicate_checked() {
         use serde_json::json;

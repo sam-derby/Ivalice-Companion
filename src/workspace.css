@@ -924,6 +924,10 @@ body {
   min-height: 0;
   overflow: auto;
 }
+.workspace-unit-tabs[hidden],
+.workspace-unit-panel[hidden] {
+  display: none;
+}
 .workspace-unit-panel[data-panel='jobs'] {
   overflow: hidden;
 }

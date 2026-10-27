@@ -355,6 +355,7 @@ export interface EditContext {
     description: string;
   }[];
   unitsOnErrands?: number[];
+  removableUnitPositions?: number[];
   jobOptions?: {
     unitPosition: number;
     jobSlots: number[];
@@ -449,6 +450,7 @@ export interface SaveTransactionRequest {
   snapshotGeneration: number;
   manualSlotId: number;
   operations: (
+    | { kind: 'remove_unit'; unitPosition: number }
     | {
         kind: 'create_creature';
         formKey: string;

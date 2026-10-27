@@ -319,6 +319,13 @@ export function useDraftProjection(
     setProjection(null);
     setFailure(null);
   }
+  function discardUnit(position: number) {
+    setInputs((current) =>
+      current.filter((input) => input.position !== position),
+    );
+    setProjection(null);
+    setFailure(null);
+  }
   const error = failure?.key === key ? failure.message : null;
   return {
     reader: required ? (projection?.reader ?? null) : null,
@@ -330,6 +337,7 @@ export function useDraftProjection(
     commitAll,
     resetStat,
     discard,
+    discardUnit,
     hasErrors: inputs.some((input) => input.error !== null) || !!error,
     blocked: busy || inputs.length > 0 || !!error,
     current: projection?.key === key,

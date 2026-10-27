@@ -4,6 +4,8 @@
 
 mod progression;
 mod roster;
+#[cfg(test)]
+mod roster_tests;
 mod story;
 pub use progression::BaseStatKind;
 
@@ -37,6 +39,10 @@ pub enum GilEditError {
 /// Further verified fields can be added without changing the container path.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum EditOperation {
+    /// Dismiss an active unit by marking its record inactive. Ramza is protected.
+    RemoveUnit {
+        unit_position: u8,
+    },
     /// Owner-authorized experimental construction without a saved donor.
     CreateCreature {
         form_id: u16,
@@ -534,6 +540,26 @@ fn edit_enhanced_png_inner(
     abilities: Option<&ValidatedAbilityFlags>,
     preview: bool,
 ) -> Result<PreparedEdit, GilEditError> {
+    if operations
+        .iter()
+        .any(|operation| matches!(operation, EditOperation::RemoveUnit { .. }))
+    {
+        let original = crate::decode_enhanced_png(input, Some(dictionary))?;
+        let records = original
+            .unit_records(slot)?
+            .ok_or(GilEditError::InvalidField)?;
+        for operation in operations {
+            if let EditOperation::RemoveUnit { unit_position } = operation {
+                let position = usize::from(*unit_position);
+                if records
+                    .get(position)
+                    .is_none_or(|unit| !unit.can_remove_from_roster(position))
+                {
+                    return Err(GilEditError::InvalidField);
+                }
+            }
+        }
+    }
     // All initialization precedes field edits; the filesystem caller replaces once.
     // Donors must be active in the immutable input, never another pending addition.
     if operations.len() > 1 && operations.iter().any(is_character_addition) {
@@ -685,7 +711,8 @@ fn edit_enhanced_png_inner(
         match operation {
             EditOperation::StoryGuest { .. }
             | EditOperation::StoryMember { .. }
-            | EditOperation::RamzaForm { .. } => {
+            | EditOperation::RamzaForm { .. }
+            | EditOperation::RemoveUnit { .. } => {
                 if staged_roster.is_some() {
                     continue;
                 }
@@ -700,11 +727,12 @@ fn edit_enhanced_png_inner(
                     .collect::<Result<Vec<_>, _>>()?;
                 let changes = roster::changes(operations, &current)?;
                 if operations.iter().any(|other| {
-                    unit_position(other).is_some_and(|position| {
-                        changes
-                            .iter()
-                            .any(|(changed, _)| *changed == usize::from(position))
-                    })
+                    !matches!(other, EditOperation::RemoveUnit { .. })
+                        && unit_position(other).is_some_and(|position| {
+                            changes
+                                .iter()
+                                .any(|(changed, _)| *changed == usize::from(position))
+                        })
                 }) {
                     return Err(GilEditError::InvalidField);
                 }
@@ -1104,9 +1132,8 @@ fn edit_enhanced_png_inner(
                     manual::inactive_party_unit_payload_offset(&payload, slot, *unit_position)
                         .map_err(|_| GilEditError::InvalidField)?;
                 let end = base + manual::unit_record::SIZE;
-                let mut created = *donor.bytes();
+                let mut created = roster::copy_for_addition(donor.bytes(), *unit_position);
                 // TICSaveEditor.Core/Records/UnitSaveData.cs UnitIndex and UnitNicknameRaw at 07ea857.
-                created[1] = *unit_position;
                 created[0xdc..0xec].copy_from_slice(nickname);
                 payload
                     .get_mut(base..end)
@@ -1137,9 +1164,8 @@ fn edit_enhanced_png_inner(
                     manual::inactive_party_unit_payload_offset(&payload, slot, *unit_position)
                         .map_err(|_| GilEditError::InvalidField)?;
                 let end = base + manual::unit_record::SIZE;
-                let mut added = *donor.bytes();
+                let added = roster::copy_for_addition(donor.bytes(), *unit_position);
                 // TICSaveEditor.Core/Records/UnitSaveData.cs UnitIndex at 07ea857.
-                added[1] = *unit_position;
                 payload
                     .get_mut(base..end)
                     .ok_or(GilEditError::Encoding)?
@@ -1169,9 +1195,8 @@ fn edit_enhanced_png_inner(
                     manual::inactive_party_unit_payload_offset(&payload, slot, *unit_position)
                         .map_err(|_| GilEditError::InvalidField)?;
                 let end = base + manual::unit_record::SIZE;
-                let mut added = *donor.bytes();
+                let added = roster::copy_for_addition(donor.bytes(), *unit_position);
                 // TICSaveEditor.Core/Records/UnitSaveData.cs UnitIndex at 07ea857.
-                added[1] = *unit_position;
                 payload
                     .get_mut(base..end)
                     .ok_or(GilEditError::Encoding)?
@@ -1243,11 +1268,10 @@ fn edit_enhanced_png_inner(
                     manual::inactive_party_unit_payload_offset(&payload, slot, *unit_position)
                         .map_err(|_| GilEditError::InvalidField)?;
                 let end = base + manual::unit_record::SIZE;
-                let mut added = *donor.bytes();
+                let mut added = roster::copy_for_addition(donor.bytes(), *unit_position);
                 // TICSaveEditor.Core/Records/{Layouts/UnitSaveDataLayout,UnitSaveData}.cs at 07ea857:
                 // Character, UnitIndex, UnitNickname, NameNo and CharaNameKey.
                 added[0] = *character;
-                added[1] = *unit_position;
                 added[0xdc..0xec].fill(0);
                 added[0x11c..0x11e].fill(0);
                 added[0x230..0x232].copy_from_slice(&u16::from(*character).to_le_bytes());
@@ -1507,6 +1531,7 @@ fn edit_enhanced_png_inner(
 
 fn unit_position(operation: &EditOperation) -> Option<u8> {
     match operation {
+        EditOperation::RemoveUnit { unit_position } => Some(*unit_position),
         EditOperation::CreateCreature { unit_position, .. }
         | EditOperation::Gear { unit_position, .. }
         | EditOperation::CharacterLevel { unit_position, .. }

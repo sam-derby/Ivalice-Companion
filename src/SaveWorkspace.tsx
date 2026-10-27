@@ -1414,6 +1414,11 @@ export function SaveWorkspace({
                             On an errand
                           </span>
                         )}
+                        {draft.removals?.includes(row.key) && (
+                          <span className="workspace-membership">
+                            Pending removal
+                          </span>
+                        )}
                       </button>
                     );
                   })}
@@ -1422,6 +1427,34 @@ export function SaveWorkspace({
                   {unit ? (
                     <>
                       <header className="workspace-unit-header">
+                        {context?.removableUnitPositions?.includes(unit.key) &&
+                          !draft.additions?.some(
+                            (addition) =>
+                              addition.operation.unitPosition === unit.key,
+                          ) && (
+                            <button
+                              type="button"
+                              disabled={
+                                busy || previewBusy || statsPreview.busy
+                              }
+                              onClick={() => {
+                                setReviewOpen(false);
+                                statsPreview.discardUnit(unit.key);
+                                setDraft((current) => ({
+                                  ...current,
+                                  removals: current.removals?.includes(unit.key)
+                                    ? current.removals.filter(
+                                        (position) => position !== unit.key,
+                                      )
+                                    : [...(current.removals ?? []), unit.key],
+                                }));
+                              }}
+                            >
+                              {draft.removals?.includes(unit.key)
+                                ? 'Undo removal'
+                                : 'Remove character'}
+                            </button>
+                          )}
                         {draft.additions?.some(
                           (addition) =>
                             addition.operation.unitPosition === unit.key,
@@ -1470,9 +1503,17 @@ export function SaveWorkspace({
                           </span>
                         )}
                       </header>
+                      {draft.removals?.includes(unit.key) && (
+                        <p role="status">
+                          This character will be removed when you review and
+                          save. Equipped items are not returned to inventory.
+                          Undo removal to keep editing this character.
+                        </p>
+                      )}
                       <nav
                         className="workspace-unit-tabs"
                         aria-label="Unit panels"
+                        hidden={draft.removals?.includes(unit.key)}
                       >
                         {(
                           [
@@ -1497,6 +1538,7 @@ export function SaveWorkspace({
                         key={panel}
                         className="workspace-unit-panel"
                         data-panel={panel}
+                        hidden={draft.removals?.includes(unit.key)}
                       >
                         {panel === 'status' && (
                           <WorkspaceStatus
@@ -1582,7 +1624,10 @@ export function SaveWorkspace({
                                               (row) => row.slot === slot,
                                             )?.currentKey
                                           ) {
-                                            gear[slot] = { itemKey, source };
+                                            gear[slot] = {
+                                              itemKey,
+                                              source,
+                                            };
                                           }
                                           return { ...current, gear };
                                         });

@@ -44,6 +44,7 @@ export interface PendingAddition {
 export interface EditorDraft {
   creature?: { formKey: string; name: string } | null;
   additions?: PendingAddition[];
+  removals?: number[];
   gil: string;
   storyStep?: string;
   calendar?: { month: number; day: number };
@@ -316,8 +317,34 @@ export function collectDraft(
   }
 
   const roster = reader?.roster.value;
+  for (const position of draft.removals ?? []) {
+    const unit =
+      roster?.state === 'known'
+        ? roster.value.find((row) => row.key === position)
+        : undefined;
+    if (
+      !unit ||
+      !context.removableUnitPositions?.includes(position) ||
+      (draft.storyStep !== undefined &&
+        draft.storyStep !== String(context.storyStep))
+    ) {
+      review.errors.push(
+        'This character cannot be removed. Save or discard any story step change first.',
+      );
+      continue;
+    }
+    review.operations.push({ kind: 'remove_unit', unitPosition: position });
+    review.changes.push({
+      group: unitLabel(unit),
+      label: 'Roster',
+      before: 'Present',
+      after: 'Removed',
+      summary: `${unitLabel(unit)} removed from roster (equipped items are not returned to inventory)`,
+    });
+  }
   for (const [positionText, unitDraft] of Object.entries(draft.units)) {
     const position = Number(positionText);
+    if (draft.removals?.includes(position)) continue;
     const unit =
       roster?.state === 'known'
         ? roster.value.find((row) => row.key === position)

@@ -55,6 +55,7 @@ pub struct EditContext {
     pub collection: Vec<CollectionInfo>,
     /// Active unit positions whose saved errand byte (InTrip) is set.
     pub units_on_errands: Vec<u8>,
+    pub removable_unit_positions: Vec<u8>,
     pub backup_available: bool,
     pub job_options: Vec<EditJobOptions>,
     pub zodiac_options: Vec<EditZodiacOptions>,
@@ -673,6 +674,17 @@ pub(super) fn project_selected_reader(
                             .filter(|(position, unit)| {
                                 unit.is_active(*position) && unit.in_trip != 0
                             })
+                            .filter_map(|(position, _)| u8::try_from(position).ok())
+                            .collect()
+                    })
+                    .unwrap_or_default(),
+                removable_unit_positions: targets
+                    .as_ref()
+                    .map(|units| {
+                        units
+                            .iter()
+                            .enumerate()
+                            .filter(|(position, unit)| unit.can_remove_from_roster(*position))
                             .filter_map(|(position, _)| u8::try_from(position).ok())
                             .collect()
                     })
@@ -1585,6 +1597,7 @@ mod tests {
                 description: "Brooches.".into(),
             }],
             units_on_errands: vec![5, 6],
+            removable_unit_positions: vec![5, 6],
             zodiac_options: vec![EditZodiacOptions {
                 unit_position: 0,
                 current: ivalice_domain::identity::ZodiacSign::Aries,
@@ -1707,6 +1720,7 @@ mod tests {
         assert_eq!(wire["errands"][0]["posting"], "Salvage the ship.");
         assert_eq!(wire["collection"][0]["kind"], "artefact");
         assert_eq!(wire["unitsOnErrands"][1], 6);
+        assert_eq!(wire["removableUnitPositions"], serde_json::json!([5, 6]));
         assert_eq!(wire["storyChoices"][0]["chapter"], "Chapter 3");
         assert!(wire["storyChoices"][0]["objective"].is_null());
         assert_eq!(wire["storyChoices"][0]["guests"][0], "Agrias");

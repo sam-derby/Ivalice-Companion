@@ -24,6 +24,37 @@ function draft() {
   } satisfies EditorDraft;
 }
 
+test('removal reviews the selected character, suppresses its field edits and rejects protected or story conflicts', () => {
+  const reader = draftDocument();
+  const unit = draftUnit();
+  unit.key = 4;
+  unit.name = knownFact({ text: 'Reis', origin: 'localized_catalogue' });
+  reader.roster = knownFact([draftUnit(), unit]);
+  const context = {
+    ...draftContext(),
+    removableUnitPositions: [4],
+    unitsOnErrands: [4],
+  };
+  const staged: EditorDraft = {
+    ...draft(),
+    removals: [4],
+    units: { 4: { ...emptyUnitDraft(), faith: '30' } },
+  };
+  const review = collectDraft(reader, context, staged);
+  expect(review.errors).toEqual([]);
+  expect(review.operations).toEqual([{ kind: 'remove_unit', unitPosition: 4 }]);
+  expect(review.changes[0]?.summary).toContain('Reis removed from roster');
+  expect(
+    collectDraft(reader, context, { ...staged, removals: [0] }).operations,
+  ).not.toContainEqual({ kind: 'remove_unit', unitPosition: 0 });
+  expect(
+    collectDraft(reader, context, { ...staged, removals: [0] }).errors.length,
+  ).toBeGreaterThan(0);
+  expect(
+    collectDraft(reader, context, { ...staged, storyStep: '123' }).operations,
+  ).not.toContainEqual({ kind: 'remove_unit', unitPosition: 4 });
+});
+
 describe('date and achievement review', () => {
   const context = () => ({
     ...draftContext(),
